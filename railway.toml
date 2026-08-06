@@ -1,6 +1,5 @@
 [build]
-builder = "RAILPACK"
-buildCommand = "npm ci"
+builder = "DOCKERFILE"
 
 [deploy]
 startCommand = "npm run db:init && npm start"

@@ -154,7 +154,30 @@ describe('Rotas de partidas', () => {
       .type('form')
       .send({ jogador_a_id: String(a.id), jogador_b_id: String(b.id), vencedor_id: String(intruso.id) })
     expect(res.status).toBe(400)
-    expect(res.text).toContain('não pertence a este evento')
+    // O validador intercepta antes do service, mas mantém a rejeição
+    // de um vencedor que não é participante (400).
+    expect(res.text).toMatch(/vencedor deve ser o jogador A ou o jogador B|não pertence a este evento/)
+  })
+
+  it('POST rejeita jogador A igual ao jogador B com erro de campo', async () => {
+    const { evento, a } = criarCenario()
+    const res = await request(app)
+      .post(`/eventos/${evento.id}/partidas`)
+      .type('form')
+      .send({ jogador_a_id: String(a.id), jogador_b_id: String(a.id), vencedor_id: String(a.id) })
+    expect(res.status).toBe(400)
+    expect(res.text).toContain('O jogador B não pode ser o mesmo que o jogador A.')
+  })
+
+  it('POST rejeita vencedor que não é um dos dois jogadores da partida', async () => {
+    const { evento, a, b } = criarCenario()
+    const c = JogadorService.criar({ evento_id: evento.id, nome: 'C' })
+    const res = await request(app)
+      .post(`/eventos/${evento.id}/partidas`)
+      .type('form')
+      .send({ jogador_a_id: String(a.id), jogador_b_id: String(b.id), vencedor_id: String(c.id) })
+    expect(res.status).toBe(400)
+    expect(res.text).toContain('O vencedor deve ser o jogador A ou o jogador B.')
   })
 
   it('GET form de nova partida avisa quando faltam jogadores', async () => {

@@ -22,7 +22,8 @@
 | F4 | Sorteio automático do próximo adversário | ✔ |
 | F5 | Ranking por evento (V → D → ordem de cadastro) | ✔ |
 | Extra | Campanha individual (de quem ganhou/perdeu) | ✔ |
-| F6 | UX (responsividade, navegação, refinamentos) | ⏳ |
+| F6 | UX (responsividade, navegação, refinamentos) | ✔ |
+| F6.1 | Interface mobile premium (tema escuro, bottom nav, cards) | ✔ |
 | F7 | Testes de integração adicionais | ⏳ |
 | F8 | Evoluções (ranking entre eventos, múltiplas mesas) | ⏳ |
 
@@ -723,6 +724,70 @@ são vinculantes e já estão refletidas nas seções 3 (RF), 5 (regras de negó
 4. Após cada fase, revisar código e executar os testes da fase correspondente.
 5. Revisar (via revisor) os marcos principais: modelagem (F0), eventos (F1),
    sorteio (F4) e ranking (F5).
+
+---
+
+## 13. Interface Mobile Premium (Fase 6.1 — decisão técnica)
+
+### 13.1 Contexto
+
+O usuário opera o sistema **principalmente no celular**, mas o desktop precisa
+continuar perfeito. Decidiu-se por uma **interface mobile premium** (estilo
+Apple/Tesla/Notion): tema escuro como padrão, cartões, bottom navigation e
+microinterações, **sem alterar nenhuma regra de negócio**.
+
+### 13.2 Estratégia adotada
+
+A camada de **apresentação** (EJS + CSS + JS de front) foi melhorada sem tocar
+em rotas, services, repositories, validators, schema SQL ou regras de negócio.
+
+| Camada | Alteração |
+|--------|-----------|
+| **CSS** | Novo `public/css/premium.css` (design system) carregado **após** `style.css`; o antigo permanece como base mobile-first. |
+| **JS** | Novo `public/js/app.js` (scroll-spy, FAB contextual, barras animadas, ripple, confirmação de exclusão). `theme.js` atualizado para padrão escuro no mobile. |
+| **Partials** | `header.ejs` (fonte Inter, CSS premium, toggle sempre visível), `footer.ejs` (sem nav fixa), novo `bottomnav.ejs` (bottom navigation). |
+| **Views** | `home`, `eventos/detalhe`, `eventos/form`, `jogadores/form`, `jogadores/campanha`, `partidas/form`, `404`, `500` redesenhadas mantendo **todos os `name`/`action`** dos formulários. |
+
+### 13.3 Decisões de design
+
+1. **Tema escuro como principal**: no mobile, o padrão é **dark** (identidade
+   premium); o toggle claro/escuro continua disponível e o desktop preserva a
+   preferência do sistema + `localStorage`.
+2. **Bottom navigation**: fixa no mobile com 4 itens (Dashboard, Ranking,
+   Jogadores, Partidas) apontando para âncoras da página do evento; **some no
+   desktop** (>= 768px), onde a navegação é via navbar/topbar.
+3. **FAB contextual**: no mobile, botão flutuante que muda de ação conforme a
+   seção ativa (Jogadores → "Adicionar jogador"; demais → "Nova partida"). Some
+   no desktop.
+4. **Cards em vez de tabelas**: Ranking, Jogadores e Partidas usam cartões
+   modernos (avatar, medalhas 🥇🥈🥉, barras de aproveitamento, timeline VS),
+   com `data-label` preservado quando ainda há tabela (ex.: nenhum caso restante
+   — todas as telas principais foram convertidas).
+5. **Dashboard**: hero com badge de status colorido + datas, 3 botões grandes
+   (Editar / Iniciar-Encerrar / Excluir), card "Próximo Adversário" com sorteio
+   brilhante e card "Resumo do Evento" com estatísticas e progresso.
+6. **Acessibilidade**: `aria-label`, `aria-current` na bottom nav, focus-visible,
+   `prefers-reduced-motion`, contraste adequado.
+7. **Sem dependências novas**: ícones SVG inline (Lucide-like), fonte Inter via
+   Google Fonts CDN (mesmo padrão do Bootstrap via CDN), zero libs de animação.
+
+### 13.4 Compatibilidade com testes
+
+As strings verificadas pelos testes de smoke/integração foram preservadas
+(`Tabela de Sinuca`, `Ranking`, `Vitórias`, `Aproveitamento`, `Próximo confronto
+sugerido`, `ao menos`, `Campanha de ...`, `Vitória`, mensagens de validação).
+O único ajuste foi em `tests/partidas.test.js`: a asserção `não pertence a este
+evento` tornou-se `toMatch(/vencedor deve ser o jogador A ou o jogador B|não
+pertence a este evento/)` porque o validador de partida (já existente no working
+tree) passa a interceptar vencedores fora de {A, B} antes do service — a intenção
+do teste (rejeição com 400) é mantida.
+
+### 13.5 Verificação
+
+- `npm test` → **52/52 testes passando** (7 arquivos).
+- `npm start` + `GET` nas rotas principais (`/`, `/eventos/:id`, `/sorteio`,
+  `/eventos/novo`, forms, campanha) → **200 OK**.
+- Assets `/css/premium.css`, `/js/app.js` → **200 OK**.
 
 ---
 

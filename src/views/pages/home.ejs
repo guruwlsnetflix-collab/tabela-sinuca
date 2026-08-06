@@ -1,47 +1,51 @@
 <%- include('../partials/header', { title: 'Tabela de Sinuca' }) %>
 
 <% if (typeof msg !== 'undefined' && msg) { %>
-  <div class="alert alert-success"><%= msg %></div>
+  <div class="p-alert p-alert--success mb-4" role="status"><%= msg %></div>
 <% } %>
 <% if (typeof erro !== 'undefined' && erro) { %>
-  <div class="alert alert-danger"><%= erro %></div>
+  <div class="p-alert p-alert--danger mb-4" role="alert"><%= erro %></div>
 <% } %>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-  <h1 class="mb-0">Eventos</h1>
-  <a href="/eventos/novo" class="btn btn-primary">+ Novo evento</a>
+<div class="d-flex align-items-center justify-content-between mb-4 gap-3">
+  <div class="min-w-0">
+    <h1 class="p-page__title h2 mb-0">Eventos</h1>
+    <p class="p-page__subtitle mb-0">Campeonatos e rodadas da sua galera</p>
+  </div>
+  <a href="/eventos/novo" class="btn btn-primary p-btn p-btn--primary flex-shrink-0">
+    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+    Novo evento
+  </a>
 </div>
 
 <% if (eventos.length === 0) { %>
-  <div class="alert alert-info">
-    Nenhum evento cadastrado ainda. Crie o primeiro evento para começar.
+  <div class="p-empty">
+    <div class="p-empty__icon">
+      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+    </div>
+    <div>
+      <p class="fw-semibold mb-1">Nenhum evento cadastrado ainda</p>
+      <p class="mb-0">Crie o primeiro evento para começar.</p>
+    </div>
   </div>
 <% } else { %>
-  <div class="table-responsive">
-    <table class="table table-cards table-striped align-middle">
-      <thead>
-        <tr>
-          <th>Evento</th>
-          <th>Início</th>
-          <th>Fim</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% eventos.forEach((e) => { %>
-          <tr>
-            <td data-label="Evento"><strong><%= e.nome %></strong></td>
-            <td data-label="Início"><%= e.data_inicio %></td>
-            <td data-label="Fim"><%= e.data_fim %></td>
-            <td data-label="Status"><span class="badge text-bg-secondary"><%= e.status %></span></td>
-            <td data-label="Ações" class="text-end">
-              <a href="/eventos/<%= e.id %>" class="btn btn-sm btn-outline-primary">Abrir</a>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+  <div class="p-event-list p-stagger">
+    <% eventos.forEach((e) => { %>
+      <a href="/eventos/<%= e.id %>" class="p-event-card">
+        <div class="p-event-card__icon" aria-hidden="true">🎱</div>
+        <div class="p-event-card__main">
+          <div class="p-event-card__name"><%= e.nome %></div>
+          <div class="p-event-card__dates">
+            <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+            <%= e.data_inicio %> → <%= e.data_fim %>
+          </div>
+          <span class="badge text-bg-secondary mt-2">
+            <%= e.status === 'em_andamento' ? 'Em andamento' : (e.status === 'planejado' ? 'Planejado' : 'Encerrado') %>
+          </span>
+        </div>
+        <svg class="p-icon p-event-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </a>
+    <% }) %>
   </div>
 <% } %>
 

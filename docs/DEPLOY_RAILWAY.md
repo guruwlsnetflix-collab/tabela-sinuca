@@ -9,8 +9,10 @@ Guia passo a passo para publicar o **tabela-sinuca** na [Railway](https://railwa
   (`https://github.com/guruwlsnetflix-collab/tabela-sinuca`).
 
 > O projeto já vem com um `railway.toml` na raiz configurando build e deploy.
-> O aplicativo lê a variável `PORT` fornecida pela Railway e o banco SQLite é
-> persistido em um **volume**.
+> O builder é **`DOCKERFILE`** (usa o `Dockerfile` na raiz, mais determinístico
+> que o builder padrão — o Railpack — que pode falhar intermitentemente ao
+> baixar/descompactar o snapshot do repositório). O aplicativo lê a variável
+> `PORT` fornecida pela Railway e o banco SQLite é persistido em um **volume**.
 
 ## Passo 1 — Criar o projeto na Railway
 
@@ -81,14 +83,9 @@ Para desativar: **Settings** → **Deployments** → desative *Auto Deploy*.
 ### O deploy falha ao compilar o `better-sqlite3`
 
 `better-sqlite3` é um módulo nativo. Ele possui binários pré-compilados para
-Linux x64 (padrão da Railway). Se a compilação falhar, verifique nos **logs do
-build** se faltam ferramentas de compilação. Em último caso, force a instalação
-dos pré-built adicionando na seção `[build]` do `railway.toml`:
-
-```toml
-[build]
-buildCommand = "npm ci --no-audit --no-fund"
-```
+Linux x64 (padrão da Railway). O `Dockerfile` já instala `python3`, `make` e
+`g++` como fallback de compilação. Se mesmo assim a compilação falhar, verifique
+os **logs do build** para identificar o erro exato do `node-gyp`.
 
 ### O banco "some" após um novo deploy
 

@@ -1,67 +1,77 @@
 <%- include('../../partials/header', { title }) %>
 
 <div class="mb-4">
-  <h1 class="mb-0"><%= title %></h1>
-  <p class="text-muted mb-0">Evento: <%= evento.nome %></p>
+  <h1 class="p-page__title h2 mb-1"><%= title %></h1>
+  <p class="p-page__subtitle mb-0">Evento: <%= evento.nome %></p>
 </div>
 
 <% if (erros && erros.geral) { %>
-  <div class="alert alert-danger"><%= erros.geral %></div>
+  <div class="p-alert p-alert--danger mb-4" role="alert"><%= erros.geral %></div>
 <% } %>
 
 <form method="POST"
       action="<%= jogador.id ? '/eventos/' + evento.id + '/jogadores/' + jogador.id : '/eventos/' + evento.id + '/jogadores' %>">
-  <div class="mb-3">
-    <label for="nome" class="form-label">Nome *</label>
-    <input
-      type="text"
-      class="form-control <%= erros && erros.nome ? 'is-invalid' : '' %>"
-      id="nome"
-      name="nome"
-      value="<%= jogador.nome %>"
-      required
-      maxlength="120"
-    >
-    <% if (erros && erros.nome) { %>
-      <div class="invalid-feedback"><%= erros.nome %></div>
-    <% } %>
-  </div>
+  <div class="p-card">
+    <div class="p-card__body">
+      <div class="p-field mb-3">
+        <label for="nome" class="form-label">Nome *</label>
+        <input
+          type="text"
+          class="form-control <%= erros && erros.nome ? 'is-invalid' : '' %>"
+          id="nome"
+          name="nome"
+          value="<%= jogador.nome %>"
+          required
+          maxlength="120"
+          placeholder="Nome do jogador"
+        >
+        <% if (erros && erros.nome) { %>
+          <div class="invalid-feedback"><%= erros.nome %></div>
+        <% } %>
+      </div>
 
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <label for="apelido" class="form-label">Apelido</label>
-      <input
-        type="text"
-        class="form-control <%= erros && erros.apelido ? 'is-invalid' : '' %>"
-        id="apelido"
-        name="apelido"
-        value="<%= jogador.apelido %>"
-        maxlength="60"
-      >
-      <% if (erros && erros.apelido) { %>
-        <div class="invalid-feedback"><%= erros.apelido %></div>
-      <% } %>
+      <div class="row g-3">
+        <div class="col-md-6 p-field">
+          <label for="apelido" class="form-label">Apelido</label>
+          <input
+            type="text"
+            class="form-control <%= erros && erros.apelido ? 'is-invalid' : '' %>"
+            id="apelido"
+            name="apelido"
+            value="<%= jogador.apelido %>"
+            maxlength="60"
+            placeholder="Ex.: Magrão"
+          >
+          <% if (erros && erros.apelido) { %>
+            <div class="invalid-feedback"><%= erros.apelido %></div>
+          <% } %>
+        </div>
+
+        <div class="col-md-6 p-field">
+          <label for="telefone" class="form-label">Telefone</label>
+          <input
+            type="text"
+            class="form-control <%= erros && erros.telefone ? 'is-invalid' : '' %>"
+            id="telefone"
+            name="telefone"
+            value="<%= jogador.telefone %>"
+            maxlength="30"
+            placeholder="(11) 99999-9999"
+          >
+          <% if (erros && erros.telefone) { %>
+            <div class="invalid-feedback"><%= erros.telefone %></div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex mt-4">
+        <button type="submit" class="btn p-btn p-btn--primary">
+          <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Salvar
+        </button>
+        <a href="/eventos/<%= evento.id %>" class="btn p-btn p-btn--outline">Cancelar</a>
+      </div>
     </div>
-
-    <div class="col-md-6 mb-3">
-      <label for="telefone" class="form-label">Telefone</label>
-      <input
-        type="text"
-        class="form-control <%= erros && erros.telefone ? 'is-invalid' : '' %>"
-        id="telefone"
-        name="telefone"
-        value="<%= jogador.telefone %>"
-        maxlength="30"
-      >
-      <% if (erros && erros.telefone) { %>
-        <div class="invalid-feedback"><%= erros.telefone %></div>
-      <% } %>
-    </div>
-  </div>
-
-  <div class="d-grid gap-2 d-md-flex">
-    <button type="submit" class="btn btn-primary">Salvar</button>
-    <a href="/eventos/<%= evento.id %>" class="btn btn-secondary">Cancelar</a>
   </div>
 </form>
 

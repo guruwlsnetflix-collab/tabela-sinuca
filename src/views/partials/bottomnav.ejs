@@ -1,0 +1,56 @@
+<% if (typeof eventoId !== 'undefined' && eventoId) { %>
+<nav class="p-bottomnav" aria-label="Navegação rápida">
+  <a class="p-bottomnav__item <%= active === 'dashboard' ? 'is-active' : '' %>"
+     data-nav-key="dashboard"
+     href="/eventos/<%= eventoId %>#dashboard"
+     aria-current="<%= active === 'dashboard' ? 'page' : 'false' %>">
+    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+      <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+      <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+    </svg>
+    <span>Dashboard</span>
+  </a>
+  <a class="p-bottomnav__item <%= active === 'ranking' ? 'is-active' : '' %>"
+     data-nav-key="ranking"
+     href="/eventos/<%= eventoId %>#ranking"
+     aria-current="<%= active === 'ranking' ? 'page' : 'false' %>">
+    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+      <path d="M4 22h16"></path>
+      <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+    </svg>
+    <span>Ranking</span>
+  </a>
+  <a class="p-bottomnav__item <%= active === 'jogadores' ? 'is-active' : '' %>"
+     data-nav-key="jogadores"
+     href="/eventos/<%= eventoId %>#jogadores"
+     aria-current="<%= active === 'jogadores' ? 'page' : 'false' %>">
+    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+      <circle cx="9" cy="7" r="4"></circle>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+    </svg>
+    <span>Jogadores</span>
+  </a>
+  <a class="p-bottomnav__item <%= active === 'partidas' ? 'is-active' : '' %>"
+     data-nav-key="partidas"
+     href="/eventos/<%= eventoId %>#partidas"
+     aria-current="<%= active === 'partidas' ? 'page' : 'false' %>">
+    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <path d="M8 13h2"></path>
+      <path d="M8 17h2"></path>
+      <path d="M14 17h2"></path>
+      <path d="M13 13h3"></path>
+    </svg>
+    <span>Partidas</span>
+  </a>
+</nav>
+<% } %>

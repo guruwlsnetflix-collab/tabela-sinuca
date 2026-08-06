@@ -1,65 +1,74 @@
 <%- include('../../partials/header', { title }) %>
 
 <div class="mb-4">
-  <h1><%= title %></h1>
+  <h1 class="p-page__title h2 mb-1"><%= title %></h1>
+  <p class="p-page__subtitle mb-0">Dados do campeonato</p>
 </div>
 
 <% if (erros && erros.geral) { %>
-  <div class="alert alert-danger"><%= erros.geral %></div>
+  <div class="p-alert p-alert--danger mb-4" role="alert"><%= erros.geral %></div>
 <% } %>
 
 <form method="POST" action="<%= modoEdicao ? '/eventos/' + evento.id : '/eventos' %>">
-  <div class="mb-3">
-    <label for="nome" class="form-label">Nome do evento *</label>
-    <input
-      type="text"
-      class="form-control <%= erros && erros.nome ? 'is-invalid' : '' %>"
-      id="nome"
-      name="nome"
-      value="<%= evento.nome %>"
-      required
-      maxlength="120"
-    >
-    <% if (erros && erros.nome) { %>
-      <div class="invalid-feedback"><%= erros.nome %></div>
-    <% } %>
-  </div>
+  <div class="p-card">
+    <div class="p-card__body">
+      <div class="p-field mb-3">
+        <label for="nome" class="form-label">Nome do evento *</label>
+        <input
+          type="text"
+          class="form-control <%= erros && erros.nome ? 'is-invalid' : '' %>"
+          id="nome"
+          name="nome"
+          value="<%= evento.nome %>"
+          required
+          maxlength="120"
+          placeholder="Ex.: Campeonato de Sexta"
+        >
+        <% if (erros && erros.nome) { %>
+          <div class="invalid-feedback"><%= erros.nome %></div>
+        <% } %>
+      </div>
 
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <label for="data_inicio" class="form-label">Data de início *</label>
-      <input
-        type="date"
-        class="form-control <%= erros && erros.data_inicio ? 'is-invalid' : '' %>"
-        id="data_inicio"
-        name="data_inicio"
-        value="<%= evento.data_inicio %>"
-        required
-      >
-      <% if (erros && erros.data_inicio) { %>
-        <div class="invalid-feedback"><%= erros.data_inicio %></div>
-      <% } %>
+      <div class="row g-3">
+        <div class="col-md-6 p-field">
+          <label for="data_inicio" class="form-label">Data de início *</label>
+          <input
+            type="date"
+            class="form-control <%= erros && erros.data_inicio ? 'is-invalid' : '' %>"
+            id="data_inicio"
+            name="data_inicio"
+            value="<%= evento.data_inicio %>"
+            required
+          >
+          <% if (erros && erros.data_inicio) { %>
+            <div class="invalid-feedback"><%= erros.data_inicio %></div>
+          <% } %>
+        </div>
+
+        <div class="col-md-6 p-field">
+          <label for="data_fim" class="form-label">Data de fim *</label>
+          <input
+            type="date"
+            class="form-control <%= erros && erros.data_fim ? 'is-invalid' : '' %>"
+            id="data_fim"
+            name="data_fim"
+            value="<%= evento.data_fim %>"
+            required
+          >
+          <% if (erros && erros.data_fim) { %>
+            <div class="invalid-feedback"><%= erros.data_fim %></div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex mt-4">
+        <button type="submit" class="btn p-btn p-btn--primary">
+          <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Salvar
+        </button>
+        <a href="<%= modoEdicao ? '/eventos/' + evento.id : '/' %>" class="btn p-btn p-btn--outline">Cancelar</a>
+      </div>
     </div>
-
-    <div class="col-md-6 mb-3">
-      <label for="data_fim" class="form-label">Data de fim *</label>
-      <input
-        type="date"
-        class="form-control <%= erros && erros.data_fim ? 'is-invalid' : '' %>"
-        id="data_fim"
-        name="data_fim"
-        value="<%= evento.data_fim %>"
-        required
-      >
-      <% if (erros && erros.data_fim) { %>
-        <div class="invalid-feedback"><%= erros.data_fim %></div>
-      <% } %>
-    </div>
-  </div>
-
-  <div class="d-grid gap-2 d-md-flex">
-    <button type="submit" class="btn btn-primary">Salvar</button>
-    <a href="<%= modoEdicao ? '/eventos/' + evento.id : '/' %>" class="btn btn-secondary">Cancelar</a>
   </div>
 </form>
 

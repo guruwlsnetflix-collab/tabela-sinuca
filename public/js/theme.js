@@ -20,6 +20,12 @@
     if (salvo === 'dark' || salvo === 'light') {
       return salvo
     }
+    // Mobile: tema escuro como padrão (identidade premium);
+    // Desktop: respeita a preferência do sistema.
+    const mobile = window.matchMedia && window.matchMedia('(max-width: 767.98px)').matches
+    if (mobile) {
+      return 'dark'
+    }
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
       ? 'dark'
       : 'light'
