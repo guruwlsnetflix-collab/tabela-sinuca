@@ -88,6 +88,21 @@ router.post('/eventos/:eventoId/jogadores/:id', jogadorValidators.atualizar, (re
   }
 })
 
+router.get('/eventos/:eventoId/jogadores/:id/campanha', (req, res) => {
+  try {
+    const campanha = JogadorService.campanha(
+      Number(req.params.eventoId),
+      Number(req.params.id)
+    )
+    res.render('pages/jogadores/campanha', {
+      title: `Campanha de ${campanha.jogador.nome}`,
+      campanha
+    })
+  } catch (err) {
+    res.status(err.status || 500).render('pages/404')
+  }
+})
+
 router.post('/eventos/:eventoId/jogadores/:id/excluir', (req, res) => {
   const eventoId = Number(req.params.eventoId)
   try {

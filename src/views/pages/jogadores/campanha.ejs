@@ -1,0 +1,75 @@
+<%- include('../../partials/header', { title }) %>
+
+<div class="mb-4">
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <h1 class="mb-0"><%= campanha.jogador.nome %>
+        <% if (campanha.jogador.apelido) { %><span class="text-muted fs-4">(<%= campanha.jogador.apelido %>)</span><% } %>
+      </h1>
+      <p class="text-muted mb-0">Campanha no evento: <%= campanha.evento.nome %></p>
+    </div>
+    <a href="/eventos/<%= campanha.evento.id %>" class="btn btn-outline-secondary">Voltar ao evento</a>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6 fw-bold"><%= campanha.resumo.jogos %></div>
+        <div class="text-muted">Jogos</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6 fw-bold text-success"><%= campanha.resumo.vitorias %></div>
+        <div class="text-muted">Vitórias</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6 fw-bold text-danger"><%= campanha.resumo.derrotas %></div>
+        <div class="text-muted">Derrotas</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="h5 mb-3">Histórico de confrontos</h2>
+
+<% if (campanha.partidas.length === 0) { %>
+  <div class="alert alert-info">Este jogador ainda não disputou nenhuma partida neste evento.</div>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Adversário</th>
+          <th>Resultado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% campanha.partidas.forEach((p) => { %>
+          <tr>
+            <td><%= p.data_partida %></td>
+            <td><%= p.adversario %></td>
+            <td>
+              <% if (p.vitoria) { %>
+                <span class="badge text-bg-success">Vitória</span>
+              <% } else { %>
+                <span class="badge text-bg-danger">Derrota para <%= p.vencedor %></span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../../partials/footer') %>

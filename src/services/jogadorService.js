@@ -64,6 +64,39 @@ const JogadorService = {
     }
     JogadorRepository.excluir(id)
     return jogador
+  },
+
+  campanha(eventoId, jogadorId) {
+    const jogador = this.obter(jogadorId)
+    const evento = EventoService.obter(eventoId)
+    if (jogador.evento_id !== evento.id) {
+      throw new Error('O jogador não pertence a este evento.')
+    }
+
+    const partidas = JogadorRepository.listarPartidas(jogadorId).map((p) => {
+      const vitoria = p.vencedor_id === jogadorId
+      const adversarioId = p.jogador_a_id === jogadorId ? p.jogador_b_id : p.jogador_a_id
+      const adversario = p.jogador_a_id === jogadorId ? p.jogador_b : p.jogador_a
+      return {
+        id: p.id,
+        data_partida: p.data_partida,
+        adversario,
+        adversarioId,
+        vencedor: p.vencedor,
+        vitoria
+      }
+    })
+
+    return {
+      jogador,
+      evento,
+      partidas,
+      resumo: {
+        vitorias: partidas.filter((p) => p.vitoria).length,
+        derrotas: partidas.filter((p) => !p.vitoria).length,
+        jogos: partidas.length
+      }
+    }
   }
 }
 

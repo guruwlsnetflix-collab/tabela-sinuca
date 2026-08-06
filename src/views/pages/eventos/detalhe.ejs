@@ -102,7 +102,10 @@
           <% ranking.forEach((r) => { %>
             <tr>
               <td class="text-center"><strong><%= r.posicao %></strong></td>
-              <td><%= r.jogador.nome %><% if (r.jogador.apelido) { %> <span class="text-muted">(<%= r.jogador.apelido %>)</span><% } %></td>
+              <td>
+                <a href="/eventos/<%= evento.id %>/jogadores/<%= r.jogador.id %>/campanha"><%= r.jogador.nome %></a>
+                <% if (r.jogador.apelido) { %> <span class="text-muted">(<%= r.jogador.apelido %>)</span><% } %>
+              </td>
               <td class="text-center"><%= r.jogos %></td>
               <td class="text-center text-success fw-bold"><%= r.vitorias %></td>
               <td class="text-center text-danger"><%= r.derrotas %></td>
