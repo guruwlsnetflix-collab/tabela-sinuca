@@ -1,0 +1,227 @@
+<%- include('../../partials/header', { title }) %>
+
+<%
+  function fmtData(v) {
+    if (!v) return ''
+    var s = String(v).replace('T', ' ')
+    var parts = s.split(' ')
+    var d = parts[0] || ''
+    var t = parts[1] || ''
+    var dparts = d.split('-')
+    var dd = dparts.length === 3 ? dparts[2] + '/' + dparts[1] + '/' + dparts[0] : d
+    var tt = t.length >= 5 ? t.substring(0, 5) : ''
+    return tt ? dd + ' · ' + tt : dd
+  }
+
+  var totalPartidas = partidas.length
+  var totalVitorias = ranking.reduce(function (s, r) { return s + r.vitorias }, 0)
+  var totalDerrotas = ranking.reduce(function (s, r) { return s + r.derrotas }, 0)
+  var comJogos = ranking.filter(function (r) { return r.jogos > 0 })
+  var aproveitamentoMedio = comJogos.length
+    ? Math.round(comJogos.reduce(function (s, r) { return s + r.aproveitamento }, 0) / comJogos.length)
+    : 0
+%>
+
+<div class="report">
+
+  <!-- Cabeçalho do evento -->
+  <header class="report__head">
+    <h1 class="report__title">🏆 <%= evento.nome %></h1>
+    <div class="report__meta">
+      <span>Status: <strong><%= statusLabel[evento.status] %></strong></span>
+      <span>Início: <strong><%= evento.data_inicio %></strong></span>
+      <span>Fim: <strong><%= evento.data_fim %></strong></span>
+      <span>Gerado em: <strong><%= new Date().toLocaleString('pt-BR') %></strong></span>
+    </div>
+  </header>
+
+  <!-- Resumo -->
+  <section class="report__section">
+    <h2 class="report__section-title">
+      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      Resumo do Evento
+    </h2>
+    <div class="report__stats">
+      <div class="report__stat">
+        <div class="report__stat-value"><%= totalPartidas %></div>
+        <div class="report__stat-label">Partidas</div>
+      </div>
+      <div class="report__stat">
+        <div class="report__stat-value"><%= totalVitorias %></div>
+        <div class="report__stat-label">Vitórias</div>
+      </div>
+      <div class="report__stat">
+        <div class="report__stat-value"><%= totalDerrotas %></div>
+        <div class="report__stat-label">Derrotas</div>
+      </div>
+      <div class="report__stat">
+        <div class="report__stat-value"><%= aproveitamentoMedio %>%</div>
+        <div class="report__stat-label">Aproveitamento</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Jogadores cadastrados -->
+  <section class="report__section">
+    <h2 class="report__section-title">
+      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Jogadores Cadastrados (<%= jogadores.length %>)
+    </h2>
+    <% if (jogadores.length === 0) { %>
+      <p class="report__empty">Nenhum jogador cadastrado neste evento.</p>
+    <% } else { %>
+      <div class="report__players">
+        <% jogadores.forEach((j) => { %>
+          <div class="report__player">
+            <span class="report__avatar" aria-hidden="true"><%= String(j.nome || '?').charAt(0).toUpperCase() %></span>
+            <span class="report__player-name">
+              <%= j.nome %>
+              <% if (j.apelido) { %><span class="report__player-alias d-block">@<%= j.apelido %></span><% } %>
+            </span>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- Ranking -->
+  <section class="report__section">
+    <h2 class="report__section-title">
+      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+      Ranking
+    </h2>
+    <% if (ranking.length === 0) { %>
+      <p class="report__empty">Nenhum jogador no evento ainda.</p>
+    <% } else { %>
+      <table class="report__table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Jogador</th>
+            <th>Jogos</th>
+            <th>Vitórias</th>
+            <th>Derrotas</th>
+            <th>Aproveitamento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% ranking.forEach((r) => { %>
+            <tr>
+              <td><%= r.posicao === 1 ? '🥇 ' : (r.posicao === 2 ? '🥈 ' : (r.posicao === 3 ? '🥉 ' : '')) %><%= r.posicao %></td>
+              <td><%= r.jogador.nome %><%= r.jogador.apelido ? ' (' + r.jogador.apelido + ')' : '' %></td>
+              <td><%= r.jogos %></td>
+              <td><%= r.vitorias %></td>
+              <td><%= r.derrotas %></td>
+              <td><%= r.aproveitamento %>%</td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </section>
+
+  <!-- Partidas por jogador -->
+  <section class="report__section">
+    <h2 class="report__section-title">
+      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/><path d="M13 13h3"/></svg>
+      Partidas por Jogador
+    </h2>
+
+    <% if (partidasPorJogador.length === 0) { %>
+      <p class="report__empty">Nenhum jogador no evento ainda.</p>
+    <% } else { %>
+      <% partidasPorJogador.forEach((bloco) => { %>
+        <div class="report__player-matches">
+          <div class="report__player-matches-head">
+            <span class="report__avatar" aria-hidden="true"><%= String(bloco.jogador.nome || '?').charAt(0).toUpperCase() %></span>
+            <span><%= bloco.jogador.nome %><%= bloco.jogador.apelido ? ' (@' + bloco.jogador.apelido + ')' : '' %></span>
+            <span class="report__player-matches-stats">
+              <%= bloco.partidas.length %> partida(s) ·
+              <%= bloco.vitorias %>V · <%= bloco.derrotas %>D
+            </span>
+          </div>
+
+          <% if (bloco.partidas.length === 0) { %>
+            <p class="report__empty">Sem partidas registradas.</p>
+          <% } else { %>
+            <% bloco.partidas.forEach((p) => { %>
+              <div class="report__match <%= p.venceu ? 'report__match--win' : '' %>">
+                <span class="report__match-date">
+                  <%= fmtData(p.data_partida) || 'Data não informada' %>
+                </span>
+                <span><strong><%= p.jogador_a %></strong> vs <strong><%= p.jogador_b %></strong></span>
+                <span class="report__match-result <%= p.venceu ? 'report__match-result--win' : 'report__match-result--loss' %>">
+                  <%= p.venceu ? '✔ Vitória' : '✘ Derrota' %>
+                </span>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      <% }) %>
+    <% } %>
+  </section>
+
+</div>
+
+<!-- Barra de ações -->
+<div class="report-toolbar" role="toolbar" aria-label="Ações do relatório">
+  <button type="button" class="report-toolbar__btn report-toolbar__btn--share" id="btn-compartilhar">
+    <svg class="report-toolbar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    Compartilhar
+  </button>
+  <button type="button" class="report-toolbar__btn report-toolbar__btn--pdf" id="btn-pdf">
+    <svg class="report-toolbar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M9 11h6"/></svg>
+    Salvar em PDF
+  </button>
+  <button type="button" class="report-toolbar__btn report-toolbar__btn--print" id="btn-imprimir">
+    <svg class="report-toolbar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Imprimir
+  </button>
+  <button type="button" class="report-toolbar__btn report-toolbar__btn--close" id="btn-fechar">
+    <svg class="report-toolbar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    Fechar
+  </button>
+</div>
+
+<script>
+(function () {
+  var url = window.location.href
+  var titulo = 'Relatório — <%= evento.nome %>'
+  var btnImprimir = document.getElementById('btn-imprimir')
+  var btnPdf = document.getElementById('btn-pdf')
+  var btnCompartilhar = document.getElementById('btn-compartilhar')
+  var btnFechar = document.getElementById('btn-fechar')
+
+  if (btnImprimir) {
+    btnImprimir.addEventListener('click', function () { window.print() })
+  }
+  if (btnPdf) {
+    btnPdf.addEventListener('click', function () { window.print() })
+  }
+  if (btnFechar) {
+    btnFechar.addEventListener('click', function () {
+      if (window.history.length > 1) {
+        window.history.back()
+      } else {
+        window.location.href = '/eventos/<%= evento.id %>'
+      }
+    })
+  }
+  if (btnCompartilhar) {
+    btnCompartilhar.addEventListener('click', function () {
+      var dados = { title: titulo, text: 'Relatório do evento ' + '<%= evento.nome %>', url: url }
+      if (navigator.share) {
+        navigator.share(dados).catch(function () {})
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          alert('Link copiado para a área de transferência!')
+        }).catch(function () {})
+      } else {
+        window.prompt('Copie o link do relatório:', url)
+      }
+    })
+  }
+})()
+</script>
+
+<%- include('../../partials/footer') %>

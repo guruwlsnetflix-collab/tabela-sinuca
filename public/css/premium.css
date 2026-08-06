@@ -379,6 +379,12 @@ html {
   color: var(--p-danger);
 }
 
+.p-action-btn--report:hover {
+  background: rgba(250, 204, 21, 0.12);
+  border-color: rgba(250, 204, 21, 0.35);
+  color: var(--p-secondary);
+}
+
 .p-action-btn__icon {
   width: 22px;
   height: 22px;

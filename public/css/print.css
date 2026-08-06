@@ -1,0 +1,333 @@
+/* =========================================================
+   RELATÓRIO + IMPRESSÃO (Tabela de Sinuca)
+   ---------------------------------------------------------
+   Barra de ações (Compartilhar / Salvar em PDF / Imprimir /
+   Fechar) e layout do relatório do evento. As regras @media
+   print ocultam a navegação e a barra ao imprimir.
+   ========================================================= */
+
+/* ---------- Barra de ações (apenas tela) ---------- */
+.report-toolbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1050;
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--p-bg) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--p-border);
+}
+
+.report-toolbar__btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--p-radius-sm);
+  font-family: var(--p-font);
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: var(--p-shadow-soft);
+  transition: transform var(--p-transition), filter var(--p-transition);
+  cursor: pointer;
+}
+
+.report-toolbar__btn:hover {
+  filter: brightness(1.08);
+}
+
+.report-toolbar__btn:active {
+  transform: scale(0.97);
+}
+
+.report-toolbar__btn:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+.report-toolbar__btn--share {
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+}
+
+.report-toolbar__btn--pdf {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+}
+
+.report-toolbar__btn--print {
+  background: linear-gradient(135deg, #22C55E, #16A34A);
+}
+
+.report-toolbar__btn--close {
+  background: linear-gradient(135deg, #6B7280, #4B5563);
+}
+
+.report-toolbar__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ---------- Conteúdo do relatório ---------- */
+.report {
+  max-width: 820px;
+  margin: 0 auto;
+  padding-bottom: 100px;
+}
+
+.report__head {
+  padding: 24px;
+  border: 1px solid var(--p-border);
+  border-radius: var(--p-radius);
+  background: var(--p-card);
+  box-shadow: var(--p-shadow-soft);
+  margin-bottom: 24px;
+}
+
+.report__title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.report__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  color: var(--p-muted);
+  font-size: 0.95rem;
+}
+
+.report__meta strong {
+  color: var(--p-text);
+}
+
+.report__section {
+  margin-bottom: 28px;
+}
+
+.report__section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--p-border);
+}
+
+.report__section-title .p-icon {
+  color: var(--p-primary);
+}
+
+.report__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.report__stat {
+  padding: 16px;
+  border-radius: var(--p-radius-sm);
+  background: var(--p-card);
+  border: 1px solid var(--p-border);
+  box-shadow: var(--p-shadow-soft);
+}
+
+.report__stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.report__stat-label {
+  color: var(--p-muted);
+  font-size: 0.85rem;
+}
+
+.report__players {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.report__player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--p-radius-sm);
+  background: var(--p-card);
+  border: 1px solid var(--p-border);
+}
+
+.report__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--p-accent), var(--p-primary));
+  flex-shrink: 0;
+}
+
+.report__player-name {
+  font-weight: 600;
+  min-width: 0;
+}
+
+.report__player-alias {
+  color: var(--p-muted);
+  font-size: 0.8rem;
+}
+
+.report__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.report__table th,
+.report__table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--p-border);
+}
+
+.report__table th {
+  color: var(--p-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.report__table tr:last-child td {
+  border-bottom: 0;
+}
+
+.report__player-matches {
+  margin-bottom: 18px;
+}
+
+.report__player-matches-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.report__player-matches-stats {
+  margin-left: auto;
+  color: var(--p-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.report__match {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--p-card);
+  border: 1px solid var(--p-border);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.report__match--win {
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.report__match-date {
+  color: var(--p-muted);
+  font-size: 0.8rem;
+}
+
+.report__match-result {
+  margin-left: auto;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.report__match-result--win {
+  color: var(--p-primary);
+}
+
+.report__match-result--loss {
+  color: var(--p-danger);
+}
+
+.report__empty {
+  color: var(--p-muted);
+  padding: 12px 0;
+}
+
+/* ---------- Impressão ---------- */
+@media print {
+  .p-topbar,
+  .p-footer,
+  .p-bottomnav,
+  .p-fab,
+  .report-toolbar {
+    display: none !important;
+  }
+
+  .report {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  body,
+  .report__head,
+  .report__stat,
+  .report__player,
+  .report__match {
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    border-color: #d1d5db !important;
+  }
+
+  .report__section-title {
+    border-bottom-color: #d1d5db;
+  }
+
+  .report__table th,
+  .report__table td {
+    border-bottom-color: #d1d5db;
+  }
+
+  .report__meta,
+  .report__stat-label,
+  .report__table th,
+  .report__match-date,
+  .report__player-matches-stats {
+    color: #4b5563 !important;
+  }
+
+  .report__meta strong {
+    color: #111827;
+  }
+
+  .report__section-title .p-icon {
+    color: #16a34a;
+  }
+}

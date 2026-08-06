@@ -55,8 +55,8 @@ router.post('/eventos', eventoValidators.criar, (req, res) => {
   }
 })
 
-function renderDetalhe(res, req, extra) {
-  const evento = EventoService.obter(Number(req.params.id))
+function carregarDadosEvento(eventoId) {
+  const evento = EventoService.obter(eventoId)
   const jogadores = db
     .prepare('SELECT id, nome, apelido, ativo FROM jogadores WHERE evento_id = ? ORDER BY nome')
     .all(evento.id)
@@ -73,6 +73,25 @@ function renderDetalhe(res, req, extra) {
     `)
     .all(evento.id)
   const ranking = RankingService.gerar(evento.id)
+  return { evento, jogadores, partidas, ranking }
+}
+
+function partidasPorJogador(jogadores, partidas) {
+  return jogadores.map((jogador) => {
+    const suasPartidas = partidas.filter(
+      (p) => p.jogador_a_id === jogador.id || p.jogador_b_id === jogador.id
+    )
+    return {
+      jogador,
+      partidas: suasPartidas.map((p) => ({ ...p, venceu: p.vencedor_id === jogador.id })),
+      vitorias: suasPartidas.filter((p) => p.vencedor_id === jogador.id).length,
+      derrotas: suasPartidas.filter((p) => p.vencedor_id !== jogador.id).length
+    }
+  })
+}
+
+function renderDetalhe(res, req, extra) {
+  const { evento, jogadores, partidas, ranking } = carregarDadosEvento(Number(req.params.id))
 
   res.render('pages/eventos/detalhe', {
     title: evento.nome,
@@ -115,6 +134,23 @@ router.get('/eventos/:id/sorteio', (req, res) => {
     })
   } catch (err) {
     res.redirect(`/eventos/${req.params.id}?erro=${encodeURIComponent(err.message)}`)
+  }
+})
+
+router.get('/eventos/:id/relatorio', (req, res) => {
+  try {
+    const { evento, jogadores, partidas, ranking } = carregarDadosEvento(Number(req.params.id))
+    res.render('pages/eventos/relatorio', {
+      title: `Relatório — ${evento.nome}`,
+      evento,
+      jogadores,
+      partidas,
+      ranking,
+      partidasPorJogador: partidasPorJogador(jogadores, partidas),
+      statusLabel: STATUS_LABEL
+    })
+  } catch (err) {
+    res.status(err.status || 500).render('pages/404')
   }
 })
 

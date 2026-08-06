@@ -121,6 +121,35 @@ describe('Rotas de eventos', () => {
     expect(res.text).toContain('Detalhe')
   })
 
+  it('GET /eventos/:id/relatorio exibe o relatório com as seções', async () => {
+    const evento = EventoService.criar({
+      nome: 'Torneio Relatório',
+      data_inicio: '2026-08-01',
+      data_fim: '2026-08-02'
+    })
+    const a = db
+      .prepare('INSERT INTO jogadores (evento_id, nome) VALUES (?, ?)')
+      .run(evento.id, 'João')
+    const b = db
+      .prepare('INSERT INTO jogadores (evento_id, nome) VALUES (?, ?)')
+      .run(evento.id, 'Maria')
+    db.prepare(
+      'INSERT INTO partidas (evento_id, jogador_a_id, jogador_b_id, vencedor_id) VALUES (?, ?, ?, ?)'
+    ).run(evento.id, a.lastInsertRowid, b.lastInsertRowid, a.lastInsertRowid)
+
+    const res = await request(app).get(`/eventos/${evento.id}/relatorio`)
+    expect(res.status).toBe(200)
+    expect(res.text).toContain('Torneio Relatório')
+    expect(res.text).toContain('Resumo do Evento')
+    expect(res.text).toContain('Jogadores Cadastrados')
+    expect(res.text).toContain('Ranking')
+    expect(res.text).toContain('Partidas por Jogador')
+    expect(res.text).toContain('Imprimir')
+    expect(res.text).toContain('Salvar em PDF')
+    expect(res.text).toContain('Compartilhar')
+    expect(res.text).toContain('Fechar')
+  })
+
   it('GET /eventos/:id inexistente responde 404', async () => {
     const res = await request(app).get('/eventos/9999')
     expect(res.status).toBe(404)

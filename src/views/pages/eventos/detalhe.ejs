@@ -58,6 +58,10 @@
         <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
         Editar
       </a>
+      <a href="/eventos/<%= evento.id %>/relatorio" class="p-action-btn p-action-btn--report">
+        <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
+        Relatório
+      </a>
       <% if (evento.status === 'planejado') { %>
         <form method="POST" action="/eventos/<%= evento.id %>/status" class="d-grid">
           <input type="hidden" name="status" value="em_andamento">
