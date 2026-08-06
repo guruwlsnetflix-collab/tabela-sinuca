@@ -1,0 +1,37 @@
+{
+  "name": "tabela-sinuca",
+  "version": "0.1.0",
+  "description": "Controle de jogos de sinuca: eventos, jogadores, partidas e ranking por evento.",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:init": "node src/db/init.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "sinuca",
+    "ranking",
+    "eventos",
+    "sqlite",
+    "express"
+  ],
+  "author": "wilson souza",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.1",
+    "vitest": "^4.1.0"
+  }
+}

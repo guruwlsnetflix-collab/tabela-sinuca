@@ -1,0 +1,41 @@
+<%- include('../partials/header', { title: 'Tabela de Sinuca' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Eventos</h1>
+  <a href="/eventos/novo" class="btn btn-primary">+ Novo evento</a>
+</div>
+
+<% if (eventos.length === 0) { %>
+  <div class="alert alert-info">
+    Nenhum evento cadastrado ainda. Crie o primeiro evento para começar.
+  </div>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Evento</th>
+          <th>Início</th>
+          <th>Fim</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% eventos.forEach((e) => { %>
+          <tr>
+            <td><strong><%= e.nome %></strong></td>
+            <td><%= e.data_inicio %></td>
+            <td><%= e.data_fim %></td>
+            <td><span class="badge text-bg-secondary"><%= e.status %></span></td>
+            <td class="text-end">
+              <a href="/eventos/<%= e.id %>" class="btn btn-sm btn-outline-primary">Abrir</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>
