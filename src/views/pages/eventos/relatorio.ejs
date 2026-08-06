@@ -183,6 +183,25 @@
   </button>
 </div>
 
+<!-- Menu do compartilhar -->
+<div class="report-share-menu" id="report-share-menu" hidden>
+  <p class="report-share-menu__title">Compartilhar como</p>
+  <button type="button" class="report-share-menu__btn" data-share="pdf">
+    <svg class="report-share-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M9 11h6"/></svg>
+    PDF
+  </button>
+  <button type="button" class="report-share-menu__btn" data-share="imagem">
+    <svg class="report-share-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg>
+    Imagem
+  </button>
+  <button type="button" class="report-share-menu__btn" data-share="link">
+    <svg class="report-share-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+    Link
+  </button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function () {
   var url = window.location.href
@@ -191,6 +210,15 @@
   var btnPdf = document.getElementById('btn-pdf')
   var btnCompartilhar = document.getElementById('btn-compartilhar')
   var btnFechar = document.getElementById('btn-fechar')
+  var menu = document.getElementById('report-share-menu')
+  var relatorio = document.querySelector('.report')
+
+  function abrirMenu() {
+    if (menu) menu.hidden = false
+  }
+  function fecharMenu() {
+    if (menu) menu.hidden = true
+  }
 
   if (btnImprimir) {
     btnImprimir.addEventListener('click', function () { window.print() })
@@ -208,19 +236,137 @@
     })
   }
   if (btnCompartilhar) {
-    btnCompartilhar.addEventListener('click', function () {
-      var dados = { title: titulo, text: 'Relatório do evento ' + '<%= evento.nome %>', url: url }
-      if (navigator.share) {
-        navigator.share(dados).catch(function () {})
-      } else if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(function () {
-          alert('Link copiado para a área de transferência!')
-        }).catch(function () {})
-      } else {
-        window.prompt('Copie o link do relatório:', url)
-      }
+    btnCompartilhar.addEventListener('click', function (e) {
+      e.stopPropagation()
+      abrirMenu()
     })
   }
+
+  function compartilharLink() {
+    var dados = { title: titulo, text: 'Relatório do evento ' + '<%= evento.nome %>', url: url }
+    if (navigator.share) {
+      navigator.share(dados).catch(function () {})
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function () {
+        alert('Link copiado para a área de transferência!')
+      }).catch(function () {})
+    } else {
+      window.prompt('Copie o link do relatório:', url)
+    }
+  }
+
+  function nomeArquivo(ext) {
+    var slug = ('<%= evento.nome %>').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    return 'relatorio-' + (slug || 'evento') + '.' + ext
+  }
+
+  function capturar(tipo) {
+    var el = relatorio || document.body
+    document.documentElement.classList.add('capture')
+    return new Promise(function (resolve) {
+      requestAnimationFrame(function () {
+        html2canvas(el, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          windowWidth: el.scrollWidth,
+          onclone: function () {}
+        }).then(function (canvas) {
+          document.documentElement.classList.remove('capture')
+          resolve(canvas)
+        }).catch(function (err) {
+          document.documentElement.classList.remove('capture')
+          throw err
+        })
+      })
+    })
+  }
+
+  function canvasParaPdfBlob(canvas) {
+    var imgData = canvas.toDataURL('image/png')
+    var jsPDF = window.jspdf && window.jspdf.jsPDF
+    if (!jsPDF) throw new Error('jsPDF indisponível')
+    var pdf = new jsPDF('p', 'mm', 'a4')
+    var largura = pdf.internal.pageSize.getWidth()
+    var altura = pdf.internal.pageSize.getHeight()
+    var imgLargura = largura
+    var imgAltura = (canvas.height * imgLargura) / canvas.width
+    var posicao = 0
+    pdf.addImage(imgData, 'PNG', 0, posicao, imgLargura, imgAltura)
+    var restante = imgAltura - altura
+    while (restante > 0) {
+      posicao -= altura
+      pdf.addPage()
+      pdf.addImage(imgData, 'PNG', 0, posicao, imgLargura, imgAltura)
+      restante -= altura
+    }
+    return pdf.output('blob')
+  }
+
+  function compartilharArquivo(blob, nome) {
+    var arquivo = new File([blob], nome, { type: blob.type })
+    if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+      navigator.share({
+        files: [arquivo],
+        title: titulo,
+        text: 'Relatório do evento ' + '<%= evento.nome %>'
+      }).catch(function () {})
+    } else {
+      var a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = nome
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      setTimeout(function () { URL.revokeObjectURL(a.href) }, 1000)
+    }
+  }
+
+  function feedback(texto) {
+    if (btnCompartilhar) {
+      var original = btnCompartilhar.textContent
+      btnCompartilhar.textContent = texto
+      btnCompartilhar.disabled = true
+      setTimeout(function () {
+        btnCompartilhar.textContent = original
+        btnCompartilhar.disabled = false
+      }, 1600)
+    }
+  }
+
+  if (menu) {
+    menu.addEventListener('click', function (e) {
+      var alvo = e.target.closest('[data-share]')
+      if (!alvo) return
+      var opcao = alvo.getAttribute('data-share')
+      fecharMenu()
+      if (opcao === 'link') {
+        compartilharLink()
+        return
+      }
+      if (!window.html2canvas) {
+        alert('Não foi possível carregar o gerador de arquivos. Verifique a conexão.')
+        return
+      }
+      feedback('Gerando...')
+      capturar(opcao).then(function (canvas) {
+        if (opcao === 'pdf') {
+          var blob = canvasParaPdfBlob(canvas)
+          compartilharArquivo(blob, nomeArquivo('pdf'))
+        } else {
+          canvas.toBlob(function (blob) {
+            if (blob) compartilharArquivo(blob, nomeArquivo('png'))
+          }, 'image/png')
+        }
+      }).catch(function (err) {
+        alert('Falha ao gerar o arquivo. Tente novamente.')
+      })
+    })
+  }
+
+  document.addEventListener('click', function () { fecharMenu() })
 })()
 </script>
 

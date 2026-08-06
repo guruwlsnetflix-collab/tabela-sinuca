@@ -279,6 +279,133 @@
   padding: 12px 0;
 }
 
+/* ---------- Menu do compartilhar (apenas tela) ---------- */
+.report-share-menu {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(72px + env(safe-area-inset-bottom));
+  z-index: 1060;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--p-border);
+  border-radius: var(--p-radius-sm);
+  background: color-mix(in srgb, var(--p-card) 92%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--p-shadow);
+  animation: reportMenuIn var(--p-transition) cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes reportMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.report-share-menu[hidden] {
+  display: none !important;
+}
+
+.report-share-menu__title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--p-muted);
+  margin: 0 4px 2px;
+}
+
+.report-share-menu__btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 14px;
+  border: 1px solid var(--p-border);
+  border-radius: 12px;
+  background: var(--p-bg-soft);
+  color: var(--p-text);
+  font-family: var(--p-font);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--p-transition), background-color var(--p-transition);
+}
+
+.report-share-menu__btn:hover {
+  background: var(--p-card-2);
+}
+
+.report-share-menu__btn:active {
+  transform: scale(0.98);
+}
+
+.report-share-menu__btn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.6);
+  outline-offset: 2px;
+}
+
+.report-share-menu__icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: var(--p-accent);
+}
+
+/* ---------- Captura (PDF / imagem) ---------- */
+html.capture .report__head,
+html.capture .report__stat,
+html.capture .report__player,
+html.capture .report__match {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #d1d5db !important;
+  box-shadow: none !important;
+}
+
+html.capture .report__section-title {
+  border-bottom-color: #d1d5db;
+}
+
+html.capture .report__table th,
+html.capture .report__table td {
+  border-bottom-color: #d1d5db;
+}
+
+html.capture .report__meta,
+html.capture .report__stat-label,
+html.capture .report__table th,
+html.capture .report__match-date,
+html.capture .report__player-matches-stats {
+  color: #4b5563 !important;
+}
+
+html.capture .report__meta strong {
+  color: #111827;
+}
+
+html.capture .report__match-result--win {
+  color: #16a34a;
+}
+
+html.capture .report__match-result--loss {
+  color: #dc2626;
+}
+
+html.capture .report__avatar {
+  background: linear-gradient(135deg, #2563eb, #16a34a);
+}
+
 /* ---------- Impressão ---------- */
 @media print {
   .p-topbar,
