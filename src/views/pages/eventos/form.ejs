@@ -1,0 +1,66 @@
+<%- include('../../partials/header', { title }) %>
+
+<div class="mb-4">
+  <h1><%= title %></h1>
+</div>
+
+<% if (erros && erros.geral) { %>
+  <div class="alert alert-danger"><%= erros.geral %></div>
+<% } %>
+
+<form method="POST" action="<%= modoEdicao ? '/eventos/' + evento.id : '/eventos' %>">
+  <div class="mb-3">
+    <label for="nome" class="form-label">Nome do evento *</label>
+    <input
+      type="text"
+      class="form-control <%= erros && erros.nome ? 'is-invalid' : '' %>"
+      id="nome"
+      name="nome"
+      value="<%= evento.nome %>"
+      required
+      maxlength="120"
+    >
+    <% if (erros && erros.nome) { %>
+      <div class="invalid-feedback"><%= erros.nome %></div>
+    <% } %>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="data_inicio" class="form-label">Data de início *</label>
+      <input
+        type="date"
+        class="form-control <%= erros && erros.data_inicio ? 'is-invalid' : '' %>"
+        id="data_inicio"
+        name="data_inicio"
+        value="<%= evento.data_inicio %>"
+        required
+      >
+      <% if (erros && erros.data_inicio) { %>
+        <div class="invalid-feedback"><%= erros.data_inicio %></div>
+      <% } %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label for="data_fim" class="form-label">Data de fim *</label>
+      <input
+        type="date"
+        class="form-control <%= erros && erros.data_fim ? 'is-invalid' : '' %>"
+        id="data_fim"
+        name="data_fim"
+        value="<%= evento.data_fim %>"
+        required
+      >
+      <% if (erros && erros.data_fim) { %>
+        <div class="invalid-feedback"><%= erros.data_fim %></div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a href="<%= modoEdicao ? '/eventos/' + evento.id : '/' %>" class="btn btn-secondary">Cancelar</a>
+  </div>
+</form>
+
+<%- include('../../partials/footer') %>

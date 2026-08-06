@@ -1,5 +1,12 @@
 <%- include('../partials/header', { title: 'Tabela de Sinuca' }) %>
 
+<% if (typeof msg !== 'undefined' && msg) { %>
+  <div class="alert alert-success"><%= msg %></div>
+<% } %>
+<% if (typeof erro !== 'undefined' && erro) { %>
+  <div class="alert alert-danger"><%= erro %></div>
+<% } %>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1>Eventos</h1>
   <a href="/eventos/novo" class="btn btn-primary">+ Novo evento</a>

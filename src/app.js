@@ -2,6 +2,7 @@ const express = require('express')
 
 const config = require('./config')
 const routes = require('./routes')
+const eventosRoutes = require('./routes/eventos')
 const { initDb } = require('./db/init')
 
 const app = express()
@@ -16,6 +17,7 @@ app.use(express.static(config.publicDir))
 initDb()
 
 app.use('/', routes)
+app.use('/', eventosRoutes)
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' })

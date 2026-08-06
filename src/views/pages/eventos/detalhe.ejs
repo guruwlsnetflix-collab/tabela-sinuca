@@ -1,0 +1,98 @@
+<%- include('../../partials/header', { title }) %>
+
+<% if (msg) { %>
+  <div class="alert alert-success"><%= msg %></div>
+<% } %>
+<% if (erro) { %>
+  <div class="alert alert-danger"><%= erro %></div>
+<% } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="mb-0"><%= evento.nome %></h1>
+    <div class="mt-2">
+      <span class="badge text-bg-secondary"><%= statusLabel[evento.status] %></span>
+      <span class="text-muted ms-2"><%= evento.data_inicio %> → <%= evento.data_fim %></span>
+    </div>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/eventos/<%= evento.id %>/editar" class="btn btn-outline-secondary">Editar</a>
+    <% if (evento.status === 'planejado') { %>
+      <form method="POST" action="/eventos/<%= evento.id %>/status" class="d-inline">
+        <input type="hidden" name="status" value="em_andamento">
+        <button type="submit" class="btn btn-outline-primary">Iniciar evento</button>
+      </form>
+    <% } %>
+    <% if (evento.status === 'em_andamento') { %>
+      <form method="POST" action="/eventos/<%= evento.id %>/status" class="d-inline">
+        <input type="hidden" name="status" value="encerrado">
+        <button type="submit" class="btn btn-outline-warning">Encerrar evento</button>
+      </form>
+    <% } %>
+    <form method="POST" action="/eventos/<%= evento.id %>/excluir" class="d-inline"
+          onsubmit="return confirm('Excluir este evento? Esta ação não pode ser desfeita.');">
+      <button type="submit" class="btn btn-outline-danger">Excluir</button>
+    </form>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Jogadores</strong>
+        <a href="/eventos/<%= evento.id %>/jogadores/novo" class="btn btn-sm btn-primary">+ Jogador</a>
+      </div>
+      <div class="card-body">
+        <% if (jogadores.length === 0) { %>
+          <p class="text-muted mb-0">Nenhum jogador cadastrado neste evento.</p>
+        <% } else { %>
+          <ul class="list-group list-group-flush">
+            <% jogadores.forEach((j) => { %>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <%= j.nome %><% if (j.apelido) { %> <span class="text-muted">(<%= j.apelido %>)</span><% } %>
+                <span>
+                  <a href="/eventos/<%= evento.id %>/jogadores/<%= j.id %>/editar" class="btn btn-sm btn-outline-secondary">Editar</a>
+                </span>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Partidas</strong>
+        <a href="/eventos/<%= evento.id %>/partidas/novo" class="btn btn-sm btn-primary">+ Partida</a>
+      </div>
+      <div class="card-body">
+        <% if (partidas.length === 0) { %>
+          <p class="text-muted mb-0">Nenhuma partida registrada ainda.</p>
+        <% } else { %>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr><th>Data</th><th>Jogador A</th><th>Jogador B</th><th>Vencedor</th></tr>
+              </thead>
+              <tbody>
+                <% partidas.forEach((p) => { %>
+                  <tr>
+                    <td><%= p.data_partida %></td>
+                    <td><%= p.jogador_a %></td>
+                    <td><%= p.jogador_b %></td>
+                    <td><strong><%= p.vencedor %></strong></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

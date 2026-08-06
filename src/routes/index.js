@@ -11,7 +11,9 @@ router.get('/', (req, res) => {
 
   res.render('pages/home', {
     eventos,
-    title: 'Tabela de Sinuca'
+    title: 'Tabela de Sinuca',
+    msg: req.query.msg || null,
+    erro: req.query.erro || null
   })
 })
 
