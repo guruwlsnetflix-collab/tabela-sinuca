@@ -7,15 +7,15 @@
   <div class="alert alert-danger"><%= erro %></div>
 <% } %>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <div>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div class="min-w-0">
     <h1 class="mb-0"><%= evento.nome %></h1>
     <div class="mt-2">
       <span class="badge text-bg-secondary"><%= statusLabel[evento.status] %></span>
       <span class="text-muted ms-2"><%= evento.data_inicio %> → <%= evento.data_fim %></span>
     </div>
   </div>
-  <div class="d-flex gap-2">
+  <div class="d-flex flex-wrap gap-2">
     <a href="/eventos/<%= evento.id %>/editar" class="btn btn-outline-secondary">Editar</a>
     <% if (evento.status === 'planejado') { %>
       <form method="POST" action="/eventos/<%= evento.id %>/status" class="d-inline">
@@ -65,15 +65,15 @@
             <%= sorteio.vencedor.nome %> é o único jogador ativo do evento. Não há adversários para sortear.
           </div>
         <% } else if (sorteio && sorteio.sugestao) { %>
-          <div class="alert alert-success mt-3 mb-0 d-flex justify-content-between align-items-center">
-            <span>
+          <div class="alert alert-success mt-3 mb-0 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+            <span class="min-w-0">
               Próximo confronto sugerido: <strong><%= sorteio.vencedor.nome %></strong> ×
               <strong><%= sorteio.sugestao.nome %></strong>
               <% if (sorteio.ultimoAdversario) { %>
                 <br><small class="text-muted">Último adversário de <%= sorteio.vencedor.nome %>: <%= sorteio.ultimoAdversarioNome %></small>
               <% } %>
             </span>
-            <a class="btn btn-sm btn-success" href="/eventos/<%= evento.id %>/partidas/novo?jogador_a_id=<%= sorteio.vencedor.id %>&jogador_b_id=<%= sorteio.sugestao.id %>">
+            <a class="btn btn-success" href="/eventos/<%= evento.id %>/partidas/novo?jogador_a_id=<%= sorteio.vencedor.id %>&jogador_b_id=<%= sorteio.sugestao.id %>">
               Registrar partida
             </a>
           </div>
@@ -87,7 +87,7 @@
   <div class="card-header"><strong>Ranking</strong></div>
   <div class="card-body">
     <div class="table-responsive">
-      <table class="table table-striped align-middle mb-0">
+      <table class="table table-cards table-striped align-middle mb-0">
         <thead>
           <tr>
             <th class="text-center" style="width:60px">#</th>
@@ -101,15 +101,17 @@
         <tbody>
           <% ranking.forEach((r) => { %>
             <tr>
-              <td class="text-center"><strong><%= r.posicao %></strong></td>
-              <td>
-                <a href="/eventos/<%= evento.id %>/jogadores/<%= r.jogador.id %>/campanha"><%= r.jogador.nome %></a>
-                <% if (r.jogador.apelido) { %> <span class="text-muted">(<%= r.jogador.apelido %>)</span><% } %>
+              <td data-label="Posição" class="text-center"><strong><%= r.posicao %></strong></td>
+              <td data-label="Jogador">
+                <span class="table-card-content">
+                  <a href="/eventos/<%= evento.id %>/jogadores/<%= r.jogador.id %>/campanha"><%= r.jogador.nome %></a>
+                  <% if (r.jogador.apelido) { %> <span class="text-muted">(<%= r.jogador.apelido %>)</span><% } %>
+                </span>
               </td>
-              <td class="text-center"><%= r.jogos %></td>
-              <td class="text-center text-success fw-bold"><%= r.vitorias %></td>
-              <td class="text-center text-danger"><%= r.derrotas %></td>
-              <td class="text-center"><%= r.aproveitamento %>%</td>
+              <td data-label="Jogos" class="text-center"><%= r.jogos %></td>
+              <td data-label="Vitórias" class="text-center text-success fw-bold"><%= r.vitorias %></td>
+              <td data-label="Derrotas" class="text-center text-danger"><%= r.derrotas %></td>
+              <td data-label="Aproveitamento" class="text-center"><%= r.aproveitamento %>%</td>
             </tr>
           <% }) %>
         </tbody>
@@ -131,9 +133,9 @@
         <% } else { %>
           <ul class="list-group list-group-flush">
             <% jogadores.forEach((j) => { %>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <%= j.nome %><% if (j.apelido) { %> <span class="text-muted">(<%= j.apelido %>)</span><% } %>
-                <span>
+              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span class="min-w-0"><%= j.nome %><% if (j.apelido) { %> <span class="text-muted">(<%= j.apelido %>)</span><% } %></span>
+                <span class="flex-shrink-0">
                   <a href="/eventos/<%= evento.id %>/jogadores/<%= j.id %>/editar" class="btn btn-sm btn-outline-secondary">Editar</a>
                 </span>
               </li>
@@ -155,25 +157,27 @@
           <p class="text-muted mb-0">Nenhuma partida registrada ainda.</p>
         <% } else { %>
           <div class="table-responsive">
-            <table class="table table-sm align-middle">
+            <table class="table table-cards table-sm align-middle">
               <thead>
                 <tr><th>Data</th><th>Jogador A</th><th>Jogador B</th><th>Vencedor</th><th></th></tr>
               </thead>
               <tbody>
                 <% partidas.forEach((p) => { %>
                   <tr>
-                    <td><%= p.data_partida %></td>
-                    <td><%= p.jogador_a %></td>
-                    <td><%= p.jogador_b %></td>
-                    <td><strong><%= p.vencedor %></strong></td>
-                    <td class="text-end">
-                      <a href="/eventos/<%= evento.id %>/partidas/<%= p.id %>/editar" class="btn btn-sm btn-outline-secondary">Editar</a>
-                      <% if (evento.status !== 'encerrado') { %>
-                        <form method="POST" action="/eventos/<%= evento.id %>/partidas/<%= p.id %>/excluir" class="d-inline"
-                              onsubmit="return confirm('Excluir esta partida?');">
-                          <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
-                        </form>
-                      <% } %>
+                    <td data-label="Data"><%= p.data_partida %></td>
+                    <td data-label="Jogador A"><%= p.jogador_a %></td>
+                    <td data-label="Jogador B"><%= p.jogador_b %></td>
+                    <td data-label="Vencedor"><strong><%= p.vencedor %></strong></td>
+                    <td data-label="Ações" class="text-end">
+                      <span class="table-card-actions">
+                        <a href="/eventos/<%= evento.id %>/partidas/<%= p.id %>/editar" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        <% if (evento.status !== 'encerrado') { %>
+                          <form method="POST" action="/eventos/<%= evento.id %>/partidas/<%= p.id %>/excluir" class="d-inline"
+                                onsubmit="return confirm('Excluir esta partida?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                          </form>
+                        <% } %>
+                      </span>
                     </td>
                   </tr>
                 <% }) %>
