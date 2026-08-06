@@ -49,7 +49,7 @@
             <select class="form-select" id="vencedor_id" name="vencedor_id" required>
               <option value="">Selecione...</option>
               <% jogadores.forEach((j) => { %>
-                <option value="<%= j.id %>" <%= sorteio && sorteio.vencedor && sorteio.vencedor.id === j.id ? 'selected' : '' %>>
+                <option value="<%= j.id %>" <%= typeof sorteio !== 'undefined' && sorteio && sorteio.vencedor && sorteio.vencedor.id === j.id ? 'selected' : '' %>>
                   <%= j.nome %><%= j.apelido ? ' (' + j.apelido + ')' : '' %>
                 </option>
               <% }) %>
@@ -82,6 +82,38 @@
     </div>
   </div>
 <% } %>
+
+<div class="card mb-4">
+  <div class="card-header"><strong>Ranking</strong></div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-striped align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="text-center" style="width:60px">#</th>
+            <th>Jogador</th>
+            <th class="text-center">Jogos</th>
+            <th class="text-center">Vitórias</th>
+            <th class="text-center">Derrotas</th>
+            <th class="text-center">Aproveitamento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% ranking.forEach((r) => { %>
+            <tr>
+              <td class="text-center"><strong><%= r.posicao %></strong></td>
+              <td><%= r.jogador.nome %><% if (r.jogador.apelido) { %> <span class="text-muted">(<%= r.jogador.apelido %>)</span><% } %></td>
+              <td class="text-center"><%= r.jogos %></td>
+              <td class="text-center text-success fw-bold"><%= r.vitorias %></td>
+              <td class="text-center text-danger"><%= r.derrotas %></td>
+              <td class="text-center"><%= r.aproveitamento %>%</td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <div class="row g-4">
   <div class="col-lg-5">

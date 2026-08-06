@@ -5,6 +5,7 @@ const router = express.Router()
 
 const EventoService = require('../services/eventoService')
 const SorteioService = require('../services/sorteioService')
+const RankingService = require('../services/rankingService')
 const eventoValidators = require('../validators/eventoValidator')
 const db = require('../db')
 
@@ -71,15 +72,18 @@ function renderDetalhe(res, req, extra) {
       ORDER BY p.data_partida DESC, p.id DESC
     `)
     .all(evento.id)
+  const ranking = RankingService.gerar(evento.id)
 
   res.render('pages/eventos/detalhe', {
     title: evento.nome,
     evento,
     jogadores,
     partidas,
+    ranking,
     statusLabel: STATUS_LABEL,
     msg: req.query.msg || null,
     erro: req.query.erro || null,
+    sorteio: null,
     ...extra
   })
 }
