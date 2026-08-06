@@ -3,6 +3,7 @@ const express = require('express')
 const config = require('./config')
 const routes = require('./routes')
 const eventosRoutes = require('./routes/eventos')
+const jogadoresRoutes = require('./routes/jogadores')
 const { initDb } = require('./db/init')
 
 const app = express()
@@ -18,6 +19,7 @@ initDb()
 
 app.use('/', routes)
 app.use('/', eventosRoutes)
+app.use('/', jogadoresRoutes)
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' })

@@ -1,0 +1,68 @@
+<%- include('../../partials/header', { title }) %>
+
+<div class="mb-4">
+  <h1 class="mb-0"><%= title %></h1>
+  <p class="text-muted mb-0">Evento: <%= evento.nome %></p>
+</div>
+
+<% if (erros && erros.geral) { %>
+  <div class="alert alert-danger"><%= erros.geral %></div>
+<% } %>
+
+<form method="POST"
+      action="<%= jogador.id ? '/eventos/' + evento.id + '/jogadores/' + jogador.id : '/eventos/' + evento.id + '/jogadores' %>">
+  <div class="mb-3">
+    <label for="nome" class="form-label">Nome *</label>
+    <input
+      type="text"
+      class="form-control <%= erros && erros.nome ? 'is-invalid' : '' %>"
+      id="nome"
+      name="nome"
+      value="<%= jogador.nome %>"
+      required
+      maxlength="120"
+    >
+    <% if (erros && erros.nome) { %>
+      <div class="invalid-feedback"><%= erros.nome %></div>
+    <% } %>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="apelido" class="form-label">Apelido</label>
+      <input
+        type="text"
+        class="form-control <%= erros && erros.apelido ? 'is-invalid' : '' %>"
+        id="apelido"
+        name="apelido"
+        value="<%= jogador.apelido %>"
+        maxlength="60"
+      >
+      <% if (erros && erros.apelido) { %>
+        <div class="invalid-feedback"><%= erros.apelido %></div>
+      <% } %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label for="telefone" class="form-label">Telefone</label>
+      <input
+        type="text"
+        class="form-control <%= erros && erros.telefone ? 'is-invalid' : '' %>"
+        id="telefone"
+        name="telefone"
+        value="<%= jogador.telefone %>"
+        maxlength="30"
+      >
+      <% if (erros && erros.telefone) { %>
+        <div class="invalid-feedback"><%= erros.telefone %></div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a href="/eventos/<%= evento.id %>" class="btn btn-secondary">Cancelar</a>
+  </div>
+</form>
+
+<%- include('../../partials/footer') %>
