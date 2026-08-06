@@ -9,6 +9,23 @@
 
 ## 1. Resumo Executivo
 
+## Status de Implementação (atualização)
+
+> Estados: ✔ concluído | 🔄 em andamento | ⏳ pendente
+
+| Fase | Descrição | Status |
+|------|-----------|--------|
+| F0 | Setup (Express + SQLite + EJS, healthcheck, testes) | ✔ |
+| F1 | CRUD de Eventos (status, bloqueios, validações) | ✔ |
+| F2 | CRUD de Jogadores por evento | ✔ |
+| F3 | Partidas: registro, edição e exclusão | ✔ |
+| F4 | Sorteio automático do próximo adversário | ✔ |
+| F5 | Ranking por evento (V → D → ordem de cadastro) | ✔ |
+| Extra | Campanha individual (de quem ganhou/perdeu) | ✔ |
+| F6 | UX (responsividade, navegação, refinamentos) | ⏳ |
+| F7 | Testes de integração adicionais | ⏳ |
+| F8 | Evoluções (ranking entre eventos, múltiplas mesas) | ⏳ |
+
 O objetivo é construir um sistema web para controlar partidas de sinuca em um
 ambiente social (bar/clube): o usuário cadastra **jogadores**, informa **partidas**
 (jogador x adversário + vencedor) e o sistema gera automaticamente um **ranking**
