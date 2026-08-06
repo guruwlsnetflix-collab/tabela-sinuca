@@ -24,7 +24,13 @@ router.get('/eventos/:eventoId/partidas/novo', (req, res) => {
   try {
     const evento = EventoService.obter(Number(req.params.eventoId))
     const jogadores = JogadorService.listarPorEvento(evento.id)
-    renderForm(res, { evento, jogadores, partida: null, erros: null })
+    const partida = {
+      jogador_a_id: req.query.jogador_a_id || '',
+      jogador_b_id: req.query.jogador_b_id || '',
+      vencedor_id: req.query.vencedor_id || '',
+      data_partida: ''
+    }
+    renderForm(res, { evento, jogadores, partida, erros: null })
   } catch (err) {
     res.status(err.status || 500).render('pages/404')
   }

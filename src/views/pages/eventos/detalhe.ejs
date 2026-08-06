@@ -36,6 +36,53 @@
   </div>
 </div>
 
+<% if (evento.status !== 'encerrado') { %>
+  <div class="card mb-4">
+    <div class="card-header"><strong>Sorteio do próximo adversário</strong></div>
+    <div class="card-body">
+      <% if (jogadores.length < 2) { %>
+        <p class="text-muted mb-0">Cadastre ao menos 2 jogadores para sortear o próximo adversário.</p>
+      <% } else { %>
+        <form method="GET" action="/eventos/<%= evento.id %>/sorteio" class="row g-2 align-items-end">
+          <div class="col-md-6">
+            <label for="vencedor_id" class="form-label">Quem está na mesa (vencedor atual)</label>
+            <select class="form-select" id="vencedor_id" name="vencedor_id" required>
+              <option value="">Selecione...</option>
+              <% jogadores.forEach((j) => { %>
+                <option value="<%= j.id %>" <%= sorteio && sorteio.vencedor && sorteio.vencedor.id === j.id ? 'selected' : '' %>>
+                  <%= j.nome %><%= j.apelido ? ' (' + j.apelido + ')' : '' %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <button type="submit" class="btn btn-outline-primary">🎲 Sortear adversário</button>
+          </div>
+        </form>
+
+        <% if (sorteio && sorteio.semOponente) { %>
+          <div class="alert alert-warning mt-3 mb-0">
+            <%= sorteio.vencedor.nome %> é o único jogador ativo do evento. Não há adversários para sortear.
+          </div>
+        <% } else if (sorteio && sorteio.sugestao) { %>
+          <div class="alert alert-success mt-3 mb-0 d-flex justify-content-between align-items-center">
+            <span>
+              Próximo confronto sugerido: <strong><%= sorteio.vencedor.nome %></strong> ×
+              <strong><%= sorteio.sugestao.nome %></strong>
+              <% if (sorteio.ultimoAdversario) { %>
+                <br><small class="text-muted">Último adversário de <%= sorteio.vencedor.nome %>: <%= sorteio.ultimoAdversarioNome %></small>
+              <% } %>
+            </span>
+            <a class="btn btn-sm btn-success" href="/eventos/<%= evento.id %>/partidas/novo?jogador_a_id=<%= sorteio.vencedor.id %>&jogador_b_id=<%= sorteio.sugestao.id %>">
+              Registrar partida
+            </a>
+          </div>
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+<% } %>
+
 <div class="row g-4">
   <div class="col-lg-5">
     <div class="card">

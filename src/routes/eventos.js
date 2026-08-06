@@ -4,6 +4,7 @@ const { validationResult } = require('express-validator')
 const router = express.Router()
 
 const EventoService = require('../services/eventoService')
+const SorteioService = require('../services/sorteioService')
 const eventoValidators = require('../validators/eventoValidator')
 const db = require('../db')
 
@@ -53,36 +54,63 @@ router.post('/eventos', eventoValidators.criar, (req, res) => {
   }
 })
 
+function renderDetalhe(res, req, extra) {
+  const evento = EventoService.obter(Number(req.params.id))
+  const jogadores = db
+    .prepare('SELECT id, nome, apelido, ativo FROM jogadores WHERE evento_id = ? ORDER BY nome')
+    .all(evento.id)
+  const partidas = db
+    .prepare(`
+      SELECT p.id, p.data_partida, pa.nome AS jogador_a, pb.nome AS jogador_b,
+             pv.nome AS vencedor, p.jogador_a_id, p.jogador_b_id, p.vencedor_id
+      FROM partidas p
+      JOIN jogadores pa ON pa.id = p.jogador_a_id
+      JOIN jogadores pb ON pb.id = p.jogador_b_id
+      JOIN jogadores pv ON pv.id = p.vencedor_id
+      WHERE p.evento_id = ?
+      ORDER BY p.data_partida DESC, p.id DESC
+    `)
+    .all(evento.id)
+
+  res.render('pages/eventos/detalhe', {
+    title: evento.nome,
+    evento,
+    jogadores,
+    partidas,
+    statusLabel: STATUS_LABEL,
+    msg: req.query.msg || null,
+    erro: req.query.erro || null,
+    ...extra
+  })
+}
+
 router.get('/eventos/:id', (req, res) => {
   try {
-    const evento = EventoService.obter(Number(req.params.id))
-    const jogadores = db
-      .prepare('SELECT id, nome, apelido, ativo FROM jogadores WHERE evento_id = ? ORDER BY nome')
-      .all(evento.id)
-    const partidas = db
-      .prepare(`
-        SELECT p.id, p.data_partida, pa.nome AS jogador_a, pb.nome AS jogador_b,
-               pv.nome AS vencedor, p.jogador_a_id, p.jogador_b_id, p.vencedor_id
-        FROM partidas p
-        JOIN jogadores pa ON pa.id = p.jogador_a_id
-        JOIN jogadores pb ON pb.id = p.jogador_b_id
-        JOIN jogadores pv ON pv.id = p.vencedor_id
-        WHERE p.evento_id = ?
-        ORDER BY p.data_partida DESC, p.id DESC
-      `)
-      .all(evento.id)
-
-    res.render('pages/eventos/detalhe', {
-      title: evento.nome,
-      evento,
-      jogadores,
-      partidas,
-      statusLabel: STATUS_LABEL,
-      msg: req.query.msg || null,
-      erro: req.query.erro || null
-    })
+    renderDetalhe(res, req, {})
   } catch (err) {
     res.status(err.status || 500).render('pages/404')
+  }
+})
+
+router.get('/eventos/:id/sorteio', (req, res) => {
+  try {
+    const vencedorId = Number(req.query.vencedor_id)
+    const resultado = SorteioService.sugerirProximoAdversario(Number(req.params.id), vencedorId)
+    const vencedor = db
+      .prepare('SELECT id, nome, apelido FROM jogadores WHERE id = ?')
+      .get(vencedorId)
+    const ultimoAdversario = resultado.ultimoAdversario
+      ? db.prepare('SELECT nome FROM jogadores WHERE id = ?').get(resultado.ultimoAdversario)
+      : null
+    renderDetalhe(res, req, {
+      sorteio: {
+        ...resultado,
+        vencedor,
+        ultimoAdversarioNome: ultimoAdversario ? ultimoAdversario.nome : null
+      }
+    })
+  } catch (err) {
+    res.redirect(`/eventos/${req.params.id}?erro=${encodeURIComponent(err.message)}`)
   }
 })
 
