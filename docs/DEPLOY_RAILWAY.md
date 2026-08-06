@@ -40,17 +40,23 @@ deploy). Para não perder os dados do banco, criamos um **volume** persistente:
 ## Passo 3 — Configurar a variável de ambiente
 
 1. No serviço, abra a aba **Variables**.
-2. Adicione a variável:
+2. Adicione as variáveis:
 
    | Variável | Valor |
    |----------|-------|
    | `DATABASE_PATH` | `/data/sinuca.db` |
+   | `PORT` | `8080` |
 
-   Esse caminho garante que o arquivo SQLite seja gravado **dentro do volume**
-   montado em `/data`.
+   `PORT=8080` é essencial: a Railway usa o valor da variável `PORT` para o
+   **healthcheck** e para rotear o tráfego (default é `8080`). Sem ela, o app
+   pode subir em outra porta (ex.: `3000` no `Dockerfile`) e o healthcheck
+   falha com *service unavailable*.
 
-> `NODE_ENV=production` e `PORT` são configuradas automaticamente pela Railway.
-> Não é preciso adicioná-las manualmente.
+   `DATABASE_PATH=/data/sinuca.db` garante que o arquivo SQLite seja gravado
+   **dentro do volume** montado em `/data`.
+
+> `NODE_ENV=production` é configurada automaticamente pela Railway.
+> `PORT` deve ser definida manualmente como `8080` (veja acima).
 
 ## Passo 4 — Redeploy
 
