@@ -75,7 +75,7 @@
           <div class="table-responsive">
             <table class="table table-sm align-middle">
               <thead>
-                <tr><th>Data</th><th>Jogador A</th><th>Jogador B</th><th>Vencedor</th></tr>
+                <tr><th>Data</th><th>Jogador A</th><th>Jogador B</th><th>Vencedor</th><th></th></tr>
               </thead>
               <tbody>
                 <% partidas.forEach((p) => { %>
@@ -84,6 +84,15 @@
                     <td><%= p.jogador_a %></td>
                     <td><%= p.jogador_b %></td>
                     <td><strong><%= p.vencedor %></strong></td>
+                    <td class="text-end">
+                      <a href="/eventos/<%= evento.id %>/partidas/<%= p.id %>/editar" class="btn btn-sm btn-outline-secondary">Editar</a>
+                      <% if (evento.status !== 'encerrado') { %>
+                        <form method="POST" action="/eventos/<%= evento.id %>/partidas/<%= p.id %>/excluir" class="d-inline"
+                              onsubmit="return confirm('Excluir esta partida?');">
+                          <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                        </form>
+                      <% } %>
+                    </td>
                   </tr>
                 <% }) %>
               </tbody>

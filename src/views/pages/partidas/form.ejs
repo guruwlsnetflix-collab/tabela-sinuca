@@ -1,0 +1,93 @@
+<%- include('../../partials/header', { title }) %>
+
+<div class="mb-4">
+  <h1 class="mb-0"><%= title %></h1>
+  <p class="text-muted mb-0">Evento: <%= evento.nome %></p>
+</div>
+
+<% if (erros && erros.geral) { %>
+  <div class="alert alert-danger"><%= erros.geral %></div>
+<% } %>
+
+<% if (jogadores.length < 2) { %>
+  <div class="alert alert-warning">
+    É necessário cadastrar ao menos <strong>2 jogadores</strong> no evento para registrar partidas.
+    <a href="/eventos/<%= evento.id %>/jogadores/novo">Cadastrar jogador</a>
+  </div>
+<% } %>
+
+<form method="POST"
+      action="<%= partida.id ? '/eventos/' + evento.id + '/partidas/' + partida.id : '/eventos/' + evento.id + '/partidas' %>">
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="jogador_a_id" class="form-label">Jogador A *</label>
+      <select class="form-select <%= erros && erros.jogador_a_id ? 'is-invalid' : '' %>"
+              id="jogador_a_id" name="jogador_a_id" required>
+        <option value="">Selecione...</option>
+        <% jogadores.forEach((j) => { %>
+          <option value="<%= j.id %>" <%= String(partida.jogador_a_id) === String(j.id) ? 'selected' : '' %>>
+            <%= j.nome %><%= j.apelido ? ' (' + j.apelido + ')' : '' %>
+          </option>
+        <% }) %>
+      </select>
+      <% if (erros && erros.jogador_a_id) { %>
+        <div class="invalid-feedback"><%= erros.jogador_a_id %></div>
+      <% } %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label for="jogador_b_id" class="form-label">Jogador B *</label>
+      <select class="form-select <%= erros && erros.jogador_b_id ? 'is-invalid' : '' %>"
+              id="jogador_b_id" name="jogador_b_id" required>
+        <option value="">Selecione...</option>
+        <% jogadores.forEach((j) => { %>
+          <option value="<%= j.id %>" <%= String(partida.jogador_b_id) === String(j.id) ? 'selected' : '' %>>
+            <%= j.nome %><%= j.apelido ? ' (' + j.apelido + ')' : '' %>
+          </option>
+        <% }) %>
+      </select>
+      <% if (erros && erros.jogador_b_id) { %>
+        <div class="invalid-feedback"><%= erros.jogador_b_id %></div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="vencedor_id" class="form-label">Vencedor *</label>
+      <select class="form-select <%= erros && erros.vencedor_id ? 'is-invalid' : '' %>"
+              id="vencedor_id" name="vencedor_id" required>
+        <option value="">Selecione...</option>
+        <% jogadores.forEach((j) => { %>
+          <option value="<%= j.id %>" <%= String(partida.vencedor_id) === String(j.id) ? 'selected' : '' %>>
+            <%= j.nome %><%= j.apelido ? ' (' + j.apelido + ')' : '' %>
+          </option>
+        <% }) %>
+      </select>
+      <% if (erros && erros.vencedor_id) { %>
+        <div class="invalid-feedback"><%= erros.vencedor_id %></div>
+      <% } %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label for="data_partida" class="form-label">Data da partida</label>
+      <input
+        type="datetime-local"
+        class="form-control <%= erros && erros.data_partida ? 'is-invalid' : '' %>"
+        id="data_partida"
+        name="data_partida"
+        value="<%= partida.data_partida ? partida.data_partida.replace(' ', 'T').substring(0, 16) : '' %>"
+      >
+      <% if (erros && erros.data_partida) { %>
+        <div class="invalid-feedback"><%= erros.data_partida %></div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary" <%= jogadores.length < 2 ? 'disabled' : '' %>>Salvar</button>
+    <a href="/eventos/<%= evento.id %>" class="btn btn-secondary">Cancelar</a>
+  </div>
+</form>
+
+<%- include('../../partials/footer') %>

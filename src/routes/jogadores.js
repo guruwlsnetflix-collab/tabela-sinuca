@@ -8,9 +8,10 @@ const JogadorService = require('../services/jogadorService')
 const jogadorValidators = require('../validators/jogadorValidator')
 
 function renderForm(res, { evento, jogador, erros }) {
+  const editando = Boolean(jogador && jogador.id)
   const status = erros ? 400 : 200
   res.status(status).render('pages/jogadores/form', {
-    title: jogador ? 'Editar jogador' : 'Novo jogador',
+    title: editando ? 'Editar jogador' : 'Novo jogador',
     evento,
     jogador: jogador || { nome: '', apelido: '', telefone: '' },
     erros
