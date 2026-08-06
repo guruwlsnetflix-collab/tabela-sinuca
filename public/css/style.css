@@ -1,11 +1,24 @@
 body {
-  background-color: #f8f9fa;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
   /* Evita estouro horizontal por textos longos */
   overflow-wrap: break-word;
 }
 
 .navbar-brand {
   font-weight: 700;
+}
+
+/* Transição suave ao alternar tema */
+body,
+.navbar,
+.card,
+.table,
+.form-control,
+.form-select,
+.badge,
+.alert {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 /* =========================================================
@@ -71,10 +84,10 @@ body {
     display: block;
     margin-bottom: 0.75rem;
     padding: 0.5rem 0.875rem;
-    background-color: #fff;
-    border: 1px solid #dee2e6;
+    background-color: var(--bs-secondary-bg);
+    border: 1px solid var(--bs-border-color);
     border-radius: 0.5rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   }
 
   .table-cards tr:last-child {
@@ -88,7 +101,7 @@ body {
     gap: 0.5rem;
     flex-wrap: wrap;
     padding: 0.4rem 0;
-    border-bottom: 1px dashed #e9ecef;
+    border-bottom: 1px dashed var(--bs-border-color);
     overflow-wrap: anywhere;
   }
 
@@ -100,7 +113,7 @@ body {
     content: attr(data-label);
     flex: 0 0 auto;
     font-weight: 600;
-    color: #6c757d;
+    color: var(--bs-secondary-color);
   }
 
   /* Grupo de ações dentro de um card (Editar/Excluir, etc.) */
