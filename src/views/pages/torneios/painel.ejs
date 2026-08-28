@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0B1020">
+  <meta http-equiv="refresh" content="15">
+  <title><%= estado.torneio.nome %> — Painel | Tabela de Sinuca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/painel.css">
+</head>
+<body class="painel">
+  <%
+    var t = estado.torneio
+    var fin = t.status === 'finalizado'
+    var aoVivo = estado.confrontos.filter(function (c) { return c.status === 'em_andamento' })
+    var faseAtual = estado.faseAtual
+    var proximoId = (faseAtual && faseAtual.confronto && faseAtual.confronto.status === 'aguardando')
+      ? faseAtual.confronto.id
+      : null
+  %>
+
+  <header class="painel-header">
+    <div class="painel-brand" aria-hidden="true">🎱</div>
+    <div class="painel-header__main">
+      <h1 class="painel-title"><%= t.nome %></h1>
+      <div class="painel-sub">
+        <% if (t.local) { %><span class="painel-chip"><%= t.local %></span><% } %>
+        <span class="painel-chip"><%= t.data_inicio %><%= t.previsao_termino && t.previsao_termino !== t.data_inicio ? ' → ' + t.previsao_termino : '' %></span>
+        <span class="painel-chip">Modalidade: <%= t.modalidadeLabel %></span>
+      </div>
+    </div>
+    <div class="painel-fase">
+      <span class="painel-fase__label">FASE ATUAL</span>
+      <span class="painel-fase__value">
+        <%- fin ? '🏆 ' + t.vencedor_nome : (faseAtual ? faseAtual.label : 'Aguardando início') %>
+      </span>
+    </div>
+  </header>
+
+  <% if (fin) { %>
+    <div class="painel-campeao">
+      <span class="painel-campeao__item" aria-hidden="true">🏆</span>
+      <span class="painel-campeao__text"><%= t.vencedor_nome %> é o CAMPEÃO!</span>
+      <span class="painel-campeao__item" aria-hidden="true">🏆</span>
+    </div>
+  <% } %>
+
+  <main class="painel-chave">
+    <% estado.fases.forEach(function (fase) { %>
+      <section class="painel-coluna">
+        <h2 class="painel-coluna__titulo"><%= fase.label %></h2>
+        <div class="painel-coluna__jogos">
+          <% fase.confrontos.forEach(function (c) {
+            var vivo = c.status === 'em_andamento'
+            var proximo = !vivo && c.id === proximoId
+            var vencedorA = c.vencedor_id === c.jogador_a_id
+            var vencedorB = c.vencedor_id === c.jogador_b_id
+            var waits = c.status === 'aguardando' && !c.preparado
+          %>
+            <div class="painel-confronto <%= vivo ? 'painel-confronto--vivo' : (proximo ? 'painel-confronto--proximo' : (c.status === 'finalizado' ? 'painel-confronto--fim' : '')) %>">
+              <% if (vivo) { %>
+                <div class="painel-vivo">
+                  <span class="painel-vivo__ponto"></span>
+                  <span class="painel-vivo__texto">AO VIVO</span>
+                  <span class="painel-vivo__conf">Confronto <%= c.numero %></span>
+                  <span class="painel-vivo__partida">Partida <%= c.proximaPartida %> de até <%= c.maximoPartidas %></span>
+                </div>
+              <% } %>
+              <% if (proximo) { %>
+                <div class="painel-proximo">PRÓXIMO</div>
+              <% } %>
+              <% if (waits) { %>
+                <div class="painel-definir">
+                  <div class="painel-jogador">
+                    <span class="painel-nome"><%= c.jogador_a_nome || '—' %></span>
+                    <span class="painel-placar">0</span>
+                  </div>
+                  <div class="painel-anda">
+                    <span class="painel-vs">×</span>
+                    <span class="painel-label">Definindo…</span>
+                  </div>
+                  <div class="painel-jogador">
+                    <span class="painel-nome"><%= c.jogador_b_nome || '—' %></span>
+                    <span class="painel-placar">0</span>
+                  </div>
+                </div>
+              <% } else { %>
+                <div class="painel-jogo">
+                  <div class="painel-jogador <%= vencedorA ? 'painel-jogador--vencedor' : '' %>">
+                    <span class="painel-nome"><%= c.jogador_a_nome || '—' %></span>
+                    <span class="painel-placar"><%= c.placar_a %></span>
+                  </div>
+                  <div class="painel-anda">
+                    <span class="painel-vs">×</span>
+                    <%- c.status === 'finalizado' ? '<span class="painel-classificado">' + (c.numero === 15 ? 'CAMPEÃO' : 'CLASSIFICADO') + '</span>' : '<span class="painel-conf-num">C' + c.numero + '</span>' %>
+                  </div>
+                  <div class="painel-jogador <%= vencedorB ? 'painel-jogador--vencedor' : '' %>">
+                    <span class="painel-nome"><%= c.jogador_b_nome || '—' %></span>
+                    <span class="painel-placar"><%= c.placar_b %></span>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      </section>
+    <% }) %>
+  </main>
+
+  <footer class="painel-rodape">
+    <span class="painel-rodape__item">🎱 Tabela de Sinuca</span>
+    <span class="painel-rodape__item">Atualização automática</span>
+  </footer>
+</body>
+</html>

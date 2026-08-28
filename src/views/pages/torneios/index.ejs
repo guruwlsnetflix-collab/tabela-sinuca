@@ -1,0 +1,53 @@
+<%- include('../../partials/header', { title }) %>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+  <div class="p-alert p-alert--success mb-4" role="status"><%= msg %></div>
+<% } %>
+<% if (typeof erro !== 'undefined' && erro) { %>
+  <div class="p-alert p-alert--danger mb-4" role="alert"><%= erro %></div>
+<% } %>
+
+<div class="d-flex align-items-center justify-content-between mb-4 gap-3">
+  <div class="min-w-0">
+    <h1 class="p-page__title h2 mb-0">Torneios</h1>
+    <p class="p-page__subtitle mb-0">Mata-mata com chave de 16 jogadores</p>
+  </div>
+  <a href="/torneios/novo" class="btn btn-primary p-btn p-btn--primary flex-shrink-0">
+    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+    Novo torneio
+  </a>
+</div>
+
+<% if (torneios.length === 0) { %>
+  <div class="p-empty">
+    <div class="p-empty__icon">
+      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+    </div>
+    <div>
+      <p class="fw-semibold mb-1">Nenhum torneio criado ainda</p>
+      <p class="mb-0">Crie um torneio para começar.</p>
+    </div>
+  </div>
+<% } else { %>
+  <div class="p-event-list p-stagger">
+    <% torneios.forEach((t) => { %>
+      <a href="/torneios/<%= t.id %>" class="p-event-card">
+        <div class="p-event-card__icon" aria-hidden="true">🏆</div>
+        <div class="p-event-card__main">
+          <div class="p-event-card__name"><%= t.nome %></div>
+          <div class="p-event-card__dates">
+            <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+            <%= t.local ? t.local + ' · ' : '' %><%= t.data_inicio %><%= t.previsao_termino ? ' → ' + t.previsao_termino : '' %>
+          </div>
+          <span class="badge text-bg-secondary mt-2"><%= statusLabel[t.status] || t.status %></span>
+          <% if (t.vencedor_nome) { %>
+            <span class="badge text-bg-warning mt-2">Campeão: <%= t.vencedor_nome %></span>
+          <% } %>
+        </div>
+        <svg class="p-icon p-event-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </a>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../../partials/footer') %>

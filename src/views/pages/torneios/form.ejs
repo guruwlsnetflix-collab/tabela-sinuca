@@ -1,0 +1,98 @@
+<%- include('../../partials/header', { title }) %>
+
+<div class="mb-4">
+  <h1 class="p-page__title h2 mb-1"><%= title %></h1>
+  <p class="p-page__subtitle mb-0">Dados do torneio eliminatório</p>
+</div>
+
+<% if (erros && erros.geral) { %>
+  <div class="p-alert p-alert--danger mb-4" role="alert"><%= erros.geral %></div>
+<% } %>
+
+<form method="POST" action="<%= modoEdicao ? '/torneios/' + torneio.id : '/torneios' %>">
+  <div class="p-card">
+    <div class="p-card__body">
+      <div class="p-field mb-3">
+        <label for="nome" class="form-label">Nome do torneio *</label>
+        <input
+          type="text"
+          class="form-control <%= erros && erros.nome ? 'is-invalid' : '' %>"
+          id="nome"
+          name="nome"
+          value="<%= torneio.nome %>"
+          required
+          maxlength="120"
+          placeholder="Ex.: Torneio de Sexta"
+        >
+        <% if (erros && erros.nome) { %>
+          <div class="invalid-feedback"><%= erros.nome %></div>
+        <% } %>
+      </div>
+
+      <div class="p-field mb-3">
+        <label for="local" class="form-label">Local</label>
+        <input
+          type="text"
+          class="form-control <%= erros && erros.local ? 'is-invalid' : '' %>"
+          id="local"
+          name="local"
+          value="<%= torneio.local %>"
+          maxlength="120"
+          placeholder="Ex.: Bar do Zé"
+        >
+        <% if (erros && erros.local) { %>
+          <div class="invalid-feedback"><%= erros.local %></div>
+        <% } %>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6 p-field">
+          <label for="data_inicio" class="form-label">Data de início *</label>
+          <input
+            type="date"
+            class="form-control <%= erros && erros.data_inicio ? 'is-invalid' : '' %>"
+            id="data_inicio"
+            name="data_inicio"
+            value="<%= torneio.data_inicio %>"
+            required
+          >
+          <% if (erros && erros.data_inicio) { %>
+            <div class="invalid-feedback"><%= erros.data_inicio %></div>
+          <% } %>
+        </div>
+
+        <div class="col-md-6 p-field">
+          <label for="previsao_termino" class="form-label">Previsão de término</label>
+          <input
+            type="date"
+            class="form-control <%= erros && erros.previsao_termino ? 'is-invalid' : '' %>"
+            id="previsao_termino"
+            name="previsao_termino"
+            value="<%= torneio.previsao_termino %>"
+          >
+          <% if (erros && erros.previsao_termino) { %>
+            <div class="invalid-feedback"><%= erros.previsao_termino %></div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="p-field mt-3">
+        <label for="modalidade" class="form-label">Modalidade *</label>
+        <select id="modalidade" name="modalidade" class="form-select">
+          <option value="par" <%= (torneio.modalidade || 'par') === 'par' ? 'selected' : '' %>>Par</option>
+          <option value="impar" <%= torneio.modalidade === 'impar' ? 'selected' : '' %>>Ímpar</option>
+        </select>
+        <% if (erros && erros.modalidade) { %>
+          <div class="invalid-feedback d-block"><%= erros.modalidade %></div>
+        <% } %>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex mt-4">
+        <button type="submit" class="btn p-btn p-btn--primary">Salvar</button>
+        <a href="<%= modoEdicao ? '/torneios/' + torneio.id : '/torneios' %>" class="btn p-btn p-btn--outline">Cancelar</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<%- include('../../partials/footer') %>

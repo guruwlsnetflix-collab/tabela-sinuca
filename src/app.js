@@ -5,6 +5,8 @@ const routes = require('./routes')
 const eventosRoutes = require('./routes/eventos')
 const jogadoresRoutes = require('./routes/jogadores')
 const partidasRoutes = require('./routes/partidas')
+const torneiosRoutes = require('./routes/torneios')
+const apiTorneiosRoutes = require('./routes/apiTorneios')
 const { initDb } = require('./db/init')
 
 const app = express()
@@ -22,6 +24,8 @@ app.use('/', routes)
 app.use('/', eventosRoutes)
 app.use('/', jogadoresRoutes)
 app.use('/', partidasRoutes)
+app.use('/', torneiosRoutes)
+app.use('/', apiTorneiosRoutes)
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' })

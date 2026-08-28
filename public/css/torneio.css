@@ -1,0 +1,188 @@
+/* =========================================================
+   MÓDULO DE TORNEIOS — área administrativa
+   Chave eliminatória, confrontos, posições.
+   ========================================================= */
+
+/* ---------- Posição na chave ---------- */
+.p-posicao {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--p-text);
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.9), rgba(245, 158, 11, 0.9));
+  color: #10141f;
+  box-shadow: var(--p-glow-gold, none);
+}
+
+.p-player-card--static {
+  flex-wrap: wrap;
+  cursor: default;
+}
+
+.p-player-card--static:hover {
+  transform: none;
+  background: transparent;
+}
+
+/* ---------- Chave (bracket) ---------- */
+.p-chave {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.p-chave__fase-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--p-text);
+  opacity: 0.75;
+  margin: 0 0 0.6rem;
+  padding-left: 0.25rem;
+}
+
+@media (min-width: 992px) {
+  .p-chave {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-items: start;
+    gap: 1rem;
+  }
+  .p-chave__fase > .p-confronto {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* ---------- Confronto ---------- */
+.p-confronto {
+  background: var(--p-surface, transparent);
+  background-color: color-mix(in srgb, var(--p-bg) 92%, transparent);
+  border: 1px solid var(--p-border);
+  border-radius: 0.9rem;
+  padding: 0.8rem;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.2s;
+}
+
+.p-confronto:last-child {
+  margin-bottom: 0;
+}
+
+.p-confronto--ao-vivo {
+  border: 2px solid var(--p-danger);
+  box-shadow: 0 0 0 1px var(--p-danger), 0 8px 28px rgba(239, 68, 68, 0.22);
+}
+
+.p-confronto__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.p-confronto__numero {
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--p-text);
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+.p-confronto__players {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.p-confronto__player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.p-confronto__player .p-confronto__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.p-confronto__player--winner .p-confronto__name {
+  color: #FACC15;
+  font-weight: 800;
+}
+
+.p-confronto__player--winner .p-confronto__score {
+  color: #FACC15;
+}
+
+.p-confronto__name {
+  font-weight: 600;
+}
+
+.p-confronto__score {
+  font-weight: 800;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.p-confronto__divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  width: 5.5rem;
+}
+
+.p-confronto__vs {
+  font-weight: 800;
+  opacity: 0.45;
+}
+
+.p-confronto__partida {
+  font-size: 0.7rem;
+  color: var(--p-danger);
+  font-weight: 700;
+  text-align: center;
+}
+
+.p-confronto__result {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--p-border);
+  font-weight: 800;
+  color: var(--p-primary);
+  font-size: 0.85rem;
+}
+
+.p-confronto__actions {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--p-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.p-action-btn--danger-outline {
+  border: 1px solid color-mix(in srgb, var(--p-danger) 55%, transparent);
+  color: var(--p-danger);
+}
+
+.p-action-btn--danger-outline:hover {
+  background: var(--p-danger);
+  color: #fff;
+  border-color: var(--p-danger);
+}

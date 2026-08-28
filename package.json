@@ -24,7 +24,7 @@
   "author": "wilson souza",
   "license": "MIT",
   "dependencies": {
-    "better-sqlite3": "^11.10.0",
+    "better-sqlite3": "^13.0.3",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",

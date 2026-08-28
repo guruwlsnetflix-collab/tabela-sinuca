@@ -24,6 +24,7 @@
 | Extra | Campanha individual (de quem ganhou/perdeu) | ✔ |
 | F6 | UX (responsividade, navegação, refinamentos) | ✔ |
 | F6.1 | Interface mobile premium (tema escuro, bottom nav, cards) | ✔ |
+| Extra | **Módulo de Torneios** (mata-mata 16 jogadores, chave fixa, painel TV, API JSON) | ✔ |
 | F7 | Testes de integração adicionais | ⏳ |
 | F8 | Evoluções (ranking entre eventos, múltiplas mesas) | ⏳ |
 
@@ -788,6 +789,60 @@ do teste (rejeição com 400) é mantida.
 - `npm start` + `GET` nas rotas principais (`/`, `/eventos/:id`, `/sorteio`,
   `/eventos/novo`, forms, campanha) → **200 OK**.
 - Assets `/css/premium.css`, `/js/app.js` → **200 OK**.
+
+---
+
+## 14. Módulo de Torneios (Extra — decisão técnica)
+
+### 14.1 Contexto
+
+Fora do escopo original (eventos/partidas/ranking com "vencedor permanece na mesa"),
+o usuário solicitou um **módulo de torneios de sinuca** no estilo *mata-mata*, com
+chaveamento de **16 jogadores**, disputas em **melhor de 3** (eliminatórias) e
+**melhor de 5** (final), **avanço automático** de vencedores, **sorteio** da chave,
+**painel público para TV/telão** (com atualização automática) e **tela administrativa**
+para registrar partidas. O detalhamento completo está em **`docs/TORNEIOS.md`**.
+
+### 14.2 Decisão principal: isolamento do módulo
+
+| Opção | Avaliação |
+|-------|-----------|
+| Reutilizar `eventos`/`jogadores`/`partidas` | **Descartada.** `partidas` exige `evento_id` do modelo de ranking; reaproveitá-las contaminaria o ranking (vitórias fora do evento) e exigiria alterar regras existentes (risco de quebrar o sistema). |
+| **Tabelas próprias** (`torneios`, `torneio_jogadores`, `torneio_confrontos`, `torneio_partidas`) | **Adotada.** Módulo 100% isolado; **nenhuma** regra/drota/tabela existente foi alterada. |
+
+### 14.3 O que foi implementado
+
+- **Chave fixa:** oitavas (confrontos 1–8) → quartas (9–12) → semifinais (13–14) →
+  final (15); `vitorias_necessarias` = 2 nas eliminatórias e 3 na final.
+- **Sorteio:** embaralha os 16 jogadores, atribui `posicao` 1–16 e monta a chave;
+  permitido refazer enquanto não houver partidas registradas.
+- **Avanço automático:** `_avancarVencedor` preenche o próximo confronto pela chave
+  fixa (`AVANCO_CHAVE`); a 3ª vitória da final define o campeão e finaliza.
+- **Status:** `cadastro_jogadores` → `sorteado` → `em_andamento` → `finalizado`
+  (+ `cancelado`); edições de torneio/jogadores e re-sorteio bloqueados após sorteio/início.
+- **Correção:** `desfazerUltimaPartida` reverte placar, reabre o confronto e retira
+  o vencedor do confronto seguinte (bloqueado se o seguinte já tiver partidas).
+- **Painel TV:** página standalone `/torneios/:id/painel`, escuro, colunas por fase,
+  destaques **AO VIVO** e **PRÓXIMO**, `<meta refresh="15">`, responsivo.
+- **API JSON (leitura):** `GET /api/torneios`, `GET /api/torneios/:id` e
+  `GET /api/torneios/:id/painel` (estado serializado para integração/placar eletrônico).
+- **Melhoria de dependência:** `better-sqlite3` atualizado para `^13.0.3` (binário
+  pré-compilado compatível com Node 24 — ABI 137), corrigindo falha de build local.
+
+### 14.4 Arquivos
+
+Ver `docs/TORNEIOS.md` seção "Arquivos do módulo". Resumo de novas pastas:
+`src/repositories/{torneioRepository,confrontoRepository}.js`,
+`src/services/torneioService.js`, `src/validators/torneioValidator.js`,
+`src/routes/{torneios,apiTorneios}.js`, `src/views/pages/torneios/*.ejs`,
+`public/css/{torneio,painel}.css`, `tests/torneio.test.js`, `docs/TORNEIOS.md`.
+
+### 14.5 Verificação
+
+- `npm test` → **79/79 testes passando** (8 arquivos; 26 novos de torneio).
+- Simulação manual end-to-end via HTTP (criar → 16 jogadores → sortear → iniciar →
+  partidas 2×1/2×0 em todas as fases → final 3×2 → painel exibindo "CAMPEÃO") → OK.
+- `npm start` + `GET /torneios` → **200 OK** no banco de desenvolvimento.
 
 ---
 
