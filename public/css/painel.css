@@ -202,13 +202,12 @@ body.painel {
   .painel-coluna__jogos {
     position: relative;
     display: grid;
-    grid-template-rows: repeat(16, minmax(0, 1fr));
+    grid-template-rows: repeat(16, minmax(auto, 1fr));
     flex: 1;
     min-height: 0;
   }
   .painel-coluna__jogos .painel-confronto {
     flex: none;
-    min-height: 0;
   }
 }
 
@@ -452,14 +451,14 @@ body.painel--telao .painel-chave {
 body.painel--telao .painel-coluna__jogos {
   position: relative;
   display: grid;
-  grid-template-rows: repeat(16, minmax(0, 1fr));
+  grid-template-rows: repeat(16, minmax(auto, 1fr));
   flex: 1;
   min-height: 0;
 }
 
 body.painel--telao .painel-confronto {
   flex: none;
-  min-height: 0;
+  padding-top: clamp(28px, 3.6vh, 38px);
 }
 
 body.painel--telao .painel-anda {
@@ -471,7 +470,14 @@ body.painel--telao .painel-nome {
 }
 
 body.painel--telao .painel-classificado {
+  top: 6px;
   font-size: clamp(9px, 1.3vh, 14px);
+}
+
+body.painel--telao .painel-vivo,
+body.painel--telao .painel-proximo {
+  top: -10px;
+  left: 10px;
 }
 
 /* Fire Stick muito estreito: volta para lista simples (sem conectores) */

@@ -440,7 +440,7 @@ describe('Torneio — fluxo HTTP completo', () => {
     expect(painel.status).toBe(200)
     expect(painel.text).toContain('CAMPEÃO')
     expect(painel.text).toContain(vencedorNome)
-    expect(painel.text).toContain('meta http-equiv="refresh"')
+    expect(painel.text).toContain('atualizarPainel')
   })
 
   it('variante painel-tv (Fire Stick) força o layout de telão', async () => {
@@ -458,7 +458,9 @@ describe('Torneio — fluxo HTTP completo', () => {
     expect(tv.status).toBe(200)
     expect(tv.text).toContain('painel--telao')
     expect(tv.text).toContain('width=1600')
-    expect(tv.text).toContain('meta http-equiv="refresh"')
+    expect(tv.text).toContain('atualizarPainel')
+    expect(tv.text).not.toContain('http-equiv="refresh"')
+    expect(tv.headers['cache-control']).toBe('no-store')
 
     const original = await request(app).get(`/torneios/${torneioId}/painel`)
     expect(original.status).toBe(200)

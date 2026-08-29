@@ -300,6 +300,7 @@ router.post(
 
 function renderizarPainel(res, torneioId, opcoes = {}) {
   const estado = TorneioService.obterEstado(Number(torneioId))
+  res.set('Cache-Control', 'no-store')
   res.render('pages/torneios/painel', {
     estado,
     statusLabel: TorneioService.STATUS_LABEL,

@@ -133,7 +133,9 @@ Erros são retornados com `{ "erro": "mensagem" }` e o status HTTP correspondent
 - Tema escuro com tipografia ampla, otimizado para telão/televisão.
 - Exibe a chave completa em colunas (oitavas → quartas → semifinais → final).
 - Destaques visuais: confronto **AO VIVO** e o **PRÓXIMO** confronto da rodada.
-- **Auto-refresh** via `<meta http-equiv="refresh" content="15">`.
+- **Atualização automática a cada 15s via AJAX** (sem recarregar a página, evitando
+  que a barra de endereço do navegador da TV apareça sobre o painel). Sem reload,
+  o scroll e a posição da tela são preservados.
 - Responsivo: em telas até ~1100px vira lista vertical com rolagem discreta.
 
 ### Painel para Fire Stick TV / TVs com navegador limitado
@@ -148,8 +150,10 @@ página do torneio).
 A variante:
 - Força o viewport para `width=1600` (o navegador escala para preencher a TV).
 - Aplica a classe `painel--telao`, **ignorando** os media queries de mobile
-  (sempre 4 colunas em telas >900px, 2 colunas abaixo, 1 coluna em telas <560px).
-- Mantém auto-refresh e todas as informações iguais ao painel normal.
+  (sempre 4 colunas em telas >900px, 1 coluna abaixo).
+- Usa `100dvh` para caber na área visível (sem cortes com a barra do navegador)
+  e mantém todas as informações e a atualização AJAX iguais ao painel normal.
+- Conectores entre as fases são desenhados via SVG na posição real dos confrontos.
 
 > A rota `/painel` permanece **intacta** (ótima para computadores/notebooks).
 > Só troque para `/painel-tv` quando abrir em TV/Fire Stick.
