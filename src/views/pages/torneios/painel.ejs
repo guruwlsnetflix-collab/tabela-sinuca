@@ -57,7 +57,7 @@
 
   <main class="painel-chave">
     <% estado.fases.forEach(function (fase) { %>
-      <section class="painel-coluna">
+      <section class="painel-coluna <%= fase.key === 'final' ? 'painel-coluna--fim' : '' %>">
         <h2 class="painel-coluna__titulo"><%= fase.label %></h2>
         <div class="painel-coluna__jogos">
           <% fase.confrontos.forEach(function (c) {
@@ -66,8 +66,10 @@
             var vencedorA = c.vencedor_id === c.jogador_a_id
             var vencedorB = c.vencedor_id === c.jogador_b_id
             var waits = c.status === 'aguardando' && !c.preparado
+            var saiLinha = c.numero !== 15
+            var chegaLinha = c.numero > 8
           %>
-            <div class="painel-confronto <%= vivo ? 'painel-confronto--vivo' : (proximo ? 'painel-confronto--proximo' : (c.status === 'finalizado' ? 'painel-confronto--fim' : '')) %>" style="grid-row: <%= linhaDoConfronto(c.numero) %> / span 2;">
+            <div class="painel-confronto <%= vivo ? 'painel-confronto--vivo' : (proximo ? 'painel-confronto--proximo' : (c.status === 'finalizado' ? 'painel-confronto--fim' : '')) %> <%= saiLinha ? 'painel-card--sai' : '' %> <%= chegaLinha ? 'painel-card--chega' : '' %>" style="grid-row: <%= linhaDoConfronto(c.numero) %> / span 2;">
               <% if (vivo) { %>
                 <div class="painel-vivo">
                   <span class="painel-vivo__ponto"></span>
