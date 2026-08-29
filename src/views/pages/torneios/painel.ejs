@@ -94,7 +94,7 @@
                     <span class="painel-placar"><%= c.placar_a %></span>
                   </div>
                   <% if (c.status === 'finalizado') { %>
-                <span class="painel-classificado <%= c.numero === 15 ? 'painel-classificado--campeao' : '' %>">
+                <span class="painel-classificado <%= c.numero === 15 ? 'painel-classificado--campeao' : '' %> <%= vencedorA ? 'painel-classificado--esq' : 'painel-classificado--dir' %>">
                   <%= c.numero === 15 ? '🏆 CAMPEÃO' : 'CLASSIFICADO' %>
                 </span>
               <% } %>
