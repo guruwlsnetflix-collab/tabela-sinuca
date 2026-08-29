@@ -282,14 +282,29 @@ router.post(
 
 // ---------------- Painel público (TV) ----------------
 
+function renderizarPainel(res, torneioId, opcoes = {}) {
+  const estado = TorneioService.obterEstado(Number(torneioId))
+  res.render('pages/torneios/painel', {
+    estado,
+    statusLabel: TorneioService.STATUS_LABEL,
+    modalidadeLabel: TorneioService.MODALIDADE_LABEL,
+    telaFirestick: Boolean(opcoes.telaFirestick)
+  })
+}
+
 router.get('/torneios/:id/painel', (req, res) => {
   try {
-    const estado = TorneioService.obterEstado(Number(req.params.id))
-    res.render('pages/torneios/painel', {
-      estado,
-      statusLabel: TorneioService.STATUS_LABEL,
-      modalidadeLabel: TorneioService.MODALIDADE_LABEL
-    })
+    renderizarPainel(res, req.params.id)
+  } catch (err) {
+    res.status(err.status || 500).render('pages/404')
+  }
+})
+
+// Variante forçada para TV (Fire Stick / navegadores com viewport pequeno):
+// ignora os media queries de mobile e exibe sempre o layout de telão.
+router.get('/torneios/:id/painel-tv', (req, res) => {
+  try {
+    renderizarPainel(res, req.params.id, { telaFirestick: true })
   } catch (err) {
     res.status(err.status || 500).render('pages/404')
   }

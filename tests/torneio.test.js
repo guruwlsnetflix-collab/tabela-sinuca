@@ -443,6 +443,29 @@ describe('Torneio — fluxo HTTP completo', () => {
     expect(painel.text).toContain('meta http-equiv="refresh"')
   })
 
+  it('variante painel-tv (Fire Stick) força o layout de telão', async () => {
+    const criar = await request(app).post('/torneios').send({
+      nome: 'Torneio TV',
+      data_inicio: '2026-09-01'
+    })
+    const torneioId = Number(criar.headers.location.match(/\/torneios\/(\d+)/)[1])
+    for (let i = 1; i <= 16; i += 1) {
+      await request(app).post(`/torneios/${torneioId}/jogadores`).send({ nome: `Jogador ${i}` })
+    }
+    await request(app).post(`/torneios/${torneioId}/sortear`).send({})
+
+    const tv = await request(app).get(`/torneios/${torneioId}/painel-tv`)
+    expect(tv.status).toBe(200)
+    expect(tv.text).toContain('painel--telao')
+    expect(tv.text).toContain('width=1600')
+    expect(tv.text).toContain('meta http-equiv="refresh"')
+
+    const original = await request(app).get(`/torneios/${torneioId}/painel`)
+    expect(original.status).toBe(200)
+    expect(original.text).not.toContain('painel--telao')
+    expect(original.text).toContain('width=device-width')
+  })
+
   it('não permite sorteio com menos de 16 jogadores (valida na rota)', async () => {
     const criar = await request(app).post('/torneios').send({
       nome: 'Torneio Incompleto',

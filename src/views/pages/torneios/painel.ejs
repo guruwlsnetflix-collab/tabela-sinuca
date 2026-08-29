@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="<%= telaFirestick ? 'width=1600' : 'width=device-width, initial-scale=1.0' %>">
   <meta name="theme-color" content="#0B1020">
   <meta http-equiv="refresh" content="15">
   <title><%= estado.torneio.nome %> — Painel | Tabela de Sinuca</title>
@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/painel.css">
 </head>
-<body class="painel">
+<body class="painel <%= telaFirestick ? 'painel--telao' : '' %>">
   <%
     var t = estado.torneio
     var fin = t.status === 'finalizado'

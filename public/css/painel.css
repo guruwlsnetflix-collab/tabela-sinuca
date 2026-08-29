@@ -363,3 +363,45 @@ body.painel {
   }
   .painel-confronto { min-height: 90px; }
 }
+
+/* ============================================================
+   VARIANTE FIRE STICK TV (body.painel--telao)
+   Navegador Silk reporta viewport ~960px e cai nos media queries
+   de mobile. Estas regras (no fim do arquivo) FORÇAM o layout de
+   telão do computador, independentemente do tamanho do viewport.
+   ============================================================ */
+body.painel--telao {
+  overflow: auto;
+  height: auto;
+  min-height: 100vh;
+}
+
+body.painel--telao .painel-header {
+  flex-wrap: nowrap;
+}
+
+body.painel--telao .painel-fase {
+  min-width: 220px;
+  text-align: right;
+}
+
+body.painel--telao .painel-chave {
+  grid-template-columns: repeat(4, 1fr);
+  flex: none;
+}
+
+body.painel--telao .painel-confronto {
+  min-height: clamp(56px, 10.5vh, 130px);
+}
+
+@media (max-width: 900px) {
+  body.painel--telao .painel-chave {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  body.painel--telao .painel-chave {
+    grid-template-columns: 1fr;
+  }
+}

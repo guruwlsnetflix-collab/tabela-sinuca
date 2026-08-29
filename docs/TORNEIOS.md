@@ -90,6 +90,7 @@ tabelas `eventos`/`jogadores`/`partidas` — não interferem no ranking.
 | POST   | `/torneios/:id/confrontos/:confrontoId/partidas`       | Registrar partida             |
 | POST   | `/torneios/:id/confrontos/:confrontoId/desfazer`       | Desfazer última partida       |
 | GET    | `/torneios/:id/painel`                                 | Painel público (TV)           |
+| GET    | `/torneios/:id/painel-tv`                              | Painel TV forçado p/ Fire Stick / TVs |
 
 ### API JSON (somente leitura)
 
@@ -130,6 +131,24 @@ Erros são retornados com `{ "erro": "mensagem" }` e o status HTTP correspondent
 - Destaques visuais: confronto **AO VIVO** e o **PRÓXIMO** confronto da rodada.
 - **Auto-refresh** via `<meta http-equiv="refresh" content="15">`.
 - Responsivo: em telas até ~1100px vira lista vertical com rolagem discreta.
+
+### Painel para Fire Stick TV / TVs com navegador limitado
+
+Navegadores como o **Amazon Silk** (Fire Stick) reportam um viewport CSS pequeno
+(~960px) mesmo em TVs grandes, fazendo o painel cair no layout mobile. Para esses
+aparelhos use:
+
+**`GET /torneios/:id/painel-tv`** (ou o botão **"Painel TV / Fire Stick"** na
+página do torneio).
+
+A variante:
+- Força o viewport para `width=1600` (o navegador escala para preencher a TV).
+- Aplica a classe `painel--telao`, **ignorando** os media queries de mobile
+  (sempre 4 colunas em telas >900px, 2 colunas abaixo, 1 coluna em telas <560px).
+- Mantém auto-refresh e todas as informações iguais ao painel normal.
+
+> A rota `/painel` permanece **intacta** (ótima para computadores/notebooks).
+> Só troque para `/painel-tv` quando abrir em TV/Fire Stick.
 
 > Dica: para usar o painel em um TV, abra a URL em modo de tela cheia
 > (`F11`) no navegador do aparelho. O painel não requer login.

@@ -48,7 +48,11 @@
       <% } %>
       <a href="/torneios/<%= t.id %>/painel" target="_blank" rel="noopener" class="p-action-btn p-action-btn--report">
         <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-        Painel / TV
+        Painel TV / Computador
+      </a>
+      <a href="/torneios/<%= t.id %>/painel-tv" target="_blank" rel="noopener" class="p-action-btn p-action-btn--report">
+        <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+        Painel TV / Fire Stick
       </a>
       <% if (t.status === 'sorteado') { %>
         <form method="POST" action="/torneios/<%= t.id %>/iniciar" class="d-grid">

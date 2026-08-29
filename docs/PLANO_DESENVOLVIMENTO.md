@@ -823,7 +823,10 @@ para registrar partidas. O detalhamento completo está em **`docs/TORNEIOS.md`**
 - **Correção:** `desfazerUltimaPartida` reverte placar, reabre o confronto e retira
   o vencedor do confronto seguinte (bloqueado se o seguinte já tiver partidas).
 - **Painel TV:** página standalone `/torneios/:id/painel`, escuro, colunas por fase,
-  destaques **AO VIVO** e **PRÓXIMO**, `<meta refresh="15">`, responsivo.
+  destaques **AO VIVO** e **PRÓXIMO**, `<meta refresh="15">`, responsivo. Há ainda a
+  variante **`/torneios/:id/painel-tv`** (Fire Stick/TVs com viewport pequeno) que
+  força o layout de telão (viewport `width=1600` + classe `painel--telao`) sem alterar
+  a rota original.
 - **API JSON (leitura):** `GET /api/torneios`, `GET /api/torneios/:id` e
   `GET /api/torneios/:id/painel` (estado serializado para integração/placar eletrônico).
 - **Melhoria de dependência:** `better-sqlite3` atualizado para `^13.0.3` (binário
