@@ -96,20 +96,20 @@
                   </div>
                 </div>
               <% } else { %>
+                <% if (c.status === 'finalizado') { %>
+                  <span class="painel-classificado <%= c.numero === 15 ? 'painel-classificado--campeao' : '' %> <%= vencedorA ? 'painel-classificado--esq' : 'painel-classificado--dir' %>">
+                    <%= c.numero === 15 ? '🏆 CAMPEÃO' : 'CLASSIFICADO' %>
+                  </span>
+                <% } %>
                 <div class="painel-jogo">
                   <div class="painel-jogador <%= vencedorA ? 'painel-jogador--vencedor' : '' %>">
                     <span class="painel-nome"><%= c.jogador_a_nome || '—' %></span>
                     <span class="painel-placar"><%= c.placar_a %></span>
                   </div>
-                  <% if (c.status === 'finalizado') { %>
-                <span class="painel-classificado <%= c.numero === 15 ? 'painel-classificado--campeao' : '' %> <%= vencedorA ? 'painel-classificado--esq' : 'painel-classificado--dir' %>">
-                  <%= c.numero === 15 ? '🏆 CAMPEÃO' : 'CLASSIFICADO' %>
-                </span>
-              <% } %>
-              <div class="painel-anda">
-                <span class="painel-vs">×</span>
-                <span class="painel-conf-num">C<%= c.numero %></span>
-              </div>
+                  <div class="painel-anda">
+                    <span class="painel-vs">×</span>
+                    <span class="painel-conf-num">C<%= c.numero %></span>
+                  </div>
                   <div class="painel-jogador <%= vencedorB ? 'painel-jogador--vencedor' : '' %>">
                     <span class="painel-nome"><%= c.jogador_b_nome || '—' %></span>
                     <span class="painel-placar"><%= c.placar_b %></span>
