@@ -129,7 +129,26 @@
   </footer>
   </div>
 
+  <div class="painel-hint" id="painel-hint">Pressione OK do controle para entrar em tela cheia</div>
+
   <script>
+    function entrarTelaCheia() {
+      var el = document.documentElement
+      if (document.fullscreenElement || document.webkitFullscreenElement) return
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(function () {})
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen()
+      }
+    }
+
+    function atualizarHint() {
+      var hint = document.getElementById('painel-hint')
+      if (!hint) return
+      var ativo = document.fullscreenElement || document.webkitFullscreenElement
+      hint.classList.toggle('painel-hint--oculto', Boolean(ativo))
+    }
+
     function desenharLinhas() {
         var chave = document.querySelector('.painel-chave')
         var svg = document.querySelector('.painel-linhas')
@@ -202,6 +221,13 @@
         desenharLinhas()
       }
       window.addEventListener('resize', desenharLinhas)
+
+      document.addEventListener('click', entrarTelaCheia)
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') entrarTelaCheia()
+      })
+      document.addEventListener('fullscreenchange', atualizarHint)
+      document.addEventListener('webkitfullscreenchange', atualizarHint)
 
     function atualizarPainel() {
       var xhr = new XMLHttpRequest()
