@@ -56,8 +56,9 @@
   <% } %>
 
   <main class="painel-chave">
+    <svg class="painel-linhas" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none"></svg>
     <% estado.fases.forEach(function (fase) { %>
-      <section class="painel-coluna <%= fase.key === 'final' ? 'painel-coluna--fim' : '' %>">
+      <section class="painel-coluna">
         <h2 class="painel-coluna__titulo"><%= fase.label %></h2>
         <div class="painel-coluna__jogos">
           <% fase.confrontos.forEach(function (c) {
@@ -66,10 +67,8 @@
             var vencedorA = c.vencedor_id === c.jogador_a_id
             var vencedorB = c.vencedor_id === c.jogador_b_id
             var waits = c.status === 'aguardando' && !c.preparado
-            var saiLinha = c.numero !== 15
-            var chegaLinha = c.numero > 8
           %>
-            <div class="painel-confronto <%= vivo ? 'painel-confronto--vivo' : (proximo ? 'painel-confronto--proximo' : (c.status === 'finalizado' ? 'painel-confronto--fim' : '')) %> <%= saiLinha ? 'painel-card--sai' : '' %> <%= chegaLinha ? 'painel-card--chega' : '' %>" style="grid-row: <%= linhaDoConfronto(c.numero) %> / span 2;">
+            <div class="painel-confronto <%= vivo ? 'painel-confronto--vivo' : (proximo ? 'painel-confronto--proximo' : (c.status === 'finalizado' ? 'painel-confronto--fim' : '')) %>" data-numero="<%= c.numero %>" style="grid-row: <%= linhaDoConfronto(c.numero) %> / span 2;">
               <% if (vivo) { %>
                 <div class="painel-vivo">
                   <span class="painel-vivo__ponto"></span>
@@ -128,5 +127,82 @@
     <span class="painel-rodape__item">🎱 Tabela de Sinuca</span>
     <span class="painel-rodape__item">Atualização automática</span>
   </footer>
+
+  <script>
+    (function () {
+      function desenharLinhas() {
+        var chave = document.querySelector('.painel-chave')
+        var svg = document.querySelector('.painel-linhas')
+        if (!chave || !svg) return
+
+        var encontrados = chave.querySelectorAll('.painel-confronto[data-numero]')
+        if (encontrados.length === 0) return
+
+        var colunas = chave.querySelectorAll('.painel-coluna')
+        if (colunas.length < 2) return
+        var r0 = colunas[0].getBoundingClientRect()
+        var r1 = colunas[1].getBoundingClientRect()
+        if (r0.right > r1.left + 2) return
+
+        var cards = {}
+        for (var i = 0; i < encontrados.length; i++) {
+          cards[+encontrados[i].getAttribute('data-numero')] = encontrados[i]
+        }
+
+        var br = chave.getBoundingClientRect()
+        var W = br.width
+        var H = br.height
+        svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H)
+        svg.setAttribute('width', W)
+        svg.setAttribute('height', H)
+
+        function ponto(n, lado) {
+          var r = cards[n].getBoundingClientRect()
+          return {
+            x: (lado === 'e' ? r.left : r.right) - br.left,
+            y: (r.top + r.height / 2) - br.top
+          }
+        }
+
+        var pares = [
+          { a: 1, b: 2, c: 9 }, { a: 3, b: 4, c: 10 },
+          { a: 5, b: 6, c: 11 }, { a: 7, b: 8, c: 12 },
+          { a: 9, b: 10, c: 13 }, { a: 11, b: 12, c: 14 },
+          { a: 13, b: 14, c: 15 }
+        ]
+
+        var d = []
+        for (var j = 0; j < pares.length; j++) {
+          var p = pares[j]
+          if (!cards[p.a] || !cards[p.b] || !cards[p.c]) continue
+          var A = ponto(p.a, 'd')
+          var B = ponto(p.b, 'd')
+          var C = ponto(p.c, 'e')
+          var ex = (A.x + C.x) / 2
+          d.push('M ' + A.x + ' ' + A.y + ' H ' + ex + ' V ' + B.y + ' H ' + B.x)
+          d.push('M ' + ex + ' ' + C.y + ' H ' + C.x)
+        }
+
+        var path = svg.querySelector('path')
+        if (!path) {
+          path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+          svg.appendChild(path)
+        }
+        path.setAttribute('d', d.join(' '))
+        path.setAttribute('fill', 'none')
+        path.setAttribute('stroke', 'rgba(255, 255, 255, 0.42)')
+        path.setAttribute('stroke-width', '3')
+        path.setAttribute('stroke-linecap', 'round')
+        path.setAttribute('stroke-linejoin', 'round')
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', desenharLinhas)
+      } else {
+        desenharLinhas()
+      }
+      window.addEventListener('resize', desenharLinhas)
+    })()
+  </script>
 </body>
 </html>

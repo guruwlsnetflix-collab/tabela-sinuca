@@ -131,12 +131,22 @@ body.painel {
 /* ---------- Chave (bracket horizontal) ---------- */
 .painel-chave {
   flex: 1;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  --colgap: clamp(10px, 1.4vw, 26px);
+  --colgap: clamp(14px, 2vw, 48px);
   gap: var(--colgap);
   padding: clamp(12px, 1.8vh, 28px) clamp(16px, 2.4vw, 48px);
   min-height: 0;
+}
+
+.painel-linhas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .painel-coluna {
@@ -192,49 +202,6 @@ body.painel {
   .painel-coluna__jogos .painel-confronto {
     flex: none;
     min-height: 0;
-  }
-
-  /* Conectores: linha vertical ("trilho") à direita de cada coluna
-     + tracinhos horizontais saindo dos confrontos rumo ao trilho. */
-  .painel-coluna__jogos::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: calc(var(--colgap) / -2 - 1px);
-    width: 3px;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.05),
-      rgba(255, 255, 255, 0.28) 12%,
-      rgba(255, 255, 255, 0.28) 88%,
-      rgba(255, 255, 255, 0.05)
-    );
-    border-radius: 2px;
-    pointer-events: none;
-  }
-  .painel-coluna--fim .painel-coluna__jogos::after {
-    display: none;
-  }
-
-  .painel-card--sai::after,
-  .painel-card--chega::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    height: 3px;
-    width: calc(var(--colgap) / 2 + 5px);
-    background: rgba(255, 255, 255, 0.38);
-    transform: translateY(-50%);
-    pointer-events: none;
-  }
-  .painel-card--sai::after {
-    right: 0;
-    border-radius: 0 3px 3px 0;
-  }
-  .painel-card--chega::before {
-    left: 0;
-    border-radius: 3px 0 0 3px;
   }
 }
 
@@ -499,48 +466,6 @@ body.painel--telao .painel-classificado {
   font-size: clamp(9px, 1.3vh, 14px);
 }
 
-/* Conectores no modo telão (análogo ao desktop) */
-body.painel--telao .painel-coluna__jogos::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: calc(var(--colgap) / -2 - 1px);
-  width: 3px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.28) 12%,
-    rgba(255, 255, 255, 0.28) 88%,
-    rgba(255, 255, 255, 0.05)
-  );
-  border-radius: 2px;
-  pointer-events: none;
-}
-body.painel--telao .painel-coluna--fim .painel-coluna__jogos::after {
-  display: none;
-}
-
-body.painel--telao .painel-card--sai::after,
-body.painel--telao .painel-card--chega::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  height: 3px;
-  width: calc(var(--colgap) / 2 + 5px);
-  background: rgba(255, 255, 255, 0.38);
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-body.painel--telao .painel-card--sai::after {
-  right: 0;
-  border-radius: 0 3px 3px 0;
-}
-body.painel--telao .painel-card--chega::before {
-  left: 0;
-  border-radius: 3px 0 0 3px;
-}
-
 /* Fire Stick muito estreito: volta para lista simples (sem conectores) */
 @media (max-width: 900px) {
   body.painel--telao .painel-chave {
@@ -549,9 +474,7 @@ body.painel--telao .painel-card--chega::before {
   body.painel--telao .painel-coluna__jogos {
     display: flex;
   }
-  body.painel--telao .painel-coluna__jogos::after,
-  body.painel--telao .painel-card--sai::after,
-  body.painel--telao .painel-card--chega::before {
+  body.painel--telao .painel-linhas {
     display: none;
   }
 }
