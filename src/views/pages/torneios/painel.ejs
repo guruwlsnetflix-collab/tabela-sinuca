@@ -20,6 +20,13 @@
     var proximoId = (faseAtual && faseAtual.confronto && faseAtual.confronto.status === 'aguardando')
       ? faseAtual.confronto.id
       : null
+    // Linha inicial em grid de 16 meios: quartas/semis/final ficam entre os dois do nível anterior
+    function linhaDoConfronto(numero) {
+      if (numero <= 8) return numero * 2 - 1
+      if (numero <= 12) return (numero - 9) * 4 + 2
+      if (numero <= 14) return (numero - 13) * 8 + 4
+      return 8
+    }
   %>
 
   <header class="painel-header">
@@ -60,7 +67,7 @@
             var vencedorB = c.vencedor_id === c.jogador_b_id
             var waits = c.status === 'aguardando' && !c.preparado
           %>
-            <div class="painel-confronto <%= vivo ? 'painel-confronto--vivo' : (proximo ? 'painel-confronto--proximo' : (c.status === 'finalizado' ? 'painel-confronto--fim' : '')) %>">
+            <div class="painel-confronto <%= vivo ? 'painel-confronto--vivo' : (proximo ? 'painel-confronto--proximo' : (c.status === 'finalizado' ? 'painel-confronto--fim' : '')) %>" style="grid-row: <%= linhaDoConfronto(c.numero) %> / span 2;">
               <% if (vivo) { %>
                 <div class="painel-vivo">
                   <span class="painel-vivo__ponto"></span>

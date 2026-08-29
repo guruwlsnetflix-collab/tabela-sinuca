@@ -177,6 +177,20 @@ body.painel {
   position: relative;
 }
 
+/* Chave em "escadinha": todos os confrontos com o MESMO tamanho das
+   oitavas, e cada confronto das fases seguintes centralizado entre os
+   DOIS confrontos do nível anterior (grid de 16 meias-linhas). */
+@media (min-width: 1101px) {
+  .painel-coluna__jogos {
+    display: grid;
+    grid-template-rows: repeat(16, minmax(0, 1fr));
+  }
+  .painel-coluna__jogos .painel-confronto {
+    flex: none;
+    min-height: 0;
+  }
+}
+
 .painel-confronto--fim {
   border-color: rgba(47, 209, 111, 0.4);
   background: rgba(47, 209, 111, 0.07);
@@ -412,6 +426,11 @@ body.painel--telao .painel-chave {
   flex: none;
 }
 
+body.painel--telao .painel-coluna__jogos {
+  display: grid;
+  grid-template-rows: repeat(16, auto);
+}
+
 body.painel--telao .painel-confronto {
   min-height: clamp(56px, 10.5vh, 130px);
 }
@@ -437,5 +456,8 @@ body.painel--telao .painel-classificado {
 @media (max-width: 560px) {
   body.painel--telao .painel-chave {
     grid-template-columns: 1fr;
+  }
+  body.painel--telao .painel-coluna__jogos {
+    display: flex;
   }
 }
