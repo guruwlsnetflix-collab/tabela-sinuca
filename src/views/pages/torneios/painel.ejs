@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="<%= telaFirestick ? 'width=1600' : 'width=device-width, initial-scale=1.0' %>">
   <meta name="theme-color" content="#0B1020">
-  <meta http-equiv="refresh" content="15">
+  <meta http-equiv="refresh" content="300">
   <title><%= estado.torneio.nome %> — Painel | Tabela de Sinuca</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/css/painel.css">
 </head>
 <body class="painel <%= telaFirestick ? 'painel--telao' : '' %>">
+  <div id="painel-alvo">
   <%
     var t = estado.torneio
     var fin = t.status === 'finalizado'
@@ -127,10 +128,10 @@
     <span class="painel-rodape__item">🎱 Tabela de Sinuca</span>
     <span class="painel-rodape__item">Atualização automática</span>
   </footer>
+  </div>
 
   <script>
-    (function () {
-      function desenharLinhas() {
+    function desenharLinhas() {
         var chave = document.querySelector('.painel-chave')
         var svg = document.querySelector('.painel-linhas')
         if (!chave || !svg) return
@@ -202,7 +203,24 @@
         desenharLinhas()
       }
       window.addEventListener('resize', desenharLinhas)
-    })()
+
+    function atualizarPainel() {
+      var xhr = new XMLHttpRequest()
+      xhr.open('GET', window.location.pathname + '?_=' + Date.now())
+      xhr.onload = function () {
+        if (xhr.status !== 200) return
+        var doc = new DOMParser().parseFromString(xhr.responseText, 'text/html')
+        var alvo = document.getElementById('painel-alvo')
+        var novo = doc.getElementById('painel-alvo')
+        if (alvo && novo) {
+          alvo.innerHTML = novo.innerHTML
+          desenharLinhas()
+        }
+      }
+      xhr.send()
+    }
+
+    window.setInterval(atualizarPainel, 15000)
   </script>
 </body>
 </html>
