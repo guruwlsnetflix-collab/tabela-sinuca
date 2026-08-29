@@ -180,7 +180,7 @@
       <div class="p-chave__fase">
         <h3 class="p-chave__fase-title"><%= fase.label %></h3>
         <% fase.confrontos.forEach((conf) => { %>
-          <div class="p-confronto <%= conf.status === 'em_andamento' ? 'p-confronto--ao-vivo' : '' %>">
+          <div id="confronto-<%= conf.id %>" class="p-confronto <%= conf.status === 'em_andamento' ? 'p-confronto--ao-vivo' : '' %>">
             <div class="p-confronto__head">
               <span class="p-confronto__numero">Confronto <%= conf.numero %></span>
               <span class="badge <%= conf.status === 'finalizado' ? 'text-bg-success' : (conf.status === 'em_andamento' ? 'text-bg-danger' : 'text-bg-secondary') %>">

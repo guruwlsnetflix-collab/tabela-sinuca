@@ -48,6 +48,10 @@ partidas de ranking.
    finalizado e o vencedor avança automaticamente.
 6. **Finalizar**: registrar a 3ª vitória da final define o campeão e finaliza o torneio.
 
+> **Posicionamento no mobile:** ao registrar uma partida, os redirecionamentos levam a
+> âncora `#confronto-<id>` — a tela volta para o mesmo confronto; quando o confronto é
+> encerrado, vai para o **próximo confronto** a jogar.
+
 ### Correções e bloqueios
 
 - **Desfazer última partida** (`POST .../confrontos/:confrontoId/desfazer`): reverte o

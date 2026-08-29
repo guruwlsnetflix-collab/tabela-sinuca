@@ -547,4 +547,25 @@ describe('API JSON de torneios', () => {
     expect(res.body.fases[0].confrontos[0].placar_a).toBe(1)
     expect(res.body.fase_atual.confronto.numero).toBe(1)
   })
+
+  it('redireciona com âncora para o confronto após registrar partida', async () => {
+    const torneio = criarTorneio()
+    cadastrar16(torneio.id)
+    TorneioService.sortear(torneio.id)
+    TorneioService.iniciar(torneio.id)
+    const c1 = ConfrontoRepository.obterPorNumero(torneio.id, 1)
+
+    const parcial = await request(app)
+      .post(`/torneios/${torneio.id}/confrontos/${c1.id}/partidas`)
+      .send({ vencedor_id: c1.jogador_a_id })
+    expect(parcial.status).toBe(302)
+    expect(parcial.headers.location).toContain(`#confronto-${c1.id}`)
+
+    const fechado = await request(app)
+      .post(`/torneios/${torneio.id}/confrontos/${c1.id}/partidas`)
+      .send({ vencedor_id: c1.jogador_a_id })
+    const c2 = ConfrontoRepository.obterPorNumero(torneio.id, 2)
+    expect(fechado.status).toBe(302)
+    expect(fechado.headers.location).toContain(`#confronto-${c2.id}`)
+  })
 })

@@ -69,6 +69,7 @@
   padding: 0.8rem;
   margin-bottom: 0.75rem;
   transition: border-color 0.2s;
+  scroll-margin-top: 14px;
 }
 
 .p-confronto:last-child {

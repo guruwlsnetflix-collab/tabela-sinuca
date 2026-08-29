@@ -6,6 +6,21 @@ const router = express.Router()
 const TorneioService = require('../services/torneioService')
 const torneioValidators = require('../validators/torneioValidator')
 
+function alvoConfronto(torneioId, confrontoId) {
+  try {
+    const estado = TorneioService.obterEstado(Number(torneioId))
+    const lista = []
+    estado.fases.forEach((f) => f.confrontos.forEach((c) => lista.push(c)))
+    const idx = lista.findIndex((c) => c.id === Number(confrontoId))
+    if (idx === -1) return Number(confrontoId)
+    if (lista[idx].status !== 'finalizado') return Number(confrontoId)
+    const proximo = lista.find((c) => c.status !== 'finalizado')
+    return proximo ? proximo.id : Number(confrontoId)
+  } catch (err) {
+    return Number(confrontoId)
+  }
+}
+
 function renderForm(res, { torneio, erros, modoEdicao }) {
   const status = erros ? 400 : 200
   res.status(status).render('pages/torneios/form', {
@@ -243,9 +258,9 @@ router.post('/torneios/:id/jogadores/:jogadorId/excluir', (req, res) => {
 router.post('/torneios/:id/confrontos/:confrontoId/iniciar', (req, res) => {
   try {
     TorneioService.iniciarConfronto(Number(req.params.id), Number(req.params.confrontoId))
-    res.redirect(`/torneios/${req.params.id}?msg=Confronto em andamento.`)
+    res.redirect(`/torneios/${req.params.id}?msg=Confronto em andamento.#confronto-${req.params.confrontoId}`)
   } catch (err) {
-    res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}`)
+    res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}#confronto-${req.params.confrontoId}`)
   }
 })
 
@@ -253,7 +268,7 @@ router.post('/torneios/:id/confrontos/:confrontoId/partidas', (req, res) => {
   const vencedorId = Number(req.body.vencedor_id)
   if (!vencedorId) {
     return res.redirect(
-      `/torneios/${req.params.id}?erro=${encodeURIComponent('Selecione o vencedor da partida.')}`
+      `/torneios/${req.params.id}?erro=${encodeURIComponent('Selecione o vencedor da partida.')}#confronto-${req.params.confrontoId}`
     )
   }
   try {
@@ -262,9 +277,10 @@ router.post('/torneios/:id/confrontos/:confrontoId/partidas', (req, res) => {
       Number(req.params.confrontoId),
       vencedorId
     )
-    res.redirect(`/torneios/${req.params.id}?msg=Partida registrada.`)
+    const alvo = alvoConfronto(req.params.id, req.params.confrontoId)
+    res.redirect(`/torneios/${req.params.id}?msg=Partida registrada.#confronto-${alvo}`)
   } catch (err) {
-    res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}`)
+    res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}#confronto-${req.params.confrontoId}`)
   }
 })
 
@@ -273,9 +289,9 @@ router.post(
   (req, res) => {
     try {
       TorneioService.desfazerUltimaPartida(Number(req.params.id), Number(req.params.confrontoId))
-      res.redirect(`/torneios/${req.params.id}?msg=Última partida do confronto desfeita.`)
+      res.redirect(`/torneios/${req.params.id}?msg=Última partida do confronto desfeita.#confronto-${req.params.confrontoId}`)
     } catch (err) {
-      res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}`)
+      res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}#confronto-${req.params.confrontoId}`)
     }
   }
 )
