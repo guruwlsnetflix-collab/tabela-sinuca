@@ -23,6 +23,17 @@ function criarTorneio() {
   })
 }
 
+function criarTorneioComMesas(numeroMesas) {
+  return TorneioService.criar({
+    nome: 'Torneio Mesas',
+    local: 'Bar do Zé',
+    data_inicio: '2026-09-01',
+    previsao_termino: '2026-09-02',
+    modalidade: 'par',
+    numero_mesas: numeroMesas
+  })
+}
+
 function cadastrar16(torneioId) {
   return NOMES.map((nome) => TorneioService.cadastrarJogador({ torneio_id: torneioId, nome }))
 }
@@ -500,6 +511,87 @@ describe('Torneio — fluxo HTTP completo', () => {
     expect(res.status).toBe(400)
     const idx = await request(app).get('/torneios')
     expect(idx.text).not.toContain('undefined')
+  })
+})
+
+describe('TorneioService — número de mesas (jogos simultâneos)', () => {
+  beforeEach(limparDb)
+
+  function prepararTorneio(numeroMesas) {
+    const torneio = numeroMesas ? criarTorneioComMesas(numeroMesas) : criarTorneio()
+    cadastrar16(torneio.id)
+    TorneioService.sortear(torneio.id)
+    TorneioService.iniciar(torneio.id)
+    return torneio.id
+  }
+
+  it('usa 1 mesa por padrão quando não informado', () => {
+    const torneio = criarTorneio()
+    expect(torneio.numero_mesas).toBe(1)
+  })
+
+  it('armazena o número de mesas informado na criação', () => {
+    const torneio = criarTorneioComMesas(3)
+    expect(torneio.numero_mesas).toBe(3)
+  })
+
+  it('permite iniciar confrontos até o limite de mesas e bloqueia o seguinte', () => {
+    const torneioId = prepararTorneio(2)
+    const c1 = ConfrontoRepository.obterPorNumero(torneioId, 1)
+    const c2 = ConfrontoRepository.obterPorNumero(torneioId, 2)
+    const c3 = ConfrontoRepository.obterPorNumero(torneioId, 3)
+
+    expect(TorneioService.iniciarConfronto(torneioId, c1.id).status).toBe('em_andamento')
+    expect(TorneioService.iniciarConfronto(torneioId, c2.id).status).toBe('em_andamento')
+
+    expect(() => TorneioService.iniciarConfronto(torneioId, c3.id)).toThrow('mesa')
+  })
+
+  it('com 1 mesa não permite dois confrontos simultâneos', () => {
+    const torneioId = prepararTorneio(1)
+    const c1 = ConfrontoRepository.obterPorNumero(torneioId, 1)
+    const c2 = ConfrontoRepository.obterPorNumero(torneioId, 2)
+
+    TorneioService.iniciarConfronto(torneioId, c1.id)
+    expect(() => TorneioService.iniciarConfronto(torneioId, c2.id)).toThrow('mesa')
+  })
+
+  it('libera mesa ao finalizar um confronto', () => {
+    const torneioId = prepararTorneio(1)
+    const c1 = ConfrontoRepository.obterPorNumero(torneioId, 1)
+    const c2 = ConfrontoRepository.obterPorNumero(torneioId, 2)
+
+    TorneioService.iniciarConfronto(torneioId, c1.id)
+    expect(() => TorneioService.iniciarConfronto(torneioId, c2.id)).toThrow('mesa')
+
+    TorneioService.registrarPartida(torneioId, c1.id, c1.jogador_a_id)
+    TorneioService.registrarPartida(torneioId, c1.id, c1.jogador_a_id)
+
+    expect(TorneioService.iniciarConfronto(torneioId, c2.id).status).toBe('em_andamento')
+  })
+
+  it('obterEstado informa mesas ocupadas e disponíveis', () => {
+    const torneioId = prepararTorneio(2)
+    let estado = TorneioService.obterEstado(torneioId)
+    expect(estado.torneio.numero_mesas).toBe(2)
+    expect(estado.mesasOcupadas).toBe(0)
+    expect(estado.mesasDisponiveis).toBe(2)
+
+    const c1 = ConfrontoRepository.obterPorNumero(torneioId, 1)
+    TorneioService.iniciarConfronto(torneioId, c1.id)
+
+    estado = TorneioService.obterEstado(torneioId)
+    expect(estado.mesasOcupadas).toBe(1)
+    expect(estado.mesasDisponiveis).toBe(1)
+  })
+
+  it('valida criação com número de mesas inválido (via rota)', async () => {
+    const res = await request(app).post('/torneios').send({
+      nome: 'Torneio Sem Mesa',
+      data_inicio: '2026-09-01',
+      numero_mesas: 0
+    })
+    expect(res.status).toBe(400)
   })
 })
 

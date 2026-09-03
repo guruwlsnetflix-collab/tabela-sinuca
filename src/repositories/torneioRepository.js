@@ -7,7 +7,7 @@ const TorneioRepository = {
     return db
       .prepare(`
         SELECT t.id, t.nome, t.local, t.data_inicio, t.previsao_termino,
-               t.modalidade, t.status, t.criado_em,
+               t.modalidade, t.numero_mesas, t.status, t.criado_em,
                tj.nome AS vencedor_nome
         FROM torneios t
         LEFT JOIN torneio_jogadores tj ON tj.id = t.vencedor_id
@@ -20,7 +20,7 @@ const TorneioRepository = {
     return db
       .prepare(`
         SELECT t.id, t.nome, t.local, t.data_inicio, t.previsao_termino,
-               t.modalidade, t.status, t.vencedor_id, t.criado_em,
+               t.modalidade, t.numero_mesas, t.status, t.vencedor_id, t.criado_em,
                tj.nome AS vencedor_nome
         FROM torneios t
         LEFT JOIN torneio_jogadores tj ON tj.id = t.vencedor_id
@@ -29,22 +29,37 @@ const TorneioRepository = {
       .get(id)
   },
 
-  criar({ nome, local, data_inicio, previsao_termino, modalidade }) {
+  criar({ nome, local, data_inicio, previsao_termino, modalidade, numero_mesas }) {
     const info = db
       .prepare(`
-        INSERT INTO torneios (nome, local, data_inicio, previsao_termino, modalidade)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO torneios (nome, local, data_inicio, previsao_termino, modalidade, numero_mesas)
+        VALUES (?, ?, ?, ?, ?, ?)
       `)
-      .run(nome, local || null, data_inicio, previsao_termino || null, modalidade || 'par')
+      .run(
+        nome,
+        local || null,
+        data_inicio,
+        previsao_termino || null,
+        modalidade || 'par',
+        numero_mesas || 1
+      )
     return this.obterPorId(info.lastInsertRowid)
   },
 
-  atualizar(id, { nome, local, data_inicio, previsao_termino, modalidade }) {
+  atualizar(id, { nome, local, data_inicio, previsao_termino, modalidade, numero_mesas }) {
     db.prepare(`
       UPDATE torneios
-      SET nome = ?, local = ?, data_inicio = ?, previsao_termino = ?, modalidade = ?
+      SET nome = ?, local = ?, data_inicio = ?, previsao_termino = ?, modalidade = ?, numero_mesas = ?
       WHERE id = ?
-    `).run(nome, local || null, data_inicio, previsao_termino || null, modalidade || 'par', id)
+    `).run(
+      nome,
+      local || null,
+      data_inicio,
+      previsao_termino || null,
+      modalidade || 'par',
+      numero_mesas || 1,
+      id
+    )
     return this.obterPorId(id)
   },
 

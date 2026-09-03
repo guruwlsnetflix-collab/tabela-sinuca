@@ -7,6 +7,8 @@
   var torneioAtivo = ['sorteado', 'em_andamento'].indexOf(t.status) >= 0
   var podeCorrigir = ['em_andamento', 'finalizado'].indexOf(t.status) >= 0
   var sorteioPronto = estado.totalJogadores === tamanhoChave
+  var mesasOcupadas = estado.mesasOcupadas || 0
+  var mesasDisponiveis = estado.mesasDisponiveis || 0
 %>
 
 <% if (typeof msg !== 'undefined' && msg) { %>
@@ -27,6 +29,7 @@
         <%= t.statusLabel %>
       </span>
       <span class="badge text-bg-info"><%= t.modalidadeLabel %></span>
+      <span class="badge text-bg-light"><%= t.numero_mesas %> mesa(s)</span>
       <% if (t.local) { %>
         <span class="p-hero__dates">
           <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -213,7 +216,9 @@
               <div class="p-confronto__actions">
                 <% if (conf.status === 'aguardando') { %>
                   <form method="POST" action="/torneios/<%= t.id %>/confrontos/<%= conf.id %>/iniciar" class="d-inline">
-                    <button type="submit" class="btn p-btn p-btn--outline btn-sm">Iniciar confronto</button>
+                    <button type="submit" class="btn p-btn p-btn--outline btn-sm" <%= mesasDisponiveis > 0 ? '' : 'disabled title="Nenhuma mesa disponível. Aguarde um confronto terminar."' %>>
+                      <%= mesasDisponiveis > 0 ? 'Iniciar confronto' : 'Mesas ocupadas' %>
+                    </button>
                   </form>
                 <% } %>
                 <form method="POST" action="/torneios/<%= t.id %>/confrontos/<%= conf.id %>/partidas" class="d-inline-flex gap-2 align-items-center">

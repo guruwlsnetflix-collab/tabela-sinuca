@@ -63,6 +63,8 @@ CREATE TABLE IF NOT EXISTS torneios (
   previsao_termino TEXT,
   modalidade       TEXT    NOT NULL DEFAULT 'par'
     CHECK (modalidade IN ('par', 'impar')),
+  numero_mesas     INTEGER NOT NULL DEFAULT 1
+    CHECK (numero_mesas >= 1),
   status           TEXT    NOT NULL DEFAULT 'cadastro_jogadores'
     CHECK (status IN ('planejado', 'cadastro_jogadores', 'sorteado', 'em_andamento', 'finalizado', 'cancelado')),
   vencedor_id      INTEGER REFERENCES torneio_jogadores (id) ON DELETE SET NULL,

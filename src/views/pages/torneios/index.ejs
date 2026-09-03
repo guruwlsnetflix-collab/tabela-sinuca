@@ -40,6 +40,7 @@
             <%= t.local ? t.local + ' · ' : '' %><%= t.data_inicio %><%= t.previsao_termino ? ' → ' + t.previsao_termino : '' %>
           </div>
           <span class="badge text-bg-secondary mt-2"><%= statusLabel[t.status] || t.status %></span>
+          <span class="badge text-bg-light mt-2"><%= t.numero_mesas %> mesa(s)</span>
           <% if (t.vencedor_nome) { %>
             <span class="badge text-bg-warning mt-2">Campeão: <%= t.vencedor_nome %></span>
           <% } %>

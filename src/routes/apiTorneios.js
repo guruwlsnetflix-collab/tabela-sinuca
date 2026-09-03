@@ -29,10 +29,13 @@ function serializarEstado(estado) {
       data_inicio: estado.torneio.data_inicio,
       previsao_termino: estado.torneio.previsao_termino,
       modalidade: estado.torneio.modalidade,
+      numero_mesas: estado.torneio.numero_mesas,
       status: estado.torneio.status,
       vencedor: estado.torneio.vencedor_nome || null
     },
     total_jogadores: estado.totalJogadores,
+    mesas_ocupadas: estado.mesasOcupadas,
+    mesas_disponiveis: estado.mesasDisponiveis,
     fases: estado.fases.map((fase) => ({
       key: fase.key,
       label: fase.label,
@@ -58,6 +61,7 @@ router.get('/api/torneios', (req, res) => {
     local: t.local,
     data_inicio: t.data_inicio,
     modalidade: t.modalidade,
+    numero_mesas: t.numero_mesas,
     status: t.status,
     vencedor: t.vencedor_nome || null,
     url: `/torneios/${t.id}`

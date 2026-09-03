@@ -25,7 +25,7 @@ function renderForm(res, { torneio, erros, modoEdicao }) {
   const status = erros ? 400 : 200
   res.status(status).render('pages/torneios/form', {
     title: modoEdicao ? 'Editar torneio' : 'Novo torneio',
-    torneio: torneio || { nome: '', local: '', data_inicio: '', previsao_termino: '', modalidade: 'par' },
+    torneio: torneio || { nome: '', local: '', data_inicio: '', previsao_termino: '', modalidade: 'par', numero_mesas: 1 },
     modalidadeLabel: TorneioService.MODALIDADE_LABEL,
     erros,
     modoEdicao
@@ -87,7 +87,7 @@ router.post('/torneios', torneioValidators.criar, (req, res) => {
     return renderForm(res, { torneio: req.body, erros, modoEdicao: false })
   }
   try {
-    const torneio = TorneioService.criar({ ...req.body, modalidade: req.body.modalidade || 'par' })
+    const torneio = TorneioService.criar({ ...req.body, modalidade: req.body.modalidade || 'par', numero_mesas: Number(req.body.numero_mesas) || 1 })
     res.redirect(`/torneios/${torneio.id}?msg=Torneio criado com sucesso.`)
   } catch (err) {
     renderForm(res, {
@@ -133,7 +133,7 @@ router.post('/torneios/:id', torneioValidators.atualizar, (req, res) => {
     return renderForm(res, { torneio: { ...req.body, id }, erros, modoEdicao: true })
   }
   try {
-    TorneioService.atualizar(id, { ...req.body, modalidade: req.body.modalidade || 'par' })
+    TorneioService.atualizar(id, { ...req.body, modalidade: req.body.modalidade || 'par', numero_mesas: Number(req.body.numero_mesas) || 1 })
     res.redirect(`/torneios/${id}?msg=Torneio atualizado com sucesso.`)
   } catch (err) {
     renderForm(res, { torneio: { ...req.body, id }, erros: { geral: err.message }, modoEdicao: true })

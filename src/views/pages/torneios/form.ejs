@@ -87,6 +87,23 @@
         <% } %>
       </div>
 
+      <div class="p-field mt-3">
+        <label for="numero_mesas" class="form-label">Número de mesas *</label>
+        <input
+          type="number"
+          class="form-control <%= erros && erros.numero_mesas ? 'is-invalid' : '' %>"
+          id="numero_mesas"
+          name="numero_mesas"
+          value="<%= torneio.numero_mesas || 1 %>"
+          min="1"
+          required
+        >
+        <div class="form-text">Será o número de jogos que poderão acontecer simultaneamente.</div>
+        <% if (erros && erros.numero_mesas) { %>
+          <div class="invalid-feedback d-block"><%= erros.numero_mesas %></div>
+        <% } %>
+      </div>
+
       <div class="d-grid gap-2 d-md-flex mt-4">
         <button type="submit" class="btn p-btn p-btn--primary">Salvar</button>
         <a href="<%= modoEdicao ? '/torneios/' + torneio.id : '/torneios' %>" class="btn p-btn p-btn--outline">Cancelar</a>

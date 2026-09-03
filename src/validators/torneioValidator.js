@@ -27,7 +27,11 @@ const basicoRules = [
     }),
   body('modalidade')
     .optional({ values: 'falsy' })
-    .isIn(['par', 'impar']).withMessage('Modalidade inválida.')
+    .isIn(['par', 'impar']).withMessage('Modalidade inválida.'),
+  body('numero_mesas')
+    .optional({ values: 'null' })
+    .default(1)
+    .isInt({ min: 1 }).withMessage('O número de mesas deve ser um inteiro maior ou igual a 1.')
 ]
 
 const jogadorRules = [

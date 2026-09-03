@@ -107,8 +107,15 @@ const TorneioService = {
     return torneio
   },
 
-  criar({ nome, local, data_inicio, previsao_termino, modalidade }) {
-    return TorneioRepository.criar({ nome, local, data_inicio, previsao_termino, modalidade })
+  criar({ nome, local, data_inicio, previsao_termino, modalidade, numero_mesas }) {
+    return TorneioRepository.criar({
+      nome,
+      local,
+      data_inicio,
+      previsao_termino,
+      modalidade,
+      numero_mesas
+    })
   },
 
   atualizar(id, dados) {
@@ -272,6 +279,12 @@ const TorneioService = {
     if (!confronto.jogador_a_id || !confronto.jogador_b_id) {
       throw negar('O confronto ainda não possui os dois jogadores definidos.')
     }
+    const mesas = this._mesasOcupadas(torneio.id)
+    if (mesas >= torneio.numero_mesas) {
+      throw negar(
+        `Todas as ${torneio.numero_mesas} mesa(s) estão ocupadas (${mesas} jogo(s) em andamento). Aguarde um confronto terminar.`
+      )
+    }
     ConfrontoRepository.iniciar(confronto.id)
     return ConfrontoRepository.obterPorId(confronto.id)
   },
@@ -426,6 +439,12 @@ const TorneioService = {
 
   // ---------------- Estado para views ----------------
 
+  _mesasOcupadas(torneioId) {
+    return ConfrontoRepository.listarPorTorneio(torneioId).filter(
+      (c) => c.status === 'em_andamento'
+    ).length
+  },
+
   obterEstado(torneioId) {
     const torneio = this.obter(torneioId)
     const jogadores = TorneioRepository.listarJogadores(torneio.id)
@@ -446,6 +465,8 @@ const TorneioService = {
       confrontos: confCompletos.filter((c) => c.fase === fase.key)
     }))
 
+    const mesasOcupadas = this._mesasOcupadas(torneio.id)
+
     return {
       torneio: {
         ...torneio,
@@ -454,6 +475,8 @@ const TorneioService = {
       },
       jogadores,
       totalJogadores: jogadores.length,
+      mesasOcupadas,
+      mesasDisponiveis: Math.max(0, torneio.numero_mesas - mesasOcupadas),
       confrontos: confCompletos,
       fases,
       faseAtual: calcularFaseAtual(torneio, confCompletos),

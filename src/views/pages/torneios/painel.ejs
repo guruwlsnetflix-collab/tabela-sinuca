@@ -37,6 +37,7 @@
         <% if (t.local) { %><span class="painel-chip"><%= t.local %></span><% } %>
         <span class="painel-chip"><%= t.data_inicio %><%= t.previsao_termino && t.previsao_termino !== t.data_inicio ? ' → ' + t.previsao_termino : '' %></span>
         <span class="painel-chip">Modalidade: <%= t.modalidadeLabel %></span>
+        <span class="painel-chip">Mesas: <%= t.numero_mesas %> (<%= estado.mesasOcupadas || 0 %> em uso)</span>
       </div>
     </div>
     <div class="painel-fase">
