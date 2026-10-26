@@ -97,12 +97,13 @@ function definirSessao(res, payload) {
   res.cookie(NOME_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',
+    secure: config.env === 'production',
     maxAge: config.duracaoSessaoMs
   })
 }
 
 function limparSessao(res) {
-  res.clearCookie(NOME_COOKIE)
+  res.clearCookie(NOME_COOKIE, { httpOnly: true, sameSite: 'lax', secure: config.env === 'production' })
 }
 
 function lerSessao(req) {

@@ -6,6 +6,7 @@ const router = express.Router()
 const TorneioService = require('../services/torneioService')
 const torneioValidators = require('../validators/torneioValidator')
 const { exigirTorneio } = require('../middleware/auth')
+const { renderErro } = require('../middleware/erros')
 
 function alvoConfronto(torneioId, confrontoId) {
   try {
@@ -108,7 +109,7 @@ router.get('/torneios/:id', (req, res) => {
       erro: req.query.erro || null
     })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -123,7 +124,7 @@ router.get('/torneios/:id/editar', exigirTorneio, (req, res) => {
       modoEdicao: true
     })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -186,7 +187,7 @@ router.get('/torneios/:id/jogadores/novo', exigirTorneio, (req, res) => {
     const torneio = TorneioService.obter(Number(req.params.id))
     renderJogadorForm(res, { torneio, jogador: null, erros: null })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -216,7 +217,7 @@ router.get('/torneios/:id/jogadores/:jogadorId/editar', exigirTorneio, (req, res
     }
     renderJogadorForm(res, { torneio, jogador, erros: null })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -315,7 +316,7 @@ router.get('/torneios/:id/painel', (req, res) => {
   try {
     renderizarPainel(res, req.params.id)
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -325,7 +326,7 @@ router.get('/torneios/:id/painel-tv', (req, res) => {
   try {
     renderizarPainel(res, req.params.id, { telaFirestick: true })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 

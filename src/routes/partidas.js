@@ -8,6 +8,7 @@ const JogadorService = require('../services/jogadorService')
 const PartidaService = require('../services/partidaService')
 const partidaValidators = require('../validators/partidaValidator')
 const { exigirEvento } = require('../middleware/auth')
+const { renderErro } = require('../middleware/erros')
 
 function dataInicioSugerida(evento) {
   if (!evento || !evento.data_inicio) return ''
@@ -55,7 +56,7 @@ router.get('/eventos/:eventoId/partidas/novo', exigirEvento, (req, res) => {
     }
     renderForm(res, { evento, jogadores, partida, erros: null })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -93,7 +94,7 @@ router.get('/eventos/:eventoId/partidas/:id/editar', exigirEvento, (req, res) =>
     const jogadores = JogadorService.listarPorEvento(evento.id)
     renderForm(res, { evento, jogadores, partida, erros: null })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 

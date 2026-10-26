@@ -8,6 +8,7 @@ const JogadorService = require('../services/jogadorService')
 const FinanceiroService = require('../services/financeiroService')
 const jogadorValidators = require('../validators/jogadorValidator')
 const { exigirEvento } = require('../middleware/auth')
+const { renderErro } = require('../middleware/erros')
 
 function fmtMoeda(v) {
   return 'R$ ' + (Number(v) || 0).toFixed(2).replace('.', ',')
@@ -45,7 +46,7 @@ router.get('/eventos/:eventoId/jogadores/novo', exigirEvento, (req, res) => {
     const evento = EventoService.obter(Number(req.params.eventoId))
     renderForm(res, { evento, jogador: null, erros: null })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -80,7 +81,7 @@ router.get('/eventos/:eventoId/jogadores/:id/editar', exigirEvento, (req, res) =
     const jogador = JogadorService.obter(Number(req.params.id))
     renderForm(res, { evento, jogador, erros: null })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -121,7 +122,7 @@ router.get('/eventos/:eventoId/jogadores/:id/campanha', (req, res) => {
       campanha
     })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 

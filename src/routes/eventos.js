@@ -9,6 +9,7 @@ const RankingService = require('../services/rankingService')
 const FinanceiroService = require('../services/financeiroService')
 const eventoValidators = require('../validators/eventoValidator')
 const { exigirEvento } = require('../middleware/auth')
+const { renderErro } = require('../middleware/erros')
 const db = require('../db')
 
 const STATUS_LABEL = {
@@ -115,7 +116,7 @@ router.get('/eventos/:id', (req, res) => {
   try {
     renderDetalhe(res, req, {})
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -155,7 +156,7 @@ router.get('/eventos/:id/relatorio', (req, res) => {
       statusLabel: STATUS_LABEL
     })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -170,7 +171,7 @@ router.get('/eventos/:id/editar', exigirEvento, (req, res) => {
       modoEdicao: true
     })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -242,7 +243,7 @@ router.get('/eventos/:id/painel', (req, res) => {
   try {
     renderizarPainel(res, req.params.id)
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 
@@ -252,7 +253,7 @@ router.get('/eventos/:id/painel-tv', (req, res) => {
   try {
     renderizarPainel(res, req.params.id, { telaFirestick: true })
   } catch (err) {
-    res.status(err.status || 500).render('pages/404')
+    renderErro(res, err)
   }
 })
 

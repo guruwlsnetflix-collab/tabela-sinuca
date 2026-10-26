@@ -1,0 +1,19 @@
+<%- include('../partials/header', { title }) %>
+
+<div class="p-error">
+  <div class="p-error__ball" aria-hidden="true">
+    <span>8</span>
+  </div>
+  <p class="p-error__code"><%= codigo %></p>
+  <h1 class="p-page__title h2 mb-2"><%= title %></h1>
+  <p class="p-page__subtitle mb-0"><%= mensagem %></p>
+  <% if (typeof detalhe !== 'undefined' && detalhe) { %>
+    <pre class="p-error__detail"><%= detalhe %></pre>
+  <% } %>
+  <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+    <a href="/" class="btn p-btn p-btn--primary">Ir para o início</a>
+    <button type="button" class="btn p-btn p-btn--outline" data-voltar>Voltar</button>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

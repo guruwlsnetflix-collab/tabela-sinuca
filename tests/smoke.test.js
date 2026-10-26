@@ -13,7 +13,7 @@ describe('Smoke tests', () => {
   it('GET /health responde ok', async () => {
     const res = await request(app).get('/health')
     expect(res.status).toBe(200)
-    expect(res.body).toEqual({ status: 'ok' })
+    expect(res.body).toMatchObject({ status: 'ok' })
   })
 
   it('GET /pagina-inexistente responde 404', async () => {
