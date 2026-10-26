@@ -1,5 +1,23 @@
 const { body } = require('express-validator')
 
+const SENHA_MIN = 6
+const SENHA_MAX = 60
+
+const senhaCriacaoRules = [
+  body('senha')
+    .trim()
+    .notEmpty().withMessage('A senha do torneio é obrigatória.')
+    .isLength({ min: SENHA_MIN, max: SENHA_MAX })
+    .withMessage(`A senha deve ter entre ${SENHA_MIN} e ${SENHA_MAX} caracteres.`)
+]
+
+const senhaAtualizacaoRules = [
+  body('senha')
+    .optional({ values: 'falsy' })
+    .isLength({ min: SENHA_MIN, max: SENHA_MAX })
+    .withMessage(`A senha deve ter entre ${SENHA_MIN} e ${SENHA_MAX} caracteres.`)
+]
+
 const nomeRules = [
   body('nome')
     .trim()
@@ -44,8 +62,8 @@ const jogadorRules = [
 ]
 
 const torneioValidators = {
-  criar: basicoRules,
-  atualizar: basicoRules,
+  criar: [...basicoRules, ...senhaCriacaoRules],
+  atualizar: [...basicoRules, ...senhaAtualizacaoRules],
   jogador: jogadorRules
 }
 

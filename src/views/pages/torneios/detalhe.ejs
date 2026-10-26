@@ -2,10 +2,11 @@
 
 <%
   var t = estado.torneio
-  var podeEditarJogadores = ['planejado', 'cadastro_jogadores'].indexOf(t.status) >= 0
+  var podeEditar = typeof podeEditarTorneio === 'function' && podeEditarTorneio(t.id)
+  var podeEditarJogadores = podeEditar && ['planejado', 'cadastro_jogadores'].indexOf(t.status) >= 0
   var torneioEmAndamento = t.status === 'em_andamento'
   var torneioAtivo = ['sorteado', 'em_andamento'].indexOf(t.status) >= 0
-  var podeCorrigir = ['em_andamento', 'finalizado'].indexOf(t.status) >= 0
+  var podeCorrigir = podeEditar && ['em_andamento', 'finalizado'].indexOf(t.status) >= 0
   var sorteioPronto = estado.totalJogadores === tamanhoChave
   var mesasOcupadas = estado.mesasOcupadas || 0
   var mesasDisponiveis = estado.mesasDisponiveis || 0
@@ -57,7 +58,7 @@
         <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
         Painel TV / Fire Stick
       </a>
-      <% if (t.status === 'sorteado') { %>
+      <% if (podeEditar && t.status === 'sorteado') { %>
         <form method="POST" action="/torneios/<%= t.id %>/iniciar" class="d-grid">
           <button type="submit" class="p-action-btn p-action-btn--status">
             <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -65,7 +66,7 @@
           </button>
         </form>
       <% } %>
-      <% if (t.status !== 'finalizado' && t.status !== 'cancelado') { %>
+      <% if (podeEditar && t.status !== 'finalizado' && t.status !== 'cancelado') { %>
         <form method="POST" action="/torneios/<%= t.id %>/cancelar" class="d-grid"
               data-confirm="Cancelar este torneio?">
           <button type="submit" class="p-action-btn p-action-btn--danger-outline">
@@ -74,13 +75,15 @@
           </button>
         </form>
       <% } %>
-      <form method="POST" action="/torneios/<%= t.id %>/excluir" class="d-grid"
-            data-confirm="Excluir este torneio? Esta ação não pode ser desfeita.">
-        <button type="submit" class="p-action-btn p-action-btn--danger">
-          <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-          Excluir
-        </button>
-      </form>
+      <% if (podeEditar) { %>
+        <form method="POST" action="/torneios/<%= t.id %>/excluir" class="d-grid"
+              data-confirm="Excluir este torneio? Esta ação não pode ser desfeita.">
+          <button type="submit" class="p-action-btn p-action-btn--danger">
+            <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            Excluir
+          </button>
+        </form>
+      <% } %>
     </div>
   </div>
 
@@ -114,7 +117,7 @@
         </form>
       <% } %>
 
-      <% if (sorteioPronto && (t.status === 'cadastro_jogadores' || t.status === 'sorteado')) { %>
+      <% if (podeEditar && sorteioPronto && (t.status === 'cadastro_jogadores' || t.status === 'sorteado')) { %>
         <form method="POST" action="/torneios/<%= t.id %>/sortear" class="d-inline ms-2"
               data-confirm="<%= t.status === 'sorteado' ? 'Já existe um sorteio realizado. Refazer o sorteio? A chave será redesenhada.' : 'Realizar o sorteio e formar a chave?' %>">
           <button type="submit" class="btn p-btn p-btn--glow">
@@ -212,7 +215,7 @@
               <div class="p-confronto__result">
                 <%= conf.vencedor_nome %> <%= conf.numero === 15 ? 'venceu e é o CAMPEÃO 🏆' : 'CLASSIFICADO' %>
               </div>
-            <% } else if (conf.preparado && torneioEmAndamento) { %>
+            <% } else if (conf.preparado && torneioEmAndamento && podeEditar) { %>
               <div class="p-confronto__actions">
                 <% if (conf.status === 'aguardando') { %>
                   <form method="POST" action="/torneios/<%= t.id %>/confrontos/<%= conf.id %>/iniciar" class="d-inline">

@@ -1,0 +1,48 @@
+<%- include('../../partials/header', { title }) %>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6 col-lg-5">
+    <div class="mb-4">
+      <h1 class="p-page__title h2 mb-1">Entrar</h1>
+      <p class="p-page__subtitle mb-0">Acesso para edição dos dados</p>
+    </div>
+
+    <% if (erro) { %>
+      <div class="p-alert p-alert--danger mb-4" role="alert"><%= erro %></div>
+    <% } %>
+
+    <form method="POST" action="/login" class="p-card">
+      <div class="p-card__body">
+        <input type="hidden" name="next" value="<%= next %>">
+        <div class="p-field">
+          <label for="senha" class="form-label">Senha</label>
+          <input
+            type="password"
+            class="form-control"
+            id="senha"
+            name="senha"
+            autocomplete="current-password"
+            autofocus
+            required
+            maxlength="60"
+            placeholder="Digite a senha"
+          >
+          <div class="form-text mt-2">
+            Informe a senha do evento ou do torneio para poder editar os dados dele.
+            A senha mestra dá acesso a todos os eventos e torneios.
+            Sem senha você acompanha tudo como visitante (somente leitura).
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex mt-4">
+          <button type="submit" class="btn p-btn p-btn--primary flex-shrink-0">
+            Entrar
+          </button>
+          <a href="/" class="btn p-btn p-btn--outline">Voltar</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

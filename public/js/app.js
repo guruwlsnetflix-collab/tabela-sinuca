@@ -21,7 +21,8 @@
       dashboard: fab ? { href: fab.dataset.fabDashboardHref, label: fab.dataset.fabDashboardLabel } : null,
       ranking: fab ? { href: fab.dataset.fabRankingHref, label: fab.dataset.fabRankingLabel } : null,
       jogadores: fab ? { href: fab.dataset.fabJogadoresHref, label: fab.dataset.fabJogadoresLabel } : null,
-      partidas: fab ? { href: fab.dataset.fabPartidasHref, label: fab.dataset.fabPartidasLabel } : null
+      partidas: fab ? { href: fab.dataset.fabPartidasHref, label: fab.dataset.fabPartidasLabel } : null,
+      financeiro: fab ? { href: fab.dataset.fabPartidasHref, label: fab.dataset.fabPartidasLabel } : null
     }
 
     const observer = new IntersectionObserver(

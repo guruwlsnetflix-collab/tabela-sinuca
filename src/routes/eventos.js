@@ -6,7 +6,9 @@ const router = express.Router()
 const EventoService = require('../services/eventoService')
 const SorteioService = require('../services/sorteioService')
 const RankingService = require('../services/rankingService')
+const FinanceiroService = require('../services/financeiroService')
 const eventoValidators = require('../validators/eventoValidator')
+const { exigirEvento } = require('../middleware/auth')
 const db = require('../db')
 
 const STATUS_LABEL = {
@@ -18,7 +20,7 @@ const STATUS_LABEL = {
 router.get('/eventos/novo', (req, res) => {
   res.render('pages/eventos/form', {
     title: 'Novo evento',
-    evento: { nome: '', data_inicio: '', data_fim: '' },
+    evento: { nome: '', data_inicio: '', data_fim: '', valor_aposta_padrao: '' },
     statusLabel: STATUS_LABEL,
     erros: null,
     modoEdicao: false
@@ -43,7 +45,7 @@ router.post('/eventos', eventoValidators.criar, (req, res) => {
 
   try {
     const evento = EventoService.criar(req.body)
-    res.redirect(`/eventos/${evento.id}?msg=Evento criado com sucesso.`)
+    res.redirect(`/eventos/${evento.id}?msg=${encodeURIComponent('Evento criado. Informe a senha definida para editar os dados.')}`)
   } catch (err) {
     res.status(400).render('pages/eventos/form', {
       title: 'Novo evento',
@@ -62,7 +64,7 @@ function carregarDadosEvento(eventoId) {
     .all(evento.id)
   const partidas = db
     .prepare(`
-      SELECT p.id, p.data_partida, pa.nome AS jogador_a, pb.nome AS jogador_b,
+      SELECT p.id, p.data_partida, p.valor_aposta, p.pago, pa.nome AS jogador_a, pb.nome AS jogador_b,
              pv.nome AS vencedor, p.jogador_a_id, p.jogador_b_id, p.vencedor_id
       FROM partidas p
       JOIN jogadores pa ON pa.id = p.jogador_a_id
@@ -73,7 +75,8 @@ function carregarDadosEvento(eventoId) {
     `)
     .all(evento.id)
   const ranking = RankingService.gerar(evento.id)
-  return { evento, jogadores, partidas, ranking }
+  const financeiro = FinanceiroService.gerar(evento.id)
+  return { evento, jogadores, partidas, ranking, financeiro }
 }
 
 function partidasPorJogador(jogadores, partidas) {
@@ -91,7 +94,7 @@ function partidasPorJogador(jogadores, partidas) {
 }
 
 function renderDetalhe(res, req, extra) {
-  const { evento, jogadores, partidas, ranking } = carregarDadosEvento(Number(req.params.id))
+  const { evento, jogadores, partidas, ranking, financeiro } = carregarDadosEvento(Number(req.params.id))
 
   res.render('pages/eventos/detalhe', {
     title: evento.nome,
@@ -99,6 +102,7 @@ function renderDetalhe(res, req, extra) {
     jogadores,
     partidas,
     ranking,
+    financeiro,
     statusLabel: STATUS_LABEL,
     msg: req.query.msg || null,
     erro: req.query.erro || null,
@@ -139,13 +143,14 @@ router.get('/eventos/:id/sorteio', (req, res) => {
 
 router.get('/eventos/:id/relatorio', (req, res) => {
   try {
-    const { evento, jogadores, partidas, ranking } = carregarDadosEvento(Number(req.params.id))
+    const { evento, jogadores, partidas, ranking, financeiro } = carregarDadosEvento(Number(req.params.id))
     res.render('pages/eventos/relatorio', {
       title: `Relatório — ${evento.nome}`,
       evento,
       jogadores,
       partidas,
       ranking,
+      financeiro,
       partidasPorJogador: partidasPorJogador(jogadores, partidas),
       statusLabel: STATUS_LABEL
     })
@@ -154,7 +159,7 @@ router.get('/eventos/:id/relatorio', (req, res) => {
   }
 })
 
-router.get('/eventos/:id/editar', (req, res) => {
+router.get('/eventos/:id/editar', exigirEvento, (req, res) => {
   try {
     const evento = EventoService.obter(Number(req.params.id))
     res.render('pages/eventos/form', {
@@ -169,7 +174,7 @@ router.get('/eventos/:id/editar', (req, res) => {
   }
 })
 
-router.post('/eventos/:id', eventoValidators.atualizar, (req, res) => {
+router.post('/eventos/:id', exigirEvento, eventoValidators.atualizar, (req, res) => {
   const id = Number(req.params.id)
   const erros = validationResult(req)
   if (!erros.isEmpty()) {
@@ -200,7 +205,7 @@ router.post('/eventos/:id', eventoValidators.atualizar, (req, res) => {
   }
 })
 
-router.post('/eventos/:id/status', eventoValidators.status, (req, res) => {
+router.post('/eventos/:id/status', exigirEvento, eventoValidators.status, (req, res) => {
   try {
     EventoService.mudarStatus(Number(req.params.id), req.body.status)
     res.redirect(`/eventos/${req.params.id}?msg=Status atualizado.`)
@@ -209,12 +214,45 @@ router.post('/eventos/:id/status', eventoValidators.status, (req, res) => {
   }
 })
 
-router.post('/eventos/:id/excluir', (req, res) => {
+router.post('/eventos/:id/excluir', exigirEvento, (req, res) => {
   try {
     EventoService.excluir(Number(req.params.id))
     res.redirect('/?msg=Evento excluído.')
   } catch (err) {
     res.redirect(`/eventos/${req.params.id}?erro=${encodeURIComponent(err.message)}`)
+  }
+})
+
+// ---------------- Painel público (TV / Smart TV / Fire Stick) ----------------
+
+function renderizarPainel(res, eventoId, opcoes = {}) {
+  const { evento, partidas, ranking, financeiro } = carregarDadosEvento(Number(eventoId))
+  res.set('Cache-Control', 'no-store')
+  res.render('pages/eventos/painel', {
+    evento,
+    partidas,
+    ranking,
+    financeiro,
+    statusLabel: STATUS_LABEL,
+    telaFirestick: Boolean(opcoes.telaFirestick)
+  })
+}
+
+router.get('/eventos/:id/painel', (req, res) => {
+  try {
+    renderizarPainel(res, req.params.id)
+  } catch (err) {
+    res.status(err.status || 500).render('pages/404')
+  }
+})
+
+// Variante forçada para TV (Fire Stick / navegadores com viewport pequeno):
+// ignora os media queries de mobile e exibe sempre o layout de telão.
+router.get('/eventos/:id/painel-tv', (req, res) => {
+  try {
+    renderizarPainel(res, req.params.id, { telaFirestick: true })
+  } catch (err) {
+    res.status(err.status || 500).render('pages/404')
   }
 })
 

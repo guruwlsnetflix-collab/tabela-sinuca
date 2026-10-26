@@ -5,6 +5,7 @@ const router = express.Router()
 
 const TorneioService = require('../services/torneioService')
 const torneioValidators = require('../validators/torneioValidator')
+const { exigirTorneio } = require('../middleware/auth')
 
 function alvoConfronto(torneioId, confrontoId) {
   try {
@@ -88,7 +89,7 @@ router.post('/torneios', torneioValidators.criar, (req, res) => {
   }
   try {
     const torneio = TorneioService.criar({ ...req.body, modalidade: req.body.modalidade || 'par', numero_mesas: Number(req.body.numero_mesas) || 1 })
-    res.redirect(`/torneios/${torneio.id}?msg=Torneio criado com sucesso.`)
+    res.redirect(`/torneios/${torneio.id}?msg=${encodeURIComponent('Torneio criado. Informe a senha definida para editar os dados.')}`)
   } catch (err) {
     renderForm(res, {
       torneio: req.body,
@@ -111,7 +112,7 @@ router.get('/torneios/:id', (req, res) => {
   }
 })
 
-router.get('/torneios/:id/editar', (req, res) => {
+router.get('/torneios/:id/editar', exigirTorneio, (req, res) => {
   try {
     const torneio = TorneioService.obter(Number(req.params.id))
     res.status(200).render('pages/torneios/form', {
@@ -126,7 +127,7 @@ router.get('/torneios/:id/editar', (req, res) => {
   }
 })
 
-router.post('/torneios/:id', torneioValidators.atualizar, (req, res) => {
+router.post('/torneios/:id', exigirTorneio, torneioValidators.atualizar, (req, res) => {
   const id = Number(req.params.id)
   const erros = mapaDeErros(req)
   if (Object.keys(erros).length > 0) {
@@ -140,7 +141,7 @@ router.post('/torneios/:id', torneioValidators.atualizar, (req, res) => {
   }
 })
 
-router.post('/torneios/:id/cancelar', (req, res) => {
+router.post('/torneios/:id/cancelar', exigirTorneio, (req, res) => {
   try {
     TorneioService.cancelar(Number(req.params.id))
     res.redirect(`/torneios/${req.params.id}?msg=Torneio cancelado.`)
@@ -149,7 +150,7 @@ router.post('/torneios/:id/cancelar', (req, res) => {
   }
 })
 
-router.post('/torneios/:id/excluir', (req, res) => {
+router.post('/torneios/:id/excluir', exigirTorneio, (req, res) => {
   try {
     TorneioService.excluir(Number(req.params.id))
     res.redirect('/torneios?msg=Torneio excluído.')
@@ -160,7 +161,7 @@ router.post('/torneios/:id/excluir', (req, res) => {
 
 // ---------------- Sorteio e início ----------------
 
-router.post('/torneios/:id/sortear', (req, res) => {
+router.post('/torneios/:id/sortear', exigirTorneio, (req, res) => {
   try {
     TorneioService.sortear(Number(req.params.id))
     res.redirect(`/torneios/${req.params.id}?msg=Sorteio realizado. A chave foi formada.`)
@@ -169,7 +170,7 @@ router.post('/torneios/:id/sortear', (req, res) => {
   }
 })
 
-router.post('/torneios/:id/iniciar', (req, res) => {
+router.post('/torneios/:id/iniciar', exigirTorneio, (req, res) => {
   try {
     TorneioService.iniciar(Number(req.params.id))
     res.redirect(`/torneios/${req.params.id}?msg=Torneio em andamento!`)
@@ -180,7 +181,7 @@ router.post('/torneios/:id/iniciar', (req, res) => {
 
 // ---------------- Jogadores ----------------
 
-router.get('/torneios/:id/jogadores/novo', (req, res) => {
+router.get('/torneios/:id/jogadores/novo', exigirTorneio, (req, res) => {
   try {
     const torneio = TorneioService.obter(Number(req.params.id))
     renderJogadorForm(res, { torneio, jogador: null, erros: null })
@@ -189,7 +190,7 @@ router.get('/torneios/:id/jogadores/novo', (req, res) => {
   }
 })
 
-router.post('/torneios/:id/jogadores', torneioValidators.jogador, (req, res) => {
+router.post('/torneios/:id/jogadores', exigirTorneio, torneioValidators.jogador, (req, res) => {
   const torneioId = Number(req.params.id)
   const torneio = TorneioService.obter(torneioId)
   const erros = mapaDeErros(req)
@@ -204,7 +205,7 @@ router.post('/torneios/:id/jogadores', torneioValidators.jogador, (req, res) => 
   }
 })
 
-router.get('/torneios/:id/jogadores/:jogadorId/editar', (req, res) => {
+router.get('/torneios/:id/jogadores/:jogadorId/editar', exigirTorneio, (req, res) => {
   try {
     const torneio = TorneioService.obter(Number(req.params.id))
     const jogador = TorneioService.listarJogadores(torneio.id).find(
@@ -219,7 +220,7 @@ router.get('/torneios/:id/jogadores/:jogadorId/editar', (req, res) => {
   }
 })
 
-router.post('/torneios/:id/jogadores/:jogadorId', torneioValidators.jogador, (req, res) => {
+router.post('/torneios/:id/jogadores/:jogadorId', exigirTorneio, torneioValidators.jogador, (req, res) => {
   const torneioId = Number(req.params.id)
   const jogadorId = Number(req.params.jogadorId)
   const torneio = TorneioService.obter(torneioId)
@@ -243,7 +244,7 @@ router.post('/torneios/:id/jogadores/:jogadorId', torneioValidators.jogador, (re
   }
 })
 
-router.post('/torneios/:id/jogadores/:jogadorId/excluir', (req, res) => {
+router.post('/torneios/:id/jogadores/:jogadorId/excluir', exigirTorneio, (req, res) => {
   const torneioId = Number(req.params.id)
   try {
     TorneioService.excluirJogador(Number(req.params.jogadorId))
@@ -255,7 +256,7 @@ router.post('/torneios/:id/jogadores/:jogadorId/excluir', (req, res) => {
 
 // ---------------- Confrontos e partidas ----------------
 
-router.post('/torneios/:id/confrontos/:confrontoId/iniciar', (req, res) => {
+router.post('/torneios/:id/confrontos/:confrontoId/iniciar', exigirTorneio, (req, res) => {
   try {
     TorneioService.iniciarConfronto(Number(req.params.id), Number(req.params.confrontoId))
     res.redirect(`/torneios/${req.params.id}?msg=Confronto em andamento.#confronto-${req.params.confrontoId}`)
@@ -264,7 +265,7 @@ router.post('/torneios/:id/confrontos/:confrontoId/iniciar', (req, res) => {
   }
 })
 
-router.post('/torneios/:id/confrontos/:confrontoId/partidas', (req, res) => {
+router.post('/torneios/:id/confrontos/:confrontoId/partidas', exigirTorneio, (req, res) => {
   const vencedorId = Number(req.body.vencedor_id)
   if (!vencedorId) {
     return res.redirect(
@@ -286,6 +287,7 @@ router.post('/torneios/:id/confrontos/:confrontoId/partidas', (req, res) => {
 
 router.post(
   '/torneios/:id/confrontos/:confrontoId/desfazer',
+  exigirTorneio,
   (req, res) => {
     try {
       TorneioService.desfazerUltimaPartida(Number(req.params.id), Number(req.params.confrontoId))

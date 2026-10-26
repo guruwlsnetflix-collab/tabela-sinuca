@@ -1,5 +1,8 @@
 const { body } = require('express-validator')
 
+const SENHA_MIN = 6
+const SENHA_MAX = 60
+
 const eventoValidators = {
   criar: [
     body('nome')
@@ -17,7 +20,15 @@ const eventoValidators = {
           throw new Error('A data de fim deve ser maior ou igual à data de início.')
         }
         return true
-      })
+      }),
+    body('valor_aposta_padrao')
+      .optional({ values: 'falsy' })
+      .isFloat({ min: 0 }).withMessage('O valor da aposta padrão deve ser um número maior ou igual a zero.'),
+    body('senha')
+      .trim()
+      .notEmpty().withMessage('A senha do evento é obrigatória.')
+      .isLength({ min: SENHA_MIN, max: SENHA_MAX })
+      .withMessage(`A senha deve ter entre ${SENHA_MIN} e ${SENHA_MAX} caracteres.`)
   ],
   atualizar: [
     body('nome')
@@ -35,7 +46,14 @@ const eventoValidators = {
           throw new Error('A data de fim deve ser maior ou igual à data de início.')
         }
         return true
-      })
+      }),
+    body('valor_aposta_padrao')
+      .optional({ values: 'falsy' })
+      .isFloat({ min: 0 }).withMessage('O valor da aposta padrão deve ser um número maior ou igual a zero.'),
+    body('senha')
+      .optional({ values: 'falsy' })
+      .isLength({ min: SENHA_MIN, max: SENHA_MAX })
+      .withMessage(`A senha deve ter entre ${SENHA_MIN} e ${SENHA_MAX} caracteres.`)
   ],
   status: [
     body('status')

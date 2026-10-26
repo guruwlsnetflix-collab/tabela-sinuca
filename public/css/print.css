@@ -279,6 +279,26 @@
   padding: 12px 0;
 }
 
+.report__subtitle {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 18px 0 10px;
+  letter-spacing: -0.01em;
+}
+
+.report__money {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.report__money--receber {
+  color: var(--p-primary);
+}
+
+.report__money--pagar {
+  color: var(--p-danger);
+}
+
 /* ---------- Menu do compartilhar (apenas tela) ---------- */
 .report-share-menu {
   position: fixed;

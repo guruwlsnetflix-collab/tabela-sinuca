@@ -6,6 +6,7 @@ const db = require('../src/db')
 const EventoService = require('../src/services/eventoService')
 const JogadorService = require('../src/services/jogadorService')
 const PartidaService = require('../src/services/partidaService')
+const { agenteMestre } = require('./authHelper')
 
 function limparDb() {
   db.exec('DELETE FROM partidas; DELETE FROM jogadores; DELETE FROM eventos;')
@@ -86,6 +87,34 @@ describe('PartidaService', () => {
     ).toThrow('não pertence a este evento')
   })
 
+  it('bloqueia partida envolvendo jogador desistente', () => {
+    const evento = EventoService.criar({
+      nome: 'Com desistente',
+      data_inicio: '2026-08-01',
+      data_fim: '2026-08-02'
+    })
+    const a = JogadorService.criar({ evento_id: evento.id, nome: 'A' })
+    const b = JogadorService.criar({ evento_id: evento.id, nome: 'B' })
+    const c = JogadorService.criar({ evento_id: evento.id, nome: 'C' })
+
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id
+    })
+    JogadorService.desistir(b.id)
+
+    expect(() =>
+      PartidaService.registrar({
+        evento_id: evento.id,
+        jogador_a_id: b.id,
+        jogador_b_id: c.id,
+        vencedor_id: c.id
+      })
+    ).toThrow('parou de jogar')
+  })
+
   it('bloqueia registrar partida em evento encerrado', () => {
     const { evento, a, b } = criarCenario()
     EventoService.mudarStatus(evento.id, 'encerrado')
@@ -133,12 +162,78 @@ describe('Rotas de partidas', () => {
 
   it('POST /eventos/:id/partidas registra e redireciona', async () => {
     const { evento, a, b } = criarCenario()
-    const res = await request(app)
+    const agente = await agenteMestre(app)
+    const res = await agente
       .post(`/eventos/${evento.id}/partidas`)
       .type('form')
       .send({ jogador_a_id: String(a.id), jogador_b_id: String(b.id), vencedor_id: String(a.id) })
     expect(res.status).toBe(302)
     expect(res.headers.location).toBe(`/eventos/${evento.id}?msg=Partida%20registrada%20com%20sucesso.`)
+  })
+
+  it('POST registra aposta e aplica o padrão quando o campo vem vazio', async () => {
+    const evento = EventoService.criar({
+      nome: 'Com aposta padrão',
+      data_inicio: '2026-08-01',
+      data_fim: '2026-08-02',
+      valor_aposta_padrao: 7
+    })
+    const a = JogadorService.criar({ evento_id: evento.id, nome: 'A' })
+    const b = JogadorService.criar({ evento_id: evento.id, nome: 'B' })
+    const agente = await agenteMestre(app)
+    const res = await agente
+      .post(`/eventos/${evento.id}/partidas`)
+      .type('form')
+      .send({ jogador_a_id: String(a.id), jogador_b_id: String(b.id), vencedor_id: String(a.id), valor_aposta: '' })
+    expect(res.status).toBe(302)
+    expect(res.headers.location).toBe(`/eventos/${evento.id}?msg=Partida%20registrada%20com%20sucesso.`)
+    expect(PartidaService.listarPorEvento(evento.id)[0].valor_aposta).toBe(7)
+  })
+
+  it('POST rejeita aposta negativa', async () => {
+    const { evento, a, b } = criarCenario()
+    const agente = await agenteMestre(app)
+    const res = await agente
+      .post(`/eventos/${evento.id}/partidas`)
+      .type('form')
+      .send({
+        jogador_a_id: String(a.id),
+        jogador_b_id: String(b.id),
+        vencedor_id: String(a.id),
+        valor_aposta: '-10'
+      })
+    expect(res.status).toBe(400)
+    expect(res.text).toContain('valor da aposta')
+  })
+
+  it('GET form de nova partida sugesta o valor padrão do evento', async () => {
+    const evento = EventoService.criar({
+      nome: 'Sugestão de aposta',
+      data_inicio: '2026-08-01',
+      data_fim: '2026-08-02',
+      valor_aposta_padrao: 9.5
+    })
+    JogadorService.criar({ evento_id: evento.id, nome: 'A' })
+    JogadorService.criar({ evento_id: evento.id, nome: 'B' })
+    const agente = await agenteMestre(app)
+    const res = await agente.get(`/eventos/${evento.id}/partidas/novo`)
+    expect(res.status).toBe(200)
+    expect(res.text).toContain('Sugerido automaticamente')
+    expect(res.text).toContain('R$ 9,50')
+  })
+
+  it('GET form de nova partida inicia a data com a data de início do evento', async () => {
+    const evento = EventoService.criar({
+      nome: 'Sugestão de data',
+      data_inicio: '2026-08-01',
+      data_fim: '2026-08-02'
+    })
+    JogadorService.criar({ evento_id: evento.id, nome: 'A' })
+    JogadorService.criar({ evento_id: evento.id, nome: 'B' })
+    const agente = await agenteMestre(app)
+    const res = await agente.get(`/eventos/${evento.id}/partidas/novo`)
+    expect(res.status).toBe(200)
+    expect(res.text).toContain('value="2026-08-01T00:00"')
   })
 
   it('POST rejeita vencedor que não é participante', async () => {
@@ -149,7 +244,8 @@ describe('Rotas de partidas', () => {
       data_fim: '2026-09-02'
     })
     const intruso = JogadorService.criar({ evento_id: outro.id, nome: 'Intruso' })
-    const res = await request(app)
+    const agente = await agenteMestre(app)
+    const res = await agente
       .post(`/eventos/${evento.id}/partidas`)
       .type('form')
       .send({ jogador_a_id: String(a.id), jogador_b_id: String(b.id), vencedor_id: String(intruso.id) })
@@ -161,7 +257,8 @@ describe('Rotas de partidas', () => {
 
   it('POST rejeita jogador A igual ao jogador B com erro de campo', async () => {
     const { evento, a } = criarCenario()
-    const res = await request(app)
+    const agente = await agenteMestre(app)
+    const res = await agente
       .post(`/eventos/${evento.id}/partidas`)
       .type('form')
       .send({ jogador_a_id: String(a.id), jogador_b_id: String(a.id), vencedor_id: String(a.id) })
@@ -172,7 +269,8 @@ describe('Rotas de partidas', () => {
   it('POST rejeita vencedor que não é um dos dois jogadores da partida', async () => {
     const { evento, a, b } = criarCenario()
     const c = JogadorService.criar({ evento_id: evento.id, nome: 'C' })
-    const res = await request(app)
+    const agente = await agenteMestre(app)
+    const res = await agente
       .post(`/eventos/${evento.id}/partidas`)
       .type('form')
       .send({ jogador_a_id: String(a.id), jogador_b_id: String(b.id), vencedor_id: String(c.id) })
@@ -187,8 +285,88 @@ describe('Rotas de partidas', () => {
       data_fim: '2026-08-02'
     })
     JogadorService.criar({ evento_id: evento.id, nome: 'Único' })
-    const res = await request(app).get(`/eventos/${evento.id}/partidas/novo`)
+    const agente = await agenteMestre(app)
+    const res = await agente.get(`/eventos/${evento.id}/partidas/novo`)
     expect(res.status).toBe(200)
     expect(res.text).toContain('ao menos')
+  })
+
+  it('POST registra partida com aposta já paga quando o checkbox é enviado', async () => {
+    const { evento, a, b } = criarCenario()
+    const agente = await agenteMestre(app)
+    const res = await agente
+      .post(`/eventos/${evento.id}/partidas`)
+      .type('form')
+      .send({
+        jogador_a_id: String(a.id),
+        jogador_b_id: String(b.id),
+        vencedor_id: String(a.id),
+        valor_aposta: '10',
+        pago: '1'
+      })
+    expect(res.status).toBe(302)
+    expect(PartidaService.listarPorEvento(evento.id)[0].pago).toBe(1)
+  })
+
+  it('POST /partidas/:id/pago alterna para paga', async () => {
+    const { evento, a, b } = criarCenario()
+    const partida = PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10
+    })
+    const agente = await agenteMestre(app)
+    const res = await agente.post(`/eventos/${evento.id}/partidas/${partida.id}/pago`)
+    expect(res.status).toBe(302)
+    expect(res.headers.location).toBe(
+      `/eventos/${evento.id}?msg=${encodeURIComponent('Partida marcada como paga.')}`
+    )
+    expect(PartidaService.obter(partida.id).pago).toBe(1)
+  })
+
+  it('POST /partidas/:id/pago alterna pendente de volta', async () => {
+    const { evento, a, b } = criarCenario()
+    const partida = PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10,
+      pago: '1'
+    })
+    const agente = await agenteMestre(app)
+    const res = await agente.post(`/eventos/${evento.id}/partidas/${partida.id}/pago`)
+    expect(res.status).toBe(302)
+    expect(res.headers.location).toBe(
+      `/eventos/${evento.id}?msg=${encodeURIComponent('Partida marcada como pendente.')}`
+    )
+    expect(PartidaService.obter(partida.id).pago).toBe(0)
+  })
+
+  it('POST /partidas/:id/pago redireciona com erro para partida inexistente', async () => {
+    const { evento } = criarCenario()
+    const agente = await agenteMestre(app)
+    const res = await agente.post(`/eventos/${evento.id}/partidas/99999/pago`)
+    expect(res.status).toBe(302)
+    expect(res.headers.location).toContain(encodeURIComponent('Partida não encontrada.'))
+  })
+
+  it('GET form de edição exibe checkbox marcado quando a partida está paga', async () => {
+    const { evento, a, b } = criarCenario()
+    const partida = PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10,
+      pago: '1'
+    })
+    const agente = await agenteMestre(app)
+    const res = await agente.get(`/eventos/${evento.id}/partidas/${partida.id}/editar`)
+    expect(res.status).toBe(200)
+    expect(res.text).toContain('Aposta já quitada')
+    expect(res.text).toContain('checked')
   })
 })

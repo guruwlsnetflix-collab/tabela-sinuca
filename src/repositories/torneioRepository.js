@@ -29,11 +29,11 @@ const TorneioRepository = {
       .get(id)
   },
 
-  criar({ nome, local, data_inicio, previsao_termino, modalidade, numero_mesas }) {
+  criar({ nome, local, data_inicio, previsao_termino, modalidade, numero_mesas, senha_hash = null }) {
     const info = db
       .prepare(`
-        INSERT INTO torneios (nome, local, data_inicio, previsao_termino, modalidade, numero_mesas)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO torneios (nome, local, data_inicio, previsao_termino, modalidade, numero_mesas, senha_hash)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `)
       .run(
         nome,
@@ -41,9 +41,21 @@ const TorneioRepository = {
         data_inicio,
         previsao_termino || null,
         modalidade || 'par',
-        numero_mesas || 1
+        numero_mesas || 1,
+        senha_hash
       )
     return this.obterPorId(info.lastInsertRowid)
+  },
+
+  listarComSenha() {
+    return db
+      .prepare('SELECT id, nome, senha_hash FROM torneios WHERE senha_hash IS NOT NULL')
+      .all()
+  },
+
+  atualizarSenha(id, senha_hash) {
+    db.prepare('UPDATE torneios SET senha_hash = ? WHERE id = ?').run(senha_hash, id)
+    return this.obterPorId(id)
   },
 
   atualizar(id, { nome, local, data_inicio, previsao_termino, modalidade, numero_mesas }) {

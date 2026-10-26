@@ -6,6 +6,7 @@ const db = require('../src/db')
 const TorneioService = require('../src/services/torneioService')
 const TorneioRepository = require('../src/repositories/torneioRepository')
 const ConfrontoRepository = require('../src/repositories/confrontoRepository')
+const { agenteMestre, SENHA_TORNEIO } = require('./authHelper')
 
 const NOMES = Array.from({ length: 16 }, (_, i) => `Jogador ${String(i + 1).padStart(2, '0')}`)
 
@@ -372,12 +373,14 @@ describe('Torneio — fluxo HTTP completo', () => {
   beforeEach(limparDb)
 
   it('cria torneio, cadastra 16, sorteia, registra tudo e exibe painel com campeão', async () => {
-    const criar = await request(app).post('/torneios').send({
+    const A = await agenteMestre(app)
+    const criar = await A.post('/torneios').send({
       nome: 'Torneio HTTP',
       local: 'Clube',
       data_inicio: '2026-09-01',
       previsao_termino: '2026-09-03',
-      modalidade: 'par'
+      modalidade: 'par',
+      senha: SENHA_TORNEIO
     })
     expect(criar.status).toBe(302)
     const loc = criar.headers.location
@@ -385,20 +388,20 @@ describe('Torneio — fluxo HTTP completo', () => {
 
     for (let i = 1; i <= 16; i += 1) {
       const nome = `Jogador ${String(i).padStart(2, '0')}`
-      const r = await request(app).post(`/torneios/${torneioId}/jogadores`).send({ nome })
+      const r = await A.post(`/torneios/${torneioId}/jogadores`).send({ nome })
       expect(r.status).toBe(302)
     }
 
     expect(TorneioService.contarJogadores(torneioId)).toBe(16)
 
-    const detalhe = await request(app).get(`/torneios/${torneioId}`)
+    const detalhe = await A.get(`/torneios/${torneioId}`)
     expect(detalhe.status).toBe(200)
     expect(detalhe.text).toContain('16/16')
 
-    await request(app).post(`/torneios/${torneioId}/sortear`).send({})
+    await A.post(`/torneios/${torneioId}/sortear`).send({})
     expect(TorneioService.obter(torneioId).status).toBe('sorteado')
 
-    await request(app).post(`/torneios/${torneioId}/iniciar`).send({})
+    await A.post(`/torneios/${torneioId}/iniciar`).send({})
     expect(TorneioService.obter(torneioId).status).toBe('em_andamento')
 
     const fecharVencedorA = (numero) => {
@@ -429,16 +432,16 @@ describe('Torneio — fluxo HTTP completo', () => {
       [final.jogador_a_id, final.jogador_b_id].sort()
     )
 
-    await request(app)
+    await A
       .post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`)
       .send({ vencedor_id: campeao })
-    await request(app)
+    await A
       .post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`)
       .send({ vencedor_id: adversario })
-    await request(app)
+    await A
       .post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`)
       .send({ vencedor_id: campeao })
-    await request(app)
+    await A
       .post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`)
       .send({ vencedor_id: campeao })
 
@@ -455,15 +458,17 @@ describe('Torneio — fluxo HTTP completo', () => {
   })
 
   it('variante painel-tv (Fire Stick) força o layout de telão', async () => {
-    const criar = await request(app).post('/torneios').send({
+    const A = await agenteMestre(app)
+    const criar = await A.post('/torneios').send({
       nome: 'Torneio TV',
-      data_inicio: '2026-09-01'
+      data_inicio: '2026-09-01',
+      senha: SENHA_TORNEIO
     })
     const torneioId = Number(criar.headers.location.match(/\/torneios\/(\d+)/)[1])
     for (let i = 1; i <= 16; i += 1) {
-      await request(app).post(`/torneios/${torneioId}/jogadores`).send({ nome: `Jogador ${i}` })
+      await A.post(`/torneios/${torneioId}/jogadores`).send({ nome: `Jogador ${i}` })
     }
-    await request(app).post(`/torneios/${torneioId}/sortear`).send({})
+    await A.post(`/torneios/${torneioId}/sortear`).send({})
 
     const tv = await request(app).get(`/torneios/${torneioId}/painel-tv`)
     expect(tv.status).toBe(200)
@@ -480,15 +485,17 @@ describe('Torneio — fluxo HTTP completo', () => {
   })
 
   it('não permite sorteio com menos de 16 jogadores (valida na rota)', async () => {
-    const criar = await request(app).post('/torneios').send({
+    const A = await agenteMestre(app)
+    const criar = await A.post('/torneios').send({
       nome: 'Torneio Incompleto',
-      data_inicio: '2026-09-01'
+      data_inicio: '2026-09-01',
+      senha: SENHA_TORNEIO
     })
     const torneioId = Number(criar.headers.location.match(/\/torneios\/(\d+)/)[1])
     for (let i = 1; i <= 10; i += 1) {
-      await request(app).post(`/torneios/${torneioId}/jogadores`).send({ nome: `Jogador ${i}` })
+      await A.post(`/torneios/${torneioId}/jogadores`).send({ nome: `Jogador ${i}` })
     }
-    const res = await request(app).post(`/torneios/${torneioId}/sortear`).send({})
+    const res = await A.post(`/torneios/${torneioId}/sortear`).send({})
     expect(res.status).toBe(302)
     expect(res.headers.location).toContain('erro=')
     expect(TorneioService.obter(torneioId).status).toBe('cadastro_jogadores')
@@ -501,13 +508,15 @@ describe('Torneio — fluxo HTTP completo', () => {
   })
 
   it('página de novo torneio responde 200', async () => {
-    const res = await request(app).get('/torneios/novo')
+    const A = await agenteMestre(app)
+    const res = await A.get('/torneios/novo')
     expect(res.status).toBe(200)
     expect(res.text).toContain('Nome do torneio')
   })
 
   it('valida criação sem nome/data', async () => {
-    const res = await request(app).post('/torneios').send({})
+    const A = await agenteMestre(app)
+    const res = await A.post('/torneios').send({})
     expect(res.status).toBe(400)
     const idx = await request(app).get('/torneios')
     expect(idx.text).not.toContain('undefined')
@@ -586,7 +595,8 @@ describe('TorneioService — número de mesas (jogos simultâneos)', () => {
   })
 
   it('valida criação com número de mesas inválido (via rota)', async () => {
-    const res = await request(app).post('/torneios').send({
+    const A = await agenteMestre(app)
+    const res = await A.post('/torneios').send({
       nome: 'Torneio Sem Mesa',
       data_inicio: '2026-09-01',
       numero_mesas: 0
@@ -648,14 +658,15 @@ describe('API JSON de torneios', () => {
     TorneioService.sortear(torneio.id)
     TorneioService.iniciar(torneio.id)
     const c1 = ConfrontoRepository.obterPorNumero(torneio.id, 1)
+    const A = await agenteMestre(app)
 
-    const parcial = await request(app)
+    const parcial = await A
       .post(`/torneios/${torneio.id}/confrontos/${c1.id}/partidas`)
       .send({ vencedor_id: c1.jogador_a_id })
     expect(parcial.status).toBe(302)
     expect(parcial.headers.location).toContain(`#confronto-${c1.id}`)
 
-    const fechado = await request(app)
+    const fechado = await A
       .post(`/torneios/${torneio.id}/confrontos/${c1.id}/partidas`)
       .send({ vencedor_id: c1.jogador_a_id })
     const c2 = ConfrontoRepository.obterPorNumero(torneio.id, 2)

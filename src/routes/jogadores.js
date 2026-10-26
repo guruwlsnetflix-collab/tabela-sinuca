@@ -5,7 +5,29 @@ const router = express.Router()
 
 const EventoService = require('../services/eventoService')
 const JogadorService = require('../services/jogadorService')
+const FinanceiroService = require('../services/financeiroService')
 const jogadorValidators = require('../validators/jogadorValidator')
+const { exigirEvento } = require('../middleware/auth')
+
+function fmtMoeda(v) {
+  return 'R$ ' + (Number(v) || 0).toFixed(2).replace('.', ',')
+}
+
+function textoAcerto(projecao) {
+  const linhas = projecao.contas
+    .filter((c) => c.saldo !== 0)
+    .map((c) => {
+      const nome = c.oponente.nome || c.oponente.apelido || '?'
+      if (c.saldo > 0) {
+        return `receber ${fmtMoeda(c.saldo)} de ${nome}`
+      }
+      return `pagar ${fmtMoeda(-c.saldo)} a ${nome}`
+    })
+  if (linhas.length === 0) {
+    return 'situação financeira zerada'
+  }
+  return linhas.join('; ')
+}
 
 function renderForm(res, { evento, jogador, erros }) {
   const editando = Boolean(jogador && jogador.id)
@@ -18,7 +40,7 @@ function renderForm(res, { evento, jogador, erros }) {
   })
 }
 
-router.get('/eventos/:eventoId/jogadores/novo', (req, res) => {
+router.get('/eventos/:eventoId/jogadores/novo', exigirEvento, (req, res) => {
   try {
     const evento = EventoService.obter(Number(req.params.eventoId))
     renderForm(res, { evento, jogador: null, erros: null })
@@ -27,7 +49,7 @@ router.get('/eventos/:eventoId/jogadores/novo', (req, res) => {
   }
 })
 
-router.post('/eventos/:eventoId/jogadores', jogadorValidators.criar, (req, res) => {
+router.post('/eventos/:eventoId/jogadores', exigirEvento, jogadorValidators.criar, (req, res) => {
   const eventoId = Number(req.params.eventoId)
   const evento = EventoService.obter(eventoId)
 
@@ -52,7 +74,7 @@ router.post('/eventos/:eventoId/jogadores', jogadorValidators.criar, (req, res) 
   }
 })
 
-router.get('/eventos/:eventoId/jogadores/:id/editar', (req, res) => {
+router.get('/eventos/:eventoId/jogadores/:id/editar', exigirEvento, (req, res) => {
   try {
     const evento = EventoService.obter(Number(req.params.eventoId))
     const jogador = JogadorService.obter(Number(req.params.id))
@@ -62,7 +84,7 @@ router.get('/eventos/:eventoId/jogadores/:id/editar', (req, res) => {
   }
 })
 
-router.post('/eventos/:eventoId/jogadores/:id', jogadorValidators.atualizar, (req, res) => {
+router.post('/eventos/:eventoId/jogadores/:id', exigirEvento, jogadorValidators.atualizar, (req, res) => {
   const eventoId = Number(req.params.eventoId)
   const id = Number(req.params.id)
   const evento = EventoService.obter(eventoId)
@@ -103,11 +125,26 @@ router.get('/eventos/:eventoId/jogadores/:id/campanha', (req, res) => {
   }
 })
 
-router.post('/eventos/:eventoId/jogadores/:id/excluir', (req, res) => {
+router.post('/eventos/:eventoId/jogadores/:id/excluir', exigirEvento, (req, res) => {
   const eventoId = Number(req.params.eventoId)
   try {
     JogadorService.excluir(Number(req.params.id))
     res.redirect(`/eventos/${eventoId}?msg=Jogador excluído.`)
+  } catch (err) {
+    res.redirect(`/eventos/${eventoId}?erro=${encodeURIComponent(err.message)}`)
+  }
+})
+
+router.post('/eventos/:eventoId/jogadores/:id/desistir', exigirEvento, (req, res) => {
+  const eventoId = Number(req.params.eventoId)
+  const jogadorId = Number(req.params.id)
+  try {
+    const projecao = FinanceiroService.projetarDesistencia(eventoId, jogadorId)
+    JogadorService.desistir(jogadorId)
+    const msg =
+      `${projecao.jogador.nome} parou de jogar. Acerto de saída: ${textoAcerto(projecao)}. ` +
+      'Ele não entrará mais nos cálculos; os demais seguem o evento.'
+    res.redirect(`/eventos/${eventoId}?msg=${encodeURIComponent(msg)}`)
   } catch (err) {
     res.redirect(`/eventos/${eventoId}?erro=${encodeURIComponent(err.message)}`)
   }

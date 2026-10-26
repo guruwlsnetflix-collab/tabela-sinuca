@@ -15,6 +15,13 @@ class JogadorEventoEncerradoError extends Error {
   }
 }
 
+class JogadorInativoError extends Error {
+  constructor() {
+    super('Jogador já está marcado como desistente.')
+    this.status = 400
+  }
+}
+
 class JogadorExclusaoBloqueadaError extends Error {
   constructor() {
     super('Não é possível excluir um jogador que possui partidas registradas.')
@@ -66,6 +73,19 @@ const JogadorService = {
     return jogador
   },
 
+  desistir(id) {
+    const jogador = this.obter(id)
+    const evento = EventoService.obter(jogador.evento_id)
+    if (evento.status === 'encerrado') {
+      throw new JogadorEventoEncerradoError()
+    }
+    if (jogador.ativo === 0) {
+      throw new JogadorInativoError()
+    }
+    JogadorRepository.desativar(id)
+    return this.obter(id)
+  },
+
   campanha(eventoId, jogadorId) {
     const jogador = this.obter(jogadorId)
     const evento = EventoService.obter(eventoId)
@@ -104,5 +124,6 @@ module.exports = JogadorService
 module.exports.Errors = {
   JogadorNaoEncontradoError,
   JogadorEventoEncerradoError,
-  JogadorExclusaoBloqueadaError
+  JogadorExclusaoBloqueadaError,
+  JogadorInativoError
 }

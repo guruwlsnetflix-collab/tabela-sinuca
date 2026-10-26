@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="<%= telaFirestick ? 'width=1600' : 'width=device-width, initial-scale=1.0' %>">
+  <meta name="theme-color" content="#0B1020">
+  <title><%= evento.nome %> — Painel | Tabela de Sinuca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/evento-painel.css">
+</head>
+<body class="epainel <%= telaFirestick ? 'epainel--telao' : '' %>">
+  <div id="epainel-alvo">
+  <%
+    function fmtMoeda(v) {
+      var n = Number(v) || 0
+      return 'R$ ' + n.toFixed(2).replace('.', ',')
+    }
+    var statusClasse = evento.status === 'em_andamento' ? 'ep-chip--vivo'
+      : (evento.status === 'planejado' ? 'ep-chip--proximo' : 'ep-chip--fim')
+    var temAposta = financeiro.totalMovimentado > 0
+    var haAcertos = financeiro.acertos.length > 0
+  %>
+
+  <header class="ep-header">
+    <div class="ep-brand" aria-hidden="true">🎱</div>
+    <div class="ep-header__main">
+      <h1 class="ep-title"><%= evento.nome %></h1>
+      <div class="ep-sub">
+        <span class="ep-chip <%= statusClasse %>"><%= statusLabel[evento.status] %></span>
+        <span class="ep-chip"><%= evento.data_inicio %> → <%= evento.data_fim %></span>
+        <span class="ep-chip">Aposta padrão: <%= fmtMoeda(evento.valor_aposta_padrao) %></span>
+      </div>
+    </div>
+    <div class="ep-fase">
+      <span class="ep-fase__label">PARTIDAS</span>
+      <span class="ep-fase__value"><%= partidas.length || 0 %></span>
+    </div>
+    <nav class="ep-nav" aria-label="Navegação do painel">
+      <a href="/eventos/<%= evento.id %>" class="ep-voltar" data-nofs>
+        <span class="ep-voltar__icon" aria-hidden="true">←</span>
+        Voltar ao menu
+      </a>
+    </nav>
+  </header>
+
+  <main class="ep-grid">
+    <!-- RANKING -->
+    <section class="ep-coluna">
+      <h2 class="ep-coluna__titulo">🏆 Ranking</h2>
+      <div class="ep-ranking">
+        <% if (ranking.length === 0) { %>
+          <div class="ep-vazio">Nenhum jogador cadastrado.</div>
+        <% } else { %>
+          <% ranking.forEach((r) => { %>
+            <div class="ep-rank <%= r.posicao === 1 ? 'ep-rank--top1' : (r.posicao === 2 ? 'ep-rank--top2' : (r.posicao === 3 ? 'ep-rank--top3' : '')) %>">
+              <span class="ep-rank__pos"><%= r.posicao %></span>
+              <span class="ep-rank__nome"><%= r.jogador.nome %></span>
+              <span class="ep-rank__jogos"><%= r.jogos %> j</span>
+              <span class="ep-rank__nums">
+                <b class="ep-ok"><%= r.vitorias %>V</b>
+                <b class="ep-no"><%= r.derrotas %>D</b>
+                <b><%= r.aproveitamento %>%</b>
+              </span>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </section>
+
+    <!-- FINANCEIRO POR JOGADOR -->
+    <section class="ep-coluna">
+      <h2 class="ep-coluna__titulo">💰 Financeiro</h2>
+      <div class="ep-saldos">
+        <% if (!temAposta) { %>
+          <div class="ep-vazio">Nenhuma aposta registrada.</div>
+        <% } else { %>
+          <% financeiro.jogadoresFinanceiros.forEach((fin) => { %>
+            <div class="ep-saldo">
+              <span class="ep-saldo__nome"><%= fin.jogador.nome %></span>
+              <span class="ep-saldo__detalhe">
+                <b class="ep-ok">+<%= fmtMoeda(fin.aReceber) %></b>
+                <b class="ep-no">-<%= fmtMoeda(fin.aPagar) %></b>
+              </span>
+              <span class="ep-saldo__total <%= fin.saldo < 0 ? 'ep-no' : (fin.saldo > 0 ? 'ep-ok' : '') %>">
+                <%= fmtMoeda(fin.saldo) %>
+              </span>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </section>
+
+    <!-- ACERTO DE CONTAS -->
+    <section class="ep-coluna">
+      <h2 class="ep-coluna__titulo">🤝 Quem deve para quem</h2>
+      <% if (!temAposta) { %>
+        <div class="ep-vazio">Sem apostas não há acerto de contas.</div>
+      <% } else if (!haAcertos) { %>
+        <div class="ep-quites">🎉 Tudo quites!</div>
+      <% } else { %>
+        <div class="ep-acertos">
+          <% financeiro.acertos.forEach((a) => { %>
+            <div class="ep-acerto">
+              <div class="ep-acerto__lado">
+                <span class="ep-acerto__nome"><%= a.devedor.nome %></span>
+                <span class="ep-acerto__tag ep-acerto__tag--deve">DEVE</span>
+              </div>
+              <div class="ep-acerto__meio">
+                <span class="ep-acerto__valor"><%= fmtMoeda(a.valor) %></span>
+                <span class="ep-acerto__seta" aria-hidden="true">→</span>
+              </div>
+              <div class="ep-acerto__lado">
+                <span class="ep-acerto__nome"><%= a.credor.nome %></span>
+                <span class="ep-acerto__tag ep-acerto__tag--recebe">RECEBE</span>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+      <div class="ep-total">
+        <span>Total movimentado</span>
+        <b><%= fmtMoeda(financeiro.totalMovimentado) %></b>
+      </div>
+      <div class="ep-total">
+        <span>Pago</span>
+        <b class="ep-ok"><%= fmtMoeda(financeiro.totalPago) %></b>
+      </div>
+      <div class="ep-total">
+        <span>Pendente</span>
+        <b class="ep-no"><%= fmtMoeda(financeiro.totalPendente) %></b>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ep-rodape">
+    <span class="ep-rodape__item">🎱 Tabela de Sinuca</span>
+    <span class="ep-rodape__item">Atualização automática</span>
+  </footer>
+  </div>
+
+  <div class="ep-hint" id="epainel-hint">Pressione OK do controle para entrar em tela cheia</div>
+
+  <script>
+    function entrarTelaCheia() {
+      var el = document.documentElement
+      if (document.fullscreenElement || document.webkitFullscreenElement) return
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(function () {})
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen()
+      }
+    }
+
+    function sairTelaCheia() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(function () {})
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen()
+      }
+    }
+
+    function voltarAoMenu() {
+      var bt = document.querySelector('.ep-voltar')
+      if (bt && bt.href) {
+        window.location.href = bt.href
+      }
+    }
+
+    function atualizarHint() {
+      var hint = document.getElementById('epainel-hint')
+      if (!hint) return
+      var ativo = document.fullscreenElement || document.webkitFullscreenElement
+      hint.classList.toggle('ep-hint--oculto', Boolean(ativo))
+    }
+
+    function atualizarPainel() {
+      var xhr = new XMLHttpRequest()
+      xhr.open('GET', window.location.pathname + '?_=' + Date.now())
+      xhr.onload = function () {
+        if (xhr.status !== 200) return
+        var doc = new DOMParser().parseFromString(xhr.responseText, 'text/html')
+        var alvo = document.getElementById('epainel-alvo')
+        var novo = doc.getElementById('epainel-alvo')
+        if (alvo && novo) {
+          alvo.innerHTML = novo.innerHTML
+        }
+      }
+      xhr.send()
+    }
+
+    document.addEventListener('click', function (e) {
+      var nofs = e.target && e.target.closest ? e.target.closest('[data-nofs]') : null
+      if (nofs) return
+      entrarTelaCheia()
+    })
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        entrarTelaCheia()
+        return
+      }
+      // Botão Voltar de controles de TV/Fire Stick + teclado
+      if (e.key === 'Escape' || e.key === 'Backspace' || e.keyCode === 461) {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          sairTelaCheia()
+        } else {
+          voltarAoMenu()
+        }
+      }
+    })
+    document.addEventListener('fullscreenchange', atualizarHint)
+    document.addEventListener('webkitfullscreenchange', atualizarHint)
+
+    window.setInterval(atualizarPainel, 15000)
+  </script>
+</body>
+</html>

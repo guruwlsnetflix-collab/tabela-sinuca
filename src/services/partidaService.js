@@ -23,6 +23,20 @@ class PartidaJogadorForaDoEventoError extends Error {
   }
 }
 
+class PartidaApostaNegativaError extends Error {
+  constructor() {
+    super('O valor da aposta não pode ser negativo.')
+    this.status = 400
+  }
+}
+
+class PartidaJogadorDesistenteError extends Error {
+  constructor(nome) {
+    super(`O jogador "${nome}" parou de jogar neste evento.`)
+    this.status = 400
+  }
+}
+
 const PartidaService = {
   listarPorEvento(eventoId) {
     EventoService.obter(eventoId)
@@ -37,16 +51,25 @@ const PartidaService = {
     return partida
   },
 
-  registrar({ evento_id, jogador_a_id, jogador_b_id, vencedor_id, data_partida }) {
+  registrar({ evento_id, jogador_a_id, jogador_b_id, vencedor_id, data_partida, valor_aposta, pago }) {
     const evento = EventoService.obter(evento_id)
     if (evento.status === 'encerrado') {
       throw new PartidaEventoEncerradoError()
     }
     this._validarParticipacao(evento_id, { jogador_a_id, jogador_b_id, vencedor_id })
-    return PartidaRepository.criar({ evento_id, jogador_a_id, jogador_b_id, vencedor_id, data_partida })
+    const aposta = this._normalizarAposta(valor_aposta, evento.valor_aposta_padrao)
+    return PartidaRepository.criar({
+      evento_id,
+      jogador_a_id,
+      jogador_b_id,
+      vencedor_id,
+      data_partida,
+      valor_aposta: aposta,
+      pago: this._normalizarPago(pago)
+    })
   },
 
-  atualizar(id, { jogador_a_id, jogador_b_id, vencedor_id, data_partida }) {
+  atualizar(id, { jogador_a_id, jogador_b_id, vencedor_id, data_partida, valor_aposta, pago }) {
     const partida = this.obter(id)
     const evento = EventoService.obter(partida.evento_id)
     if (evento.status === 'encerrado') {
@@ -57,8 +80,17 @@ const PartidaService = {
       jogador_a_id,
       jogador_b_id,
       vencedor_id,
-      data_partida
+      data_partida,
+      valor_aposta: this._normalizarAposta(valor_aposta, partida.valor_aposta),
+      pago: this._normalizarPago(pago)
     })
+  },
+
+  // Marca/desmarca a quitação da aposta. Permitido mesmo em evento encerrado,
+  // pois é apenas o registro de um pagamento.
+  alternarPago(id) {
+    this.obter(id)
+    return PartidaRepository.alternarPago(id)
   },
 
   excluir(id) {
@@ -69,6 +101,28 @@ const PartidaService = {
     }
     PartidaRepository.excluir(id)
     return partida
+  },
+
+  _normalizarAposta(valor, padrao) {
+    const grande = (v) => Math.round((Number(v) || 0) * 100) / 100
+    let aposta
+    if (valor === undefined || valor === null || valor === '') {
+      aposta = grande(padrao)
+    } else {
+      aposta = grande(valor)
+    }
+    if (aposta < 0) {
+      throw new PartidaApostaNegativaError()
+    }
+    return aposta
+  },
+
+  _normalizarPago(valor) {
+    if (valor === undefined || valor === null || valor === '') return 0
+    if (valor === true || valor === 1 || valor === '1' || valor === 'on' || valor === 'true') {
+      return 1
+    }
+    return 0
   },
 
   _validarParticipacao(eventoId, { jogador_a_id, jogador_b_id, vencedor_id }) {
@@ -87,6 +141,9 @@ const PartidaService = {
       if (jogador.evento_id !== eventoId) {
         throw new PartidaJogadorForaDoEventoError(campo)
       }
+      if (jogador.ativo === 0) {
+        throw new PartidaJogadorDesistenteError(jogador.nome)
+      }
     }
     if (![Number(jogador_a_id), Number(jogador_b_id)].includes(Number(vencedor_id))) {
       throw new Error('O vencedor deve ser o jogador A ou o jogador B.')
@@ -98,5 +155,7 @@ module.exports = PartidaService
 module.exports.Errors = {
   PartidaNaoEncontradaError,
   PartidaEventoEncerradoError,
-  PartidaJogadorForaDoEventoError
+  PartidaJogadorForaDoEventoError,
+  PartidaApostaNegativaError,
+  PartidaJogadorDesistenteError
 }

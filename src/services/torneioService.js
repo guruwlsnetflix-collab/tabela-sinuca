@@ -1,6 +1,7 @@
 const db = require('../db')
 const TorneioRepository = require('../repositories/torneioRepository')
 const ConfrontoRepository = require('../repositories/confrontoRepository')
+const AuthService = require('./authService')
 
 const TAMANHO_CHAVE = 16
 
@@ -107,14 +108,15 @@ const TorneioService = {
     return torneio
   },
 
-  criar({ nome, local, data_inicio, previsao_termino, modalidade, numero_mesas }) {
+  criar({ nome, local, data_inicio, previsao_termino, modalidade, numero_mesas, senha }) {
     return TorneioRepository.criar({
       nome,
       local,
       data_inicio,
       previsao_termino,
       modalidade,
-      numero_mesas
+      numero_mesas,
+      senha_hash: senha && String(senha).trim() ? AuthService.hashSenha(senha) : null
     })
   },
 
@@ -122,6 +124,9 @@ const TorneioService = {
     const torneio = this.obter(id)
     if (!['planejado', 'cadastro_jogadores'].includes(torneio.status)) {
       throw negar('Não é possível editar o torneio após o sorteio.')
+    }
+    if (dados.senha && String(dados.senha).trim()) {
+      TorneioRepository.atualizarSenha(id, AuthService.hashSenha(dados.senha))
     }
     return TorneioRepository.atualizar(id, dados)
   },

@@ -18,6 +18,25 @@ function migrar() {
   if (!colunas.some((c) => c.name === 'numero_mesas')) {
     db.exec("ALTER TABLE torneios ADD COLUMN numero_mesas INTEGER NOT NULL DEFAULT 1 CHECK (numero_mesas >= 1)")
   }
+  if (!colunas.some((c) => c.name === 'senha_hash')) {
+    db.exec('ALTER TABLE torneios ADD COLUMN senha_hash TEXT')
+  }
+
+  const colunasEventos = db.prepare('PRAGMA table_info(eventos)').all()
+  if (!colunasEventos.some((c) => c.name === 'valor_aposta_padrao')) {
+    db.exec('ALTER TABLE eventos ADD COLUMN valor_aposta_padrao REAL NOT NULL DEFAULT 0')
+  }
+  if (!colunasEventos.some((c) => c.name === 'senha_hash')) {
+    db.exec('ALTER TABLE eventos ADD COLUMN senha_hash TEXT')
+  }
+
+  const colunasPartidas = db.prepare('PRAGMA table_info(partidas)').all()
+  if (!colunasPartidas.some((c) => c.name === 'valor_aposta')) {
+    db.exec('ALTER TABLE partidas ADD COLUMN valor_aposta REAL NOT NULL DEFAULT 0')
+  }
+  if (!colunasPartidas.some((c) => c.name === 'pago')) {
+    db.exec('ALTER TABLE partidas ADD COLUMN pago INTEGER NOT NULL DEFAULT 0')
+  }
 }
 
 if (require.main === module) {

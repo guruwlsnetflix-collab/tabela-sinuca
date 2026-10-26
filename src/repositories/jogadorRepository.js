@@ -40,6 +40,11 @@ const JogadorRepository = {
     return this.obterPorId(id)
   },
 
+  desativar(id) {
+    db.prepare('UPDATE jogadores SET ativo = 0 WHERE id = ?').run(id)
+    return this.obterPorId(id)
+  },
+
   contarPartidas(id) {
     return db
       .prepare(`

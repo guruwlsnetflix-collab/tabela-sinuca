@@ -2,13 +2,15 @@ PRAGMA journal_mode = WAL;
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS eventos (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome        TEXT    NOT NULL UNIQUE,
-  data_inicio TEXT    NOT NULL,
-  data_fim    TEXT    NOT NULL,
-  status      TEXT    NOT NULL DEFAULT 'planejado'
+  id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome                 TEXT    NOT NULL UNIQUE,
+  data_inicio          TEXT    NOT NULL,
+  data_fim             TEXT    NOT NULL,
+  status               TEXT    NOT NULL DEFAULT 'planejado'
     CHECK (status IN ('planejado', 'em_andamento', 'encerrado')),
-  criado_em   TEXT    NOT NULL DEFAULT (datetime('now'))
+  valor_aposta_padrao  REAL    NOT NULL DEFAULT 0,
+  senha_hash           TEXT,
+  criado_em            TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE IF NOT EXISTS jogadores (
@@ -30,6 +32,8 @@ CREATE TABLE IF NOT EXISTS partidas (
   jogador_b_id  INTEGER NOT NULL REFERENCES jogadores (id),
   vencedor_id   INTEGER NOT NULL REFERENCES jogadores (id),
   data_partida  TEXT    NOT NULL DEFAULT (datetime('now')),
+  valor_aposta  REAL    NOT NULL DEFAULT 0,
+  pago          INTEGER NOT NULL DEFAULT 0,
   criado_em     TEXT    NOT NULL DEFAULT (datetime('now')),
   CHECK (jogador_a_id <> jogador_b_id),
   CHECK (vencedor_id IN (jogador_a_id, jogador_b_id))
@@ -68,6 +72,7 @@ CREATE TABLE IF NOT EXISTS torneios (
   status           TEXT    NOT NULL DEFAULT 'cadastro_jogadores'
     CHECK (status IN ('planejado', 'cadastro_jogadores', 'sorteado', 'em_andamento', 'finalizado', 'cancelado')),
   vencedor_id      INTEGER REFERENCES torneio_jogadores (id) ON DELETE SET NULL,
+  senha_hash       TEXT,
   criado_em        TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 

@@ -1,4 +1,5 @@
 const EventoRepository = require('../repositories/eventoRepository')
+const AuthService = require('./authService')
 
 const STATUS_VALIDOS = ['planejado', 'em_andamento', 'encerrado']
 
@@ -26,6 +27,17 @@ class EventoExclusaoBloqueadaError extends Error {
 const EventoService = {
   statusValidos: STATUS_VALIDOS,
 
+  _normalizarAposta(valor) {
+    if (valor === undefined || valor === null || valor === '') {
+      return 0
+    }
+    const v = Math.round((Number(valor) || 0) * 100) / 100
+    if (v < 0) {
+      throw new Error('O valor da aposta padrão não pode ser negativo.')
+    }
+    return v
+  },
+
   listar() {
     return EventoRepository.listar()
   },
@@ -38,14 +50,20 @@ const EventoService = {
     return evento
   },
 
-  criar({ nome, data_inicio, data_fim }) {
+  criar({ nome, data_inicio, data_fim, valor_aposta_padrao, senha }) {
     if (EventoRepository.obterPorNome(nome)) {
       throw new EventoNomeDuplicadoError()
     }
-    return EventoRepository.criar({ nome, data_inicio, data_fim })
+    return EventoRepository.criar({
+      nome,
+      data_inicio,
+      data_fim,
+      valor_aposta_padrao: this._normalizarAposta(valor_aposta_padrao),
+      senha_hash: senha && String(senha).trim() ? AuthService.hashSenha(senha) : null
+    })
   },
 
-  atualizar(id, { nome, data_inicio, data_fim, status }) {
+  atualizar(id, { nome, data_inicio, data_fim, status, valor_aposta_padrao, senha }) {
     this.obter(id)
     if (EventoRepository.obterPorNome(nome, id)) {
       throw new EventoNomeDuplicadoError()
@@ -56,7 +74,15 @@ const EventoService = {
     if (status) {
       EventoRepository.atualizarStatus(id, status)
     }
-    return EventoRepository.atualizar(id, { nome, data_inicio, data_fim })
+    if (senha && String(senha).trim()) {
+      EventoRepository.atualizarSenha(id, AuthService.hashSenha(senha))
+    }
+    return EventoRepository.atualizar(id, {
+      nome,
+      data_inicio,
+      data_fim,
+      valor_aposta_padrao: this._normalizarAposta(valor_aposta_padrao)
+    })
   },
 
   mudarStatus(id, status) {

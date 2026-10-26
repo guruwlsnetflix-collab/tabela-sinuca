@@ -6,6 +6,7 @@ const RankingService = {
   gerar(eventoId) {
     const evento = EventoService.obter(eventoId)
     const jogadores = JogadorRepository.listarPorEvento(evento.id)
+      .filter((j) => j.ativo === 1)
 
     const partidas = db
       .prepare(`

@@ -50,11 +50,23 @@
       </div>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
+          <li class="nav-item d-none d-md-block">
             <a class="nav-link" href="/">Eventos</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item d-none d-md-block">
             <a class="nav-link" href="/torneios">Torneios</a>
+          </li>
+          <li class="nav-item ms-md-2 mt-2 mt-md-0">
+            <% if (typeof sessao !== 'undefined' && sessao) { %>
+              <form method="POST" action="/logout" class="d-flex align-items-center gap-2">
+                <span class="badge <%= sessao.nivel === 'mestre' ? 'text-bg-warning' : 'text-bg-secondary' %> px-2 py-1">
+                  <%= sessao.nivel === 'mestre' ? 'Mestre' : (sessao.nivel === 'evento' ? 'Evento' : 'Torneio') %>
+                </span>
+                <button type="submit" class="btn btn-sm p-btn p-btn--outline">Sair</button>
+              </form>
+            <% } else { %>
+              <a class="nav-link p-auth-link" href="/login">Entrar</a>
+            <% } %>
           </li>
         </ul>
       </div>

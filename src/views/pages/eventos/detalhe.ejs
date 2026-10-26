@@ -14,6 +14,11 @@
     return tt ? dd + ' · ' + tt : dd
   }
 
+  function fmtMoeda(v) {
+    var n = Number(v) || 0
+    return 'R$ ' + n.toFixed(2).replace('.', ',')
+  }
+
   // Resumo do evento
   var totalPartidas = partidas.length
   var totalVitorias = ranking.reduce(function (s, r) { return s + r.vitorias }, 0)
@@ -50,43 +55,64 @@
         <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
         <%= evento.data_inicio %> → <%= evento.data_fim %>
       </span>
+      <span class="p-hero__dates" title="Valor da aposta padrão das partidas deste evento">
+        <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        Aposta padrão: <strong><%= fmtMoeda(evento.valor_aposta_padrao) %></strong>
+      </span>
     </div>
 
     <!-- Ações grandes -->
     <div class="d-grid gap-2 d-md-flex">
-      <a href="/eventos/<%= evento.id %>/editar" class="p-action-btn p-action-btn--edit">
-        <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-        Editar
+      <a href="/eventos/<%= evento.id %>/painel" class="p-action-btn p-action-btn--report" target="_blank" rel="noopener">
+        <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+        Painel TV
       </a>
+      <% if (podeEditarEvento(evento.id)) { %>
+        <a href="/eventos/<%= evento.id %>/editar" class="p-action-btn p-action-btn--edit">
+          <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          Editar
+        </a>
+      <% } %>
       <a href="/eventos/<%= evento.id %>/relatorio" class="p-action-btn p-action-btn--report">
         <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
         Relatório
       </a>
-      <% if (evento.status === 'planejado') { %>
-        <form method="POST" action="/eventos/<%= evento.id %>/status" class="d-grid">
-          <input type="hidden" name="status" value="em_andamento">
-          <button type="submit" class="p-action-btn p-action-btn--status">
-            <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Iniciar evento
+      <% if (podeEditarEvento(evento.id)) { %>
+        <% if (evento.status === 'planejado') { %>
+          <form method="POST" action="/eventos/<%= evento.id %>/status" class="d-grid">
+            <input type="hidden" name="status" value="em_andamento">
+            <button type="submit" class="p-action-btn p-action-btn--status">
+              <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Iniciar evento
+            </button>
+          </form>
+        <% } %>
+        <% if (evento.status === 'em_andamento') { %>
+          <form method="POST" action="/eventos/<%= evento.id %>/status" class="d-grid">
+            <input type="hidden" name="status" value="encerrado">
+            <button type="submit" class="p-action-btn p-action-btn--status">
+              <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+              Encerrar evento
+            </button>
+          </form>
+        <% } %>
+        <% if (evento.status === 'encerrado') { %>
+          <form method="POST" action="/eventos/<%= evento.id %>/status" class="d-grid">
+            <input type="hidden" name="status" value="em_andamento">
+            <button type="submit" class="p-action-btn p-action-btn--status">
+              <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M11 15l1 1 3-3"/></svg>
+              Reabrir evento
+            </button>
+          </form>
+        <% } %>
+        <form method="POST" action="/eventos/<%= evento.id %>/excluir" class="d-grid"
+              data-confirm="Excluir este evento? Esta ação não pode ser desfeita.">
+          <button type="submit" class="p-action-btn p-action-btn--danger">
+            <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            Excluir
           </button>
         </form>
       <% } %>
-      <% if (evento.status === 'em_andamento') { %>
-        <form method="POST" action="/eventos/<%= evento.id %>/status" class="d-grid">
-          <input type="hidden" name="status" value="encerrado">
-          <button type="submit" class="p-action-btn p-action-btn--status">
-            <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
-            Encerrar evento
-          </button>
-        </form>
-      <% } %>
-      <form method="POST" action="/eventos/<%= evento.id %>/excluir" class="d-grid"
-            data-confirm="Excluir este evento? Esta ação não pode ser desfeita.">
-        <button type="submit" class="p-action-btn p-action-btn--danger">
-          <svg class="p-action-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-          Excluir
-        </button>
-      </form>
     </div>
   </div>
 
@@ -112,7 +138,7 @@
               <label for="vencedor_id" class="form-label">Quem está na mesa (vencedor atual)</label>
               <select class="form-select" id="vencedor_id" name="vencedor_id" required>
                 <option value="">Selecione...</option>
-                <% jogadores.forEach((j) => { %>
+                <% jogadores.filter((j) => j.ativo === 1).forEach((j) => { %>
                   <option value="<%= j.id %>" <%= typeof sorteio !== 'undefined' && sorteio && sorteio.vencedor && sorteio.vencedor.id === j.id ? 'selected' : '' %>>
                     <%= j.nome %><%= j.apelido ? ' (' + j.apelido + ')' : '' %>
                   </option>
@@ -139,9 +165,11 @@
                   <br><small class="text-muted">Último adversário de <%= sorteio.vencedor.nome %>: <%= sorteio.ultimoAdversarioNome %></small>
                 <% } %>
               </span>
-              <a class="btn p-btn p-btn--primary flex-shrink-0" href="/eventos/<%= evento.id %>/partidas/novo?jogador_a_id=<%= sorteio.vencedor.id %>&jogador_b_id=<%= sorteio.sugestao.id %>">
-                Registrar partida
-              </a>
+              <% if (podeEditarEvento(evento.id)) { %>
+                <a class="btn p-btn p-btn--primary flex-shrink-0" href="/eventos/<%= evento.id %>/partidas/novo?jogador_a_id=<%= sorteio.vencedor.id %>&jogador_b_id=<%= sorteio.sugestao.id %>">
+                  Registrar partida
+                </a>
+              <% } %>
             </div>
           <% } %>
         <% } %>
@@ -251,6 +279,129 @@
   <% } %>
 </section>
 
+<!-- ============ FINANCEIRO / ACERTO DE CONTAS ============ -->
+<section id="financeiro" data-nav-target="financeiro" class="p-section">
+  <div class="d-flex align-items-center justify-content-between mb-3 gap-2 flex-wrap">
+    <h2 class="p-section__title mb-0">
+      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+      Financeiro — Acerto de Contas
+    </h2>
+    <div class="d-flex gap-2 flex-wrap">
+      <span class="p-badge p-badge--andamento"><%= financeiro.partidasApostadas %> partida(s) com aposta</span>
+      <span class="p-badge p-badge--planejado">Total movimentado: <%= fmtMoeda(financeiro.totalMovimentado) %></span>
+      <span class="p-badge p-badge--andamento"><%= financeiro.partidasPagas %> paga(s) · <%= fmtMoeda(financeiro.totalPago) %></span>
+      <span class="p-badge p-badge--planejado"><%= financeiro.partidasPendentes %> pendente(s) · <%= fmtMoeda(financeiro.totalPendente) %></span>
+    </div>
+  </div>
+
+  <% if (financeiro.totalMovimentado === 0) { %>
+    <div class="p-empty">
+      <div class="p-empty__icon">
+        <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      </div>
+      <div>
+        <p class="fw-semibold mb-1">Nenhuma aposta registrada neste evento</p>
+        <p class="mb-0">Defina um valor de aposta nas partidas para acompanhar o acerto de contas dos jogadores.</p>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="p-financeiro">
+      <div class="p-financeiro__jogadores p-stagger">
+        <% financeiro.jogadoresFinanceiros.forEach((fin) => { %>
+          <div class="p-fin-card">
+            <div class="p-fin-card__head">
+              <div class="p-avatar" aria-hidden="true"><%= String(fin.jogador.nome || '?').charAt(0).toUpperCase() %></div>
+              <div class="min-w-0">
+                <div class="p-fin-card__name"><%= fin.jogador.nome %></div>
+                <div class="p-fin-card__partidas"><%= fin.partidasApostadas %> partida(s) apostada(s)</div>
+              </div>
+              <div class="p-fin-card__saldo <%= fin.saldo > 0 ? 'p-fin-card__saldo--positivo' : (fin.saldo < 0 ? 'p-fin-card__saldo--negativo' : '') %>">
+                <%= fin.saldo >= 0 ? '👍' : '👎' %> <%= fmtMoeda(Math.abs(fin.saldo)) %>
+              </div>
+            </div>
+            <div class="p-fin-card__linha">
+              <span>A receber</span>
+              <b class="p-fin-positivo"><%= fmtMoeda(fin.aReceber) %></b>
+            </div>
+            <div class="p-fin-card__linha">
+              <span>A pagar</span>
+              <b class="p-fin-negativo"><%= fmtMoeda(fin.aPagar) %></b>
+            </div>
+            <% if (fin.partidasPagas > 0) { %>
+              <div class="p-fin-card__linha">
+                <span>Já quitado</span>
+                <b class="p-fin-positivo"><%= fin.partidasPagas %> · <%= fmtMoeda(fin.valorQuitado) %></b>
+              </div>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+
+      <div class="p-financeiro__acertos">
+        <h3 class="p-financeiro__subtitle">
+          <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+          Quem deve para quem
+        </h3>
+        <% if (financeiro.acertos.length === 0) { %>
+          <div class="p-alert p-alert--success mb-0">
+            🎉 Tudo quites! Não há valores a pagar neste momento.
+          </div>
+        <% } else { %>
+          <div class="p-acerto-list p-stagger">
+            <% financeiro.acertos.forEach((a) => { %>
+              <div class="p-acerto">
+                <div class="p-acerto__devedor">
+                  <span class="p-acerto__nome"><%= a.devedor.nome %></span>
+                  <span class="p-acerto__tag p-acerto__tag--deve">deve</span>
+                </div>
+                <div class="p-acerto__valor">→ <%= fmtMoeda(a.valor) %> →</div>
+                <div class="p-acerto__credor">
+                  <span class="p-acerto__nome"><%= a.credor.nome %></span>
+                  <span class="p-acerto__tag p-acerto__tag--recebe">recebe</span>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+  <% if (financeiro.desistentes && financeiro.desistentes.length > 0) { %>
+    <div class="p-financeiro__desistentes mt-4">
+      <h3 class="p-financeiro__subtitle">
+        <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3 3 21"/></svg>
+        Desistentes (acertados na saída)
+      </h3>
+      <p class="p-card__sub">Partidas já realizadas antes da desistência; estes valores foram acertados na saída e não entram mais nos cálculos do evento.</p>
+      <div class="p-financeiro__jogadores">
+        <% financeiro.desistentes.forEach((fin) => { %>
+          <div class="p-fin-card p-fin-card--inativo">
+            <div class="p-fin-card__head">
+              <div class="p-avatar" aria-hidden="true"><%= String(fin.jogador.nome || '?').charAt(0).toUpperCase() %></div>
+              <div class="min-w-0">
+                <div class="p-fin-card__name"><%= fin.jogador.nome %></div>
+                <div class="p-fin-card__partidas"><%= fin.partidasApostadas %> partida(s) apostada(s)</div>
+              </div>
+              <div class="p-fin-card__saldo <%= fin.saldo > 0 ? 'p-fin-card__saldo--positivo' : (fin.saldo < 0 ? 'p-fin-card__saldo--negativo' : '') %>">
+                <%= fin.saldo >= 0 ? '👍' : '👎' %> <%= fmtMoeda(Math.abs(fin.saldo)) %>
+              </div>
+            </div>
+            <div class="p-fin-card__linha">
+              <span>A receber</span>
+              <b class="p-fin-positivo"><%= fmtMoeda(fin.aReceber) %></b>
+            </div>
+            <div class="p-fin-card__linha">
+              <span>A pagar</span>
+              <b class="p-fin-negativo"><%= fmtMoeda(fin.aPagar) %></b>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
+</section>
+
 <!-- ============ JOGADORES ============ -->
 <section id="jogadores" data-nav-target="jogadores" class="p-section">
   <div class="d-flex align-items-center justify-content-between mb-3 gap-2">
@@ -258,9 +409,11 @@
       <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Jogadores
     </h2>
-    <a href="/eventos/<%= evento.id %>/jogadores/novo" class="btn btn-primary p-btn p-btn--primary d-none d-md-inline-flex flex-shrink-0">
-      + Jogador
-    </a>
+    <% if (podeEditarEvento(evento.id)) { %>
+      <a href="/eventos/<%= evento.id %>/jogadores/novo" class="btn btn-primary p-btn p-btn--primary d-none d-md-inline-flex flex-shrink-0">
+        + Jogador
+      </a>
+    <% } %>
   </div>
 
   <% if (jogadores.length === 0) { %>
@@ -273,17 +426,46 @@
   <% } else { %>
     <div class="p-players p-stagger">
       <% jogadores.forEach((j) => { %>
-        <a href="/eventos/<%= evento.id %>/jogadores/<%= j.id %>/editar" class="p-player-card"
-           aria-label="Editar <%= j.nome %>">
-          <div class="p-avatar" aria-hidden="true"><%= String(j.nome || '?').charAt(0).toUpperCase() %></div>
-          <div class="p-player-card__main">
-            <div class="p-player-card__name"><%= j.nome %></div>
-            <% if (j.apelido) { %>
-              <div class="p-player-card__alias">@<%= j.apelido %></div>
-            <% } %>
-          </div>
-          <svg class="p-icon p-player-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-        </a>
+        <div class="p-player-card <%= j.ativo === 0 ? 'p-player-card--inativo' : '' %>">
+          <% if (podeEditarEvento(evento.id)) { %>
+            <a href="/eventos/<%= evento.id %>/jogadores/<%= j.id %>/editar"
+               class="p-player-card__link" aria-label="Editar <%= j.nome %>">
+              <div class="p-avatar" aria-hidden="true"><%= String(j.nome || '?').charAt(0).toUpperCase() %></div>
+              <div class="p-player-card__main">
+                <div class="p-player-card__name"><%= j.nome %></div>
+                <% if (j.apelido) { %>
+                  <div class="p-player-card__alias">@<%= j.apelido %></div>
+                <% } %>
+              </div>
+            </a>
+          <% } else { %>
+            <div class="p-player-card__link">
+              <div class="p-avatar" aria-hidden="true"><%= String(j.nome || '?').charAt(0).toUpperCase() %></div>
+              <div class="p-player-card__main">
+                <div class="p-player-card__name"><%= j.nome %></div>
+                <% if (j.apelido) { %>
+                  <div class="p-player-card__alias">@<%= j.apelido %></div>
+                <% } %>
+              </div>
+            </div>
+          <% } %>
+          <% if (j.ativo === 0) { %>
+            <span class="p-badge p-badge--encerrado flex-shrink-0">⏸ parou de jogar</span>
+          <% } else if (podeEditarEvento(evento.id) && evento.status !== 'encerrado') { %>
+            <form method="POST" action="/eventos/<%= evento.id %>/jogadores/<%= j.id %>/desistir" class="d-inline flex-shrink-0"
+                  data-confirm="Marcar <%= j.nome %> como desistente? As partidas dele serão acertadas na hora e ele sairá do ranking.">
+              <button type="submit" class="p-icon-btn p-icon-btn--danger" aria-label="Desistir" title="Desistir">
+                <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3 3 21"/><path d="M21 14v4a3 3 0 0 1-3 3h-4"/><path d="M3 10v4a3 3 0 0 0 3 3h4"/></svg>
+              </button>
+            </form>
+          <% } %>
+          <% if (podeEditarEvento(evento.id)) { %>
+            <a href="/eventos/<%= evento.id %>/jogadores/<%= j.id %>/editar"
+               class="p-player-card__chevron" aria-label="Editar <%= j.nome %>">
+              <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+          <% } %>
+        </div>
       <% }) %>
     </div>
   <% } %>
@@ -296,9 +478,11 @@
       <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/><path d="M13 13h3"/></svg>
       Partidas
     </h2>
-    <a href="/eventos/<%= evento.id %>/partidas/novo" class="btn btn-primary p-btn p-btn--primary flex-shrink-0">
-      + Partida
-    </a>
+    <% if (podeEditarEvento(evento.id)) { %>
+      <a href="/eventos/<%= evento.id %>/partidas/novo" class="btn btn-primary p-btn p-btn--primary flex-shrink-0">
+        + Partida
+      </a>
+    <% } %>
   </div>
 
   <% if (partidas.length === 0) { %>
@@ -313,24 +497,41 @@
       <% partidas.forEach((p) => { %>
         <div class="p-match-card">
           <div class="p-match-card__meta">
-            <span class="p-match-card__date">
-              <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-              <%= fmtData(p.data_partida) || 'Data não informada' %>
-            </span>
-            <span class="p-match-card__actions">
-              <a href="/eventos/<%= evento.id %>/partidas/<%= p.id %>/editar" class="p-icon-btn p-icon-btn--edit"
-                 aria-label="Editar partida" title="Editar">
-                <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-              </a>
-              <% if (evento.status !== 'encerrado') { %>
-                <form method="POST" action="/eventos/<%= evento.id %>/partidas/<%= p.id %>/excluir" class="d-inline"
-                      data-confirm="Excluir esta partida?">
-                  <button type="submit" class="p-icon-btn p-icon-btn--danger" aria-label="Excluir partida" title="Excluir">
-                    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            <span class="d-flex align-items-center gap-2">
+              <span class="p-match-card__date">
+                <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                <%= fmtData(p.data_partida) || 'Data não informada' %>
+              </span>
+              <span class="p-match-bet <%= Number(p.valor_aposta) > 0 ? 'p-match-bet--aposta' : 'p-match-bet--limpa' %>">
+                <%= Number(p.valor_aposta) > 0 ? fmtMoeda(p.valor_aposta) : 'Sem aposta' %>
+              </span>
+              <% if (podeEditarEvento(evento.id) && Number(p.valor_aposta) > 0) { %>
+                <form method="POST" action="/eventos/<%= evento.id %>/partidas/<%= p.id %>/pago" class="d-inline-flex">
+                  <button type="submit"
+                          class="p-match-paid p-match-paid--<%= p.pago === 1 ? 'sim' : 'nao' %>"
+                          aria-pressed="<%= p.pago === 1 ? 'true' : 'false' %>"
+                          title="<%= p.pago === 1 ? 'Marcar como pendente' : 'Marcar como paga' %>">
+                    <%= p.pago === 1 ? '✓ Pago' : 'Pendente' %>
                   </button>
                 </form>
               <% } %>
             </span>
+            <% if (podeEditarEvento(evento.id)) { %>
+              <span class="p-match-card__actions">
+                <a href="/eventos/<%= evento.id %>/partidas/<%= p.id %>/editar" class="p-icon-btn p-icon-btn--edit"
+                   aria-label="Editar partida" title="Editar">
+                  <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                </a>
+                <% if (evento.status !== 'encerrado') { %>
+                  <form method="POST" action="/eventos/<%= evento.id %>/partidas/<%= p.id %>/excluir" class="d-inline"
+                        data-confirm="Excluir esta partida?">
+                    <button type="submit" class="p-icon-btn p-icon-btn--danger" aria-label="Excluir partida" title="Excluir">
+                      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </button>
+                  </form>
+                <% } %>
+              </span>
+            <% } %>
           </div>
           <div class="p-match-card__players">
             <div class="p-match-card__player <%= p.vencedor === p.jogador_a ? 'p-match-card__player--winner' : '' %>">
@@ -351,6 +552,7 @@
 
 <%- include('../../partials/bottomnav', { eventoId: evento.id, active: 'dashboard' }) %>
 
+<% if (podeEditarEvento(evento.id)) { %>
 <a id="fab-contextual" class="p-fab"
    href="/eventos/<%= evento.id %>/partidas/novo"
    aria-label="Nova partida"
@@ -365,5 +567,6 @@
   <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
   <span class="p-fab__label">Nova partida</span>
 </a>
+<% } %>
 
 <%- include('../../partials/footer') %>

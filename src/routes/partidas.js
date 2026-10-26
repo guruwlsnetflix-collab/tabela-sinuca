@@ -7,6 +7,22 @@ const EventoService = require('../services/eventoService')
 const JogadorService = require('../services/jogadorService')
 const PartidaService = require('../services/partidaService')
 const partidaValidators = require('../validators/partidaValidator')
+const { exigirEvento } = require('../middleware/auth')
+
+function dataInicioSugerida(evento) {
+  if (!evento || !evento.data_inicio) return ''
+  const d = String(evento.data_inicio).trim()
+  return d.length >= 10 ? `${d.substring(0, 10)}T00:00` : ''
+}
+
+function jogadoresParaForm(jogadores, partida) {
+  const presentes = new Set(
+    partida
+      ? [partida.jogador_a_id, partida.jogador_b_id, partida.vencedor_id].map(Number)
+      : []
+  )
+  return jogadores.filter((j) => j.ativo === 1 || presentes.has(j.id))
+}
 
 function renderForm(res, { evento, jogadores, partida, erros }) {
   const editando = Boolean(partida && partida.id)
@@ -14,13 +30,19 @@ function renderForm(res, { evento, jogadores, partida, erros }) {
   res.status(status).render('pages/partidas/form', {
     title: editando ? 'Editar partida' : 'Nova partida',
     evento,
-    jogadores,
-    partida: partida || { jogador_a_id: '', jogador_b_id: '', vencedor_id: '', data_partida: '' },
+    jogadores: jogadoresParaForm(jogadores, partida || null),
+    partida: partida || {
+      jogador_a_id: '',
+      jogador_b_id: '',
+      vencedor_id: '',
+      data_partida: dataInicioSugerida(evento),
+      valor_aposta: ''
+    },
     erros
   })
 }
 
-router.get('/eventos/:eventoId/partidas/novo', (req, res) => {
+router.get('/eventos/:eventoId/partidas/novo', exigirEvento, (req, res) => {
   try {
     const evento = EventoService.obter(Number(req.params.eventoId))
     const jogadores = JogadorService.listarPorEvento(evento.id)
@@ -28,7 +50,8 @@ router.get('/eventos/:eventoId/partidas/novo', (req, res) => {
       jogador_a_id: req.query.jogador_a_id || '',
       jogador_b_id: req.query.jogador_b_id || '',
       vencedor_id: req.query.vencedor_id || '',
-      data_partida: ''
+      data_partida: dataInicioSugerida(evento),
+      valor_aposta: evento.valor_aposta_padrao
     }
     renderForm(res, { evento, jogadores, partida, erros: null })
   } catch (err) {
@@ -36,7 +59,7 @@ router.get('/eventos/:eventoId/partidas/novo', (req, res) => {
   }
 })
 
-router.post('/eventos/:eventoId/partidas', partidaValidators.criar, (req, res) => {
+router.post('/eventos/:eventoId/partidas', exigirEvento, partidaValidators.criar, (req, res) => {
   const eventoId = Number(req.params.eventoId)
   const evento = EventoService.obter(eventoId)
   const jogadores = JogadorService.listarPorEvento(eventoId)
@@ -63,7 +86,7 @@ router.post('/eventos/:eventoId/partidas', partidaValidators.criar, (req, res) =
   }
 })
 
-router.get('/eventos/:eventoId/partidas/:id/editar', (req, res) => {
+router.get('/eventos/:eventoId/partidas/:id/editar', exigirEvento, (req, res) => {
   try {
     const evento = EventoService.obter(Number(req.params.eventoId))
     const partida = PartidaService.obter(Number(req.params.id))
@@ -74,7 +97,7 @@ router.get('/eventos/:eventoId/partidas/:id/editar', (req, res) => {
   }
 })
 
-router.post('/eventos/:eventoId/partidas/:id', partidaValidators.atualizar, (req, res) => {
+router.post('/eventos/:eventoId/partidas/:id', exigirEvento, partidaValidators.atualizar, (req, res) => {
   const eventoId = Number(req.params.eventoId)
   const id = Number(req.params.id)
   const evento = EventoService.obter(eventoId)
@@ -102,7 +125,21 @@ router.post('/eventos/:eventoId/partidas/:id', partidaValidators.atualizar, (req
   }
 })
 
-router.post('/eventos/:eventoId/partidas/:id/excluir', (req, res) => {
+router.post('/eventos/:eventoId/partidas/:id/pago', exigirEvento, (req, res) => {
+  const eventoId = Number(req.params.eventoId)
+  try {
+    const partida = PartidaService.alternarPago(Number(req.params.id))
+    const msg =
+      partida.pago === 1
+        ? 'Partida marcada como paga.'
+        : 'Partida marcada como pendente.'
+    res.redirect(`/eventos/${eventoId}?msg=${encodeURIComponent(msg)}`)
+  } catch (err) {
+    res.redirect(`/eventos/${eventoId}?erro=${encodeURIComponent(err.message)}`)
+  }
+})
+
+router.post('/eventos/:eventoId/partidas/:id/excluir', exigirEvento, (req, res) => {
   const eventoId = Number(req.params.eventoId)
   try {
     PartidaService.excluir(Number(req.params.id))

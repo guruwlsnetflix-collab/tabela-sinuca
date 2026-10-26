@@ -5,6 +5,7 @@ const app = require('../src/app')
 const db = require('../src/db')
 const EventoService = require('../src/services/eventoService')
 const JogadorService = require('../src/services/jogadorService')
+const { agenteMestre } = require('./authHelper')
 
 function limparDb() {
   db.exec('DELETE FROM partidas; DELETE FROM jogadores; DELETE FROM eventos;')
@@ -38,6 +39,59 @@ describe('JogadorService', () => {
     expect(() => JogadorService.criar({ evento_id: evento.id, nome: 'X' })).toThrow(
       'evento encerrado'
     )
+  })
+
+  it('permite cadastrar jogador após o evento ter iniciado (em andamento)', () => {
+    const evento = criarEventoAtivo()
+    EventoService.mudarStatus(evento.id, 'em_andamento')
+    const jogador = JogadorService.criar({ evento_id: evento.id, nome: 'Chegou depois' })
+    expect(jogador.id).toBeTruthy()
+    expect(jogador.evento_id).toBe(evento.id)
+  })
+
+  it('permite editar jogador após o evento ter iniciado (em andamento)', () => {
+    const evento = criarEventoAtivo()
+    const jogador = JogadorService.criar({ evento_id: evento.id, nome: 'Antes' })
+    EventoService.mudarStatus(evento.id, 'em_andamento')
+    JogadorService.atualizar(jogador.id, { nome: 'Depois', apelido: '', telefone: '', ativo: true })
+    expect(JogadorService.obter(jogador.id).nome).toBe('Depois')
+  })
+
+  it('marca jogador como desistente (inativo)', () => {
+    const evento = criarEventoAtivo()
+    const jogador = JogadorService.criar({ evento_id: evento.id, nome: 'Vai embora' })
+    const desistente = JogadorService.desistir(jogador.id)
+    expect(desistente.ativo).toBe(0)
+  })
+
+  it('bloqueia desistência de jogador em evento encerrado', () => {
+    const evento = criarEventoAtivo()
+    const jogador = JogadorService.criar({ evento_id: evento.id, nome: 'X' })
+    EventoService.mudarStatus(evento.id, 'encerrado')
+    expect(() => JogadorService.desistir(jogador.id)).toThrow('evento encerrado')
+  })
+
+  it('bloqueia desistência repetida', () => {
+    const evento = criarEventoAtivo()
+    const jogador = JogadorService.criar({ evento_id: evento.id, nome: 'X' })
+    JogadorService.desistir(jogador.id)
+    expect(() => JogadorService.desistir(jogador.id)).toThrow('já está marcado')
+  })
+
+  it('exclui desistentes do ranking', () => {
+    const evento = criarEventoAtivo()
+    const a = JogadorService.criar({ evento_id: evento.id, nome: 'A' })
+    const b = JogadorService.criar({ evento_id: evento.id, nome: 'B' })
+    db.prepare(
+      'INSERT INTO partidas (evento_id, jogador_a_id, jogador_b_id, vencedor_id, valor_aposta) VALUES (?, ?, ?, ?, 0)'
+    ).run(evento.id, a.id, b.id, a.id)
+
+    JogadorService.desistir(b.id)
+
+    const RankingService = require('../src/services/rankingService')
+    const ranking = RankingService.gerar(evento.id)
+    expect(ranking).toHaveLength(1)
+    expect(ranking[0].jogador.id).toBe(a.id)
   })
 
   it('bloqueia exclusão de jogador com partidas', () => {
@@ -76,7 +130,8 @@ describe('Rotas de jogadores', () => {
 
   it('POST /eventos/:id/jogadores cadastra e redireciona', async () => {
     const evento = criarEventoAtivo()
-    const res = await request(app)
+    const agente = await agenteMestre(app)
+    const res = await agente
       .post(`/eventos/${evento.id}/jogadores`)
       .type('form')
       .send({ nome: 'Maria', apelido: 'Mari', telefone: '11999999999' })
@@ -86,7 +141,8 @@ describe('Rotas de jogadores', () => {
 
   it('POST /eventos/:id/jogadores rejeita nome vazio', async () => {
     const evento = criarEventoAtivo()
-    const res = await request(app)
+    const agente = await agenteMestre(app)
+    const res = await agente
       .post(`/eventos/${evento.id}/jogadores`)
       .type('form')
       .send({ nome: '', apelido: '', telefone: '' })
@@ -94,10 +150,39 @@ describe('Rotas de jogadores', () => {
     expect(res.text).toContain('obrigatório')
   })
 
+  it('POST /eventos/:id/jogadores cadastra mesmo com evento em andamento', async () => {
+    const evento = criarEventoAtivo()
+    EventoService.mudarStatus(evento.id, 'em_andamento')
+    const agente = await agenteMestre(app)
+    const res = await agente
+      .post(`/eventos/${evento.id}/jogadores`)
+      .type('form')
+      .send({ nome: 'Mariano', apelido: '', telefone: '' })
+    expect(res.status).toBe(302)
+    expect(res.headers.location).toBe(`/eventos/${evento.id}?msg=Jogador%20cadastrado%20com%20sucesso.`)
+  })
+
+  it('POST /eventos/:id/jogadores/:id/desistir marca e informa o acerto de saída', async () => {
+    const evento = criarEventoAtivo()
+    const joao = JogadorService.criar({ evento_id: evento.id, nome: 'João' })
+    const maria = JogadorService.criar({ evento_id: evento.id, nome: 'Maria' })
+    db.prepare(
+      'INSERT INTO partidas (evento_id, jogador_a_id, jogador_b_id, vencedor_id, valor_aposta) VALUES (?, ?, ?, ?, 10)'
+    ).run(evento.id, joao.id, maria.id, maria.id)
+
+    const agente = await agenteMestre(app)
+    const res = await agente.post(`/eventos/${evento.id}/jogadores/${joao.id}/desistir`)
+    expect(res.status).toBe(302)
+    expect(res.headers.location).toContain('msg=')
+    expect(JogadorService.obter(joao.id).ativo).toBe(0)
+    expect(decodeURIComponent(res.headers.location)).toContain('Acerto de saída')
+  })
+
   it('GET /eventos/:id/jogadores/:id/editar exibe o formulário', async () => {
     const evento = criarEventoAtivo()
     const jogador = JogadorService.criar({ evento_id: evento.id, nome: 'Carlos' })
-    const res = await request(app).get(`/eventos/${evento.id}/jogadores/${jogador.id}/editar`)
+    const agente = await agenteMestre(app)
+    const res = await agente.get(`/eventos/${evento.id}/jogadores/${jogador.id}/editar`)
     expect(res.status).toBe(200)
     expect(res.text).toContain('Editar jogador')
     expect(res.text).toContain('Carlos')
