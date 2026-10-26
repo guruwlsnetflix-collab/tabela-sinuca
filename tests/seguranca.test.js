@@ -13,6 +13,13 @@ describe('Segurança', () => {
     expect(res.headers['content-security-policy']).toContain("default-src 'self'")
   })
 
+  it('cookie de sessão funciona em http:// (rede local) e é HttpOnly', async () => {
+    const res = await request(app).post('/login').type('form').send({ senha: SENHA_MESTRA })
+    const cookie = res.headers['set-cookie'].join(';')
+    expect(cookie).toContain('HttpOnly')
+    expect(cookie).not.toContain('Secure')
+  })
+
   it('após o login redireciona para o destino interno informado no formulário', async () => {
     const res = await request(app)
       .post('/login')

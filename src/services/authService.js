@@ -92,18 +92,19 @@ function lerToken(token) {
   }
 }
 
-function definirSessao(res, payload) {
+function definirSessao(req, res, payload) {
   const token = criarToken({ ...payload, exp: Date.now() + config.duracaoSessaoMs })
   res.cookie(NOME_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: config.env === 'production',
+    // Só exige HTTPS quando a conexão é HTTPS: na rede local o acesso é http://
+    secure: req.secure,
     maxAge: config.duracaoSessaoMs
   })
 }
 
-function limparSessao(res) {
-  res.clearCookie(NOME_COOKIE, { httpOnly: true, sameSite: 'lax', secure: config.env === 'production' })
+function limparSessao(req, res) {
+  res.clearCookie(NOME_COOKIE, { httpOnly: true, sameSite: 'lax', secure: req.secure })
 }
 
 function lerSessao(req) {

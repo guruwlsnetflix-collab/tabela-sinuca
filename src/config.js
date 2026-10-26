@@ -28,6 +28,8 @@ const config = {
   senhaMaestraGerada: !senhaMaestraDefinida,
   segredoSessao: process.env.SESSION_SECRET || hashSha256(`sinuca:${senhaMaestra}`),
   duracaoSessaoMs: 12 * 60 * 60 * 1000,
+  // Ligue (TRUST_PROXY=true) apenas quando o app estiver atrás de um proxy reverso
+  trustProxy: process.env.TRUST_PROXY === 'true',
   // Tentativas de senha erradas permitidas por IP a cada 15 minutos
   loginMaxTentativas: Number(process.env.LOGIN_MAX_TENTATIVAS) || 10
 }

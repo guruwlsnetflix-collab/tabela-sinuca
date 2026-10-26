@@ -83,30 +83,32 @@ Para abrir o painel numa TV da mesma rede, acesse `http://<ip-do-computador>:300
 | `SESSION_SECRET`       | _derivado_          | Segredo que assina o cookie de sessão                                 |
 | `LOGIN_MAX_TENTATIVAS` | `10`                | Senhas erradas permitidas por IP a cada 15 minutos                    |
 | `APP_NOME`             | `Tabela de Sinuca`  | Nome exibido no cabeçalho, rodapé e título das páginas                |
+| `TRUST_PROXY`          | `false`             | Use `true` só atrás de proxy reverso (Nginx, Cloudflare Tunnel)       |
 
 ## Scripts
 
-| Comando           | O que faz                                    |
-| ----------------- | -------------------------------------------- |
-| `npm run dev`     | Servidor com recarga automática              |
-| `npm start`       | Servidor em modo produção                    |
-| `npm test`        | Testes automatizados (Vitest + Supertest)    |
-| `npm run lint`    | Análise estática com ESLint                  |
-| `npm run format`  | Formata o código com Prettier                |
-| `npm run check`   | Lint, formatação e testes (o mesmo que o CI) |
-| `npm run db:init` | Cria ou atualiza o esquema do banco          |
+| Comando             | O que faz                                        |
+| ------------------- | ------------------------------------------------ |
+| `npm run dev`       | Servidor com recarga automática                  |
+| `npm start`         | Servidor em modo produção                        |
+| `npm test`          | Testes automatizados (Vitest + Supertest)        |
+| `npm run lint`      | Análise estática com ESLint                      |
+| `npm run format`    | Formata o código com Prettier                    |
+| `npm run check`     | Lint, formatação e testes (o mesmo que o CI)     |
+| `npm run db:init`   | Cria ou atualiza o esquema do banco              |
+| `npm run db:backup` | Backup do banco (funciona com o servidor ligado) |
 
 ## Segurança
 
-- Senhas de eventos e torneios guardadas com `scrypt`; cookie de sessão assinado (HMAC), `HttpOnly`, `SameSite=Lax` e `Secure` em produção.
+- Senhas de eventos e torneios guardadas com `scrypt`; cookie de sessão assinado (HMAC), `HttpOnly`, `SameSite=Lax` e `Secure` quando acessado por HTTPS.
 - Limite de tentativas de login por IP e proteção contra CSRF por verificação de origem.
 - Cabeçalhos de segurança via Helmet (CSP, `nosniff`, HSTS em produção) e SRI nos arquivos de CDN.
 - Erros internos não expõem detalhes em produção.
 
-## Deploy
+## Produção
 
-O projeto está pronto para a [Railway](https://railway.com) (`railway.toml` incluso, healthcheck em `/health`).
-Passo a passo em [docs/DEPLOY_RAILWAY.md](docs/DEPLOY_RAILWAY.md).
+O sistema roda em qualquer computador ligado no local do evento; celulares e a TV acessam pela rede Wi-Fi.
+Instalação, acesso pela TV, backup e atualização em [docs/PRODUCAO.md](docs/PRODUCAO.md).
 
 ## Estrutura
 

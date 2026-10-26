@@ -16,11 +16,13 @@ const cabecalhos = helmet({
       'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
       'img-src': ["'self'", 'data:', 'blob:'],
       'connect-src': ["'self'", 'https://cdn.jsdelivr.net'],
-      'upgrade-insecure-requests': config.env === 'production' ? [] : null
+      // Desligado para o sistema funcionar por http:// na rede local (ex.: TV do bar)
+      'upgrade-insecure-requests': null
     }
   },
   // Permite que o painel seja aberto em navegadores de TV sem restrições extras
   crossOriginEmbedderPolicy: false,
+  // Navegadores só respeitam HSTS em conexões HTTPS; em http:// é ignorado
   hsts: config.env === 'production'
 })
 

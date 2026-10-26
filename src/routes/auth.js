@@ -34,12 +34,12 @@ router.post('/login', limiteLogin, (req, res) => {
       next: destinoPosLogin(req)
     })
   }
-  AuthService.definirSessao(res, sessao)
+  AuthService.definirSessao(req, res, sessao)
   res.redirect(destinoPosLogin(req))
 })
 
 router.post('/logout', (req, res) => {
-  AuthService.limparSessao(res)
+  AuthService.limparSessao(req, res)
   res.redirect('/')
 })
 

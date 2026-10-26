@@ -21,9 +21,10 @@ const app = express()
 app.set('view engine', 'ejs')
 app.set('views', config.viewsDir)
 app.disable('x-powered-by')
-// Na Railway o app roda atrás de um proxy HTTPS: necessário para IP real
-// (limite de login) e para o cookie "secure"
-if (config.env === 'production') app.set('trust proxy', 1)
+// Atrás de um proxy reverso (Nginx, Cloudflare Tunnel, hospedagem em nuvem) é
+// preciso confiar no proxy para obter o IP real (limite de login) e saber se a
+// conexão é HTTPS (cookie "secure")
+if (config.trustProxy) app.set('trust proxy', 1)
 
 app.locals.appNome = config.appNome
 app.locals.appVersao = config.appVersao
