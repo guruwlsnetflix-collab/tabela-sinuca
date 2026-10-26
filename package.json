@@ -1,7 +1,7 @@
 {
   "name": "tabela-sinuca",
-  "version": "0.1.0",
-  "description": "Controle de jogos de sinuca: eventos, jogadores, partidas e ranking por evento.",
+  "version": "1.0.0",
+  "description": "Gestão de eventos e torneios de sinuca: jogadores, partidas, chaveamento mata-mata, ranking, financeiro e painel ao vivo para TV.",
   "type": "commonjs",
   "main": "src/server.js",
   "scripts": {
@@ -9,14 +9,22 @@
     "dev": "node --watch src/server.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:init": "node src/db/init.js"
+    "db:init": "node src/db/init.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run format:check && npm test"
   },
   "engines": {
     "node": ">=20"
   },
   "keywords": [
     "sinuca",
+    "bilhar",
+    "torneio",
     "ranking",
+    "chaveamento",
     "eventos",
     "sqlite",
     "express"
@@ -35,7 +43,15 @@
     "morgan": "^1.12.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
     "supertest": "^7.1.1",
     "vitest": "^4.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guruwlsnetflix-collab/tabela-sinuca.git"
   }
 }

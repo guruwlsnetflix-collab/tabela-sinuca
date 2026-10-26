@@ -60,16 +60,14 @@ describe('JogadorService.campanha', () => {
   })
 
   it('rejeita jogador de outro evento', () => {
-    const { evento, c } = criarCenario()
+    const { evento } = criarCenario()
     const outro = EventoService.criar({
       nome: 'Outro',
       data_inicio: '2026-09-01',
       data_fim: '2026-09-02'
     })
     const intruso = JogadorService.criar({ evento_id: outro.id, nome: 'Intruso' })
-    expect(() => JogadorService.campanha(evento.id, intruso.id)).toThrow(
-      'não pertence a este evento'
-    )
+    expect(() => JogadorService.campanha(evento.id, intruso.id)).toThrow('não pertence a este evento')
   })
 })
 

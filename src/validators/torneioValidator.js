@@ -6,7 +6,8 @@ const SENHA_MAX = 60
 const senhaCriacaoRules = [
   body('senha')
     .trim()
-    .notEmpty().withMessage('A senha do torneio é obrigatória.')
+    .notEmpty()
+    .withMessage('A senha do torneio é obrigatória.')
     .isLength({ min: SENHA_MIN, max: SENHA_MAX })
     .withMessage(`A senha deve ter entre ${SENHA_MIN} e ${SENHA_MAX} caracteres.`)
 ]
@@ -21,8 +22,10 @@ const senhaAtualizacaoRules = [
 const nomeRules = [
   body('nome')
     .trim()
-    .notEmpty().withMessage('O nome do torneio é obrigatório.')
-    .isLength({ max: 120 }).withMessage('O nome deve ter no máximo 120 caracteres.')
+    .notEmpty()
+    .withMessage('O nome do torneio é obrigatório.')
+    .isLength({ max: 120 })
+    .withMessage('O nome deve ter no máximo 120 caracteres.')
 ]
 
 const basicoRules = [
@@ -30,33 +33,38 @@ const basicoRules = [
   body('local')
     .trim()
     .optional({ values: 'falsy' })
-    .isLength({ max: 120 }).withMessage('O local deve ter no máximo 120 caracteres.'),
+    .isLength({ max: 120 })
+    .withMessage('O local deve ter no máximo 120 caracteres.'),
   body('data_inicio')
-    .notEmpty().withMessage('A data de início é obrigatória.')
-    .isISO8601().withMessage('Data de início inválida.'),
+    .notEmpty()
+    .withMessage('A data de início é obrigatória.')
+    .isISO8601()
+    .withMessage('Data de início inválida.'),
   body('previsao_termino')
     .optional({ values: 'falsy' })
-    .isISO8601().withMessage('Previsão de término inválida.')
+    .isISO8601()
+    .withMessage('Previsão de término inválida.')
     .custom((value, { req }) => {
       if (value && value < req.body.data_inicio) {
         throw new Error('A previsão de término deve ser maior ou igual à data de início.')
       }
       return true
     }),
-  body('modalidade')
-    .optional({ values: 'falsy' })
-    .isIn(['par', 'impar']).withMessage('Modalidade inválida.'),
+  body('modalidade').optional({ values: 'falsy' }).isIn(['par', 'impar']).withMessage('Modalidade inválida.'),
   body('numero_mesas')
     .optional({ values: 'null' })
     .default(1)
-    .isInt({ min: 1 }).withMessage('O número de mesas deve ser um inteiro maior ou igual a 1.')
+    .isInt({ min: 1 })
+    .withMessage('O número de mesas deve ser um inteiro maior ou igual a 1.')
 ]
 
 const jogadorRules = [
   body('nome')
     .trim()
-    .notEmpty().withMessage('O nome do jogador é obrigatório.')
-    .isLength({ max: 120 }).withMessage('O nome deve ter no máximo 120 caracteres.'),
+    .notEmpty()
+    .withMessage('O nome do jogador é obrigatório.')
+    .isLength({ max: 120 })
+    .withMessage('O nome deve ter no máximo 120 caracteres.'),
   body('apelido').trim().isLength({ max: 60 }).withMessage('O apelido deve ter no máximo 60 caracteres.'),
   body('telefone').trim().isLength({ max: 30 }).withMessage('O telefone deve ter no máximo 30 caracteres.')
 ]

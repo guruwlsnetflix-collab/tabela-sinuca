@@ -39,10 +39,6 @@ function cadastrar16(torneioId) {
   return NOMES.map((nome) => TorneioService.cadastrarJogador({ torneio_id: torneioId, nome }))
 }
 
-function jogosCompletos(torneioId) {
-  return ConfrontoRepository.listarPorTorneio(torneioId)
-}
-
 describe('TorneioService — cadastro e regras gerais', () => {
   beforeEach(limparDb)
 
@@ -58,27 +54,23 @@ describe('TorneioService — cadastro e regras gerais', () => {
     const jogadores = cadastrar16(torneio.id)
     expect(jogadores).toHaveLength(16)
     expect(TorneioService.contarJogadores(torneio.id)).toBe(16)
-    expect(() =>
-      TorneioService.cadastrarJogador({ torneio_id: torneio.id, nome: 'Jogador Extra' })
-    ).toThrow('já possui os 16 jogadores')
+    expect(() => TorneioService.cadastrarJogador({ torneio_id: torneio.id, nome: 'Jogador Extra' })).toThrow(
+      'já possui os 16 jogadores'
+    )
   })
 
   it('não permite editar o torneio após o sorteio', () => {
     const torneio = criarTorneio()
     cadastrar16(torneio.id)
     TorneioService.sortear(torneio.id)
-    expect(() =>
-      TorneioService.atualizar(torneio.id, { nome: 'Novo nome' })
-    ).toThrow('após o sorteio')
+    expect(() => TorneioService.atualizar(torneio.id, { nome: 'Novo nome' })).toThrow('após o sorteio')
   })
 
   it('não permite alterar/excluir jogadores após o sorteio', () => {
     const torneio = criarTorneio()
     const jogadores = cadastrar16(torneio.id)
     TorneioService.sortear(torneio.id)
-    expect(() =>
-      TorneioService.atualizarJogador(jogadores[0].id, { nome: 'X' })
-    ).toThrow('após o sorteio')
+    expect(() => TorneioService.atualizarJogador(jogadores[0].id, { nome: 'X' })).toThrow('após o sorteio')
     expect(() => TorneioService.excluirJogador(jogadores[0].id)).toThrow('após o sorteio')
   })
 
@@ -168,9 +160,7 @@ describe('TorneioService — partidas, placares e avanço automático', () => {
     cadastrar16(torneio.id)
     TorneioService.sortear(torneio.id)
     const c1 = ConfrontoRepository.obterPorNumero(torneio.id, 1)
-    expect(() =>
-      TorneioService.registrarPartida(torneio.id, c1.id, c1.jogador_a_id)
-    ).toThrow('em andamento')
+    expect(() => TorneioService.registrarPartida(torneio.id, c1.id, c1.jogador_a_id)).toThrow('em andamento')
   })
 
   it('não registra vencedor que não participa do confronto', () => {
@@ -179,9 +169,7 @@ describe('TorneioService — partidas, placares e avanço automático', () => {
     const intruso = TorneioRepository.listarJogadores(torneioId).find(
       (j) => j.id !== c1.jogador_a_id && j.id !== c1.jogador_b_id
     )
-    expect(() => TorneioService.registrarPartida(torneioId, c1.id, intruso.id)).toThrow(
-      'não participa'
-    )
+    expect(() => TorneioService.registrarPartida(torneioId, c1.id, intruso.id)).toThrow('não participa')
   })
 
   it('encerra confronto com 2×0 (melhor de 3) e bloqueia a terceira partida', () => {
@@ -194,9 +182,7 @@ describe('TorneioService — partidas, placares e avanço automático', () => {
     expect(atualizado.vencedor_id).toBe(c1.jogador_a_id)
     expect(atualizado.placar_a).toBe(2)
     expect(atualizado.placar_b).toBe(0)
-    expect(() =>
-      TorneioService.registrarPartida(torneioId, c1.id, c1.jogador_a_id)
-    ).toThrow('finalizado')
+    expect(() => TorneioService.registrarPartida(torneioId, c1.id, c1.jogador_a_id)).toThrow('finalizado')
   })
 
   it('encerra confronto com 2×1 quando necessário', () => {
@@ -232,9 +218,9 @@ describe('TorneioService — partidas, placares e avanço automático', () => {
     const torneioId = prepararTorneio()
     const c9 = ConfrontoRepository.obterPorNumero(torneioId, 9)
     expect(c9.jogador_a_id).toBeNull()
-    expect(() =>
-      TorneioService.registrarPartida(torneioId, c9.id, c9.jogador_a_id)
-    ).toThrow('dois jogadores definidos')
+    expect(() => TorneioService.registrarPartida(torneioId, c9.id, c9.jogador_a_id)).toThrow(
+      'dois jogadores definidos'
+    )
   })
 
   it('desfaz a última partida e remove o avanço do classificado', () => {
@@ -272,9 +258,7 @@ describe('TorneioService — partidas, placares e avanço automático', () => {
     const c9 = ConfrontoRepository.obterPorNumero(torneioId, 9)
     TorneioService.registrarPartida(torneioId, c9.id, c9.jogador_a_id)
 
-    expect(() => TorneioService.desfazerUltimaPartida(torneioId, c1.id)).toThrow(
-      'confronto seguinte'
-    )
+    expect(() => TorneioService.desfazerUltimaPartida(torneioId, c1.id)).toThrow('confronto seguinte')
   })
 })
 
@@ -323,9 +307,7 @@ describe('TorneioService — final melhor de 5', () => {
     expect(torneio.status).toBe('finalizado')
     expect(torneio.vencedor_id).toBe(final.jogador_a_id)
 
-    expect(() =>
-      TorneioService.registrarPartida(torneioId, final.id, final.jogador_a_id)
-    ).toThrow()
+    expect(() => TorneioService.registrarPartida(torneioId, final.id, final.jogador_a_id)).toThrow()
   })
 
   it('final termina 3×1', () => {
@@ -428,22 +410,12 @@ describe('Torneio — fluxo HTTP completo', () => {
     const final = ConfrontoRepository.obterPorNumero(torneioId, 15)
     const campeao = vencedorEsquerda(13)
     const adversario = vencedorDireita(14)
-    expect([campeao, adversario].sort()).toEqual(
-      [final.jogador_a_id, final.jogador_b_id].sort()
-    )
+    expect([campeao, adversario].sort()).toEqual([final.jogador_a_id, final.jogador_b_id].sort())
 
-    await A
-      .post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`)
-      .send({ vencedor_id: campeao })
-    await A
-      .post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`)
-      .send({ vencedor_id: adversario })
-    await A
-      .post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`)
-      .send({ vencedor_id: campeao })
-    await A
-      .post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`)
-      .send({ vencedor_id: campeao })
+    await A.post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`).send({ vencedor_id: campeao })
+    await A.post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`).send({ vencedor_id: adversario })
+    await A.post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`).send({ vencedor_id: campeao })
+    await A.post(`/torneios/${torneioId}/confrontos/${final.id}/partidas`).send({ vencedor_id: campeao })
 
     const torneio = TorneioService.obter(torneioId)
     expect(torneio.status).toBe('finalizado')
@@ -660,15 +632,15 @@ describe('API JSON de torneios', () => {
     const c1 = ConfrontoRepository.obterPorNumero(torneio.id, 1)
     const A = await agenteMestre(app)
 
-    const parcial = await A
-      .post(`/torneios/${torneio.id}/confrontos/${c1.id}/partidas`)
-      .send({ vencedor_id: c1.jogador_a_id })
+    const parcial = await A.post(`/torneios/${torneio.id}/confrontos/${c1.id}/partidas`).send({
+      vencedor_id: c1.jogador_a_id
+    })
     expect(parcial.status).toBe(302)
     expect(parcial.headers.location).toContain(`#confronto-${c1.id}`)
 
-    const fechado = await A
-      .post(`/torneios/${torneio.id}/confrontos/${c1.id}/partidas`)
-      .send({ vencedor_id: c1.jogador_a_id })
+    const fechado = await A.post(`/torneios/${torneio.id}/confrontos/${c1.id}/partidas`).send({
+      vencedor_id: c1.jogador_a_id
+    })
     const c2 = ConfrontoRepository.obterPorNumero(torneio.id, 2)
     expect(fechado.status).toBe(302)
     expect(fechado.headers.location).toContain(`#confronto-${c2.id}`)

@@ -13,20 +13,20 @@
 
 > Estados: ✔ concluído | 🔄 em andamento | ⏳ pendente
 
-| Fase | Descrição | Status |
-|------|-----------|--------|
-| F0 | Setup (Express + SQLite + EJS, healthcheck, testes) | ✔ |
-| F1 | CRUD de Eventos (status, bloqueios, validações) | ✔ |
-| F2 | CRUD de Jogadores por evento | ✔ |
-| F3 | Partidas: registro, edição e exclusão | ✔ |
-| F4 | Sorteio automático do próximo adversário | ✔ |
-| F5 | Ranking por evento (V → D → ordem de cadastro) | ✔ |
-| Extra | Campanha individual (de quem ganhou/perdeu) | ✔ |
-| F6 | UX (responsividade, navegação, refinamentos) | ✔ |
-| F6.1 | Interface mobile premium (tema escuro, bottom nav, cards) | ✔ |
-| Extra | **Módulo de Torneios** (mata-mata 16 jogadores, chave fixa, painel TV, API JSON) | ✔ |
-| F7 | Testes de integração adicionais | ⏳ |
-| F8 | Evoluções (ranking entre eventos, múltiplas mesas) | ⏳ |
+| Fase  | Descrição                                                                        | Status |
+| ----- | -------------------------------------------------------------------------------- | ------ |
+| F0    | Setup (Express + SQLite + EJS, healthcheck, testes)                              | ✔      |
+| F1    | CRUD de Eventos (status, bloqueios, validações)                                  | ✔      |
+| F2    | CRUD de Jogadores por evento                                                     | ✔      |
+| F3    | Partidas: registro, edição e exclusão                                            | ✔      |
+| F4    | Sorteio automático do próximo adversário                                         | ✔      |
+| F5    | Ranking por evento (V → D → ordem de cadastro)                                   | ✔      |
+| Extra | Campanha individual (de quem ganhou/perdeu)                                      | ✔      |
+| F6    | UX (responsividade, navegação, refinamentos)                                     | ✔      |
+| F6.1  | Interface mobile premium (tema escuro, bottom nav, cards)                        | ✔      |
+| Extra | **Módulo de Torneios** (mata-mata 16 jogadores, chave fixa, painel TV, API JSON) | ✔      |
+| F7    | Testes de integração adicionais                                                  | ⏳     |
+| F8    | Evoluções (ranking entre eventos, múltiplas mesas)                               | ⏳     |
 
 O objetivo é construir um sistema web para controlar partidas de sinuca em um
 ambiente social (bar/clube): o usuário cadastra **jogadores**, informa **partidas**
@@ -114,48 +114,48 @@ Decisões Confirmadas):
 
 Prioridades: **M** = Must (obrigatório), **S** = Should (recomendado), **C** = Could (opcional).
 
-| ID | Requisito | Prioridade |
-|----|-----------|-----------|
-| RF-01 | Cadastrar jogador **dentro de um evento** (nome, apelido opcional, telefone opcional) — o jogador pertence a um único evento. | M |
-| RF-02 | Listar jogadores de um evento. | M |
-| RF-03 | Editar dados de um jogador. | S |
-| RF-04 | Excluir jogador — **bloqueado** quando existirem partidas no evento; permitido apenas sem histórico. | S |
-| RF-05 | Registrar partida vinculada a um evento: evento, jogador 1, jogador 2 (adversário), vencedor, data/hora. | M |
-| RF-06 | Impedir partida de um jogador contra ele mesmo (validação). | M |
-| RF-07 | Listar partidas registradas de um evento (com possibilidade de filtro por jogador/data). | M |
-| RF-08 | Editar partida (trocar vencedor, corrigir participantes) — **com confirmação**. | S |
-| RF-09 | Excluir partida registrada por engano — **com confirmação**. | S |
-| RF-10 | **Sortear e sugerir o próximo adversário** após informar o vencedor ("vencedor permanece na mesa"), sorteando entre os jogadores do evento, preferindo quem ainda não tem partida com o vencedor / está "na fila". | M |
-| RF-11 | Calcular e exibir ranking **por evento**: melhor campanha → pior campanha, com jogadores sem partidas no final (0 jogos). | M |
-| RF-12 | Exibir estatísticas por jogador **dentro do evento**: jogos, vitórias, derrotas, aproveitamento, sequência. | M |
-| RF-13 | Exibir detalhe do confronto direto entre dois jogadores de um evento (quem ganhou de quem). | S |
-| RF-14 | Marcar/desmarcar jogador como "ativo/inativo" (para suspender sem excluir). | C |
-| RF-15 | Registrar sessão de mesa (fila de espera, quem entrou, quem ficou) — evolução, por evento. | C |
-| RF-16 | Filtro do ranking por período (hoje, mês, total), dentro do evento. | C |
-| RF-17 | Cadastrar evento (nome **único**, `data_inicio`, `data_fim`, descrição opcional, status) — CRUD básico. | M |
-| RF-18 | Listar eventos e abrir o detalhe de cada um (dashboard do evento). | M |
-| RF-19 | Adicionar/remover jogador de um evento: **adicionar enquanto em andamento**; **remover apenas sem partidas** no evento. | M |
-| RF-20 | Listar jogadores de um evento (participantes). | M |
-| RF-21 | Impedir partida em evento com jogador que não pertence ao evento (validação). | M |
-| RF-22 | Impedir registro de partidas em evento **encerrado** (status bloqueia). | M |
-| RF-23 | Editar/excluir evento (exclusão **bloqueada** com partidas; status editável). | S |
-| RF-24 | (Futuro) Ranking entre eventos — evolução, dependerá do **casamento de jogadores por nome**. | C |
+| ID    | Requisito                                                                                                                                                                                                          | Prioridade |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| RF-01 | Cadastrar jogador **dentro de um evento** (nome, apelido opcional, telefone opcional) — o jogador pertence a um único evento.                                                                                      | M          |
+| RF-02 | Listar jogadores de um evento.                                                                                                                                                                                     | M          |
+| RF-03 | Editar dados de um jogador.                                                                                                                                                                                        | S          |
+| RF-04 | Excluir jogador — **bloqueado** quando existirem partidas no evento; permitido apenas sem histórico.                                                                                                               | S          |
+| RF-05 | Registrar partida vinculada a um evento: evento, jogador 1, jogador 2 (adversário), vencedor, data/hora.                                                                                                           | M          |
+| RF-06 | Impedir partida de um jogador contra ele mesmo (validação).                                                                                                                                                        | M          |
+| RF-07 | Listar partidas registradas de um evento (com possibilidade de filtro por jogador/data).                                                                                                                           | M          |
+| RF-08 | Editar partida (trocar vencedor, corrigir participantes) — **com confirmação**.                                                                                                                                    | S          |
+| RF-09 | Excluir partida registrada por engano — **com confirmação**.                                                                                                                                                       | S          |
+| RF-10 | **Sortear e sugerir o próximo adversário** após informar o vencedor ("vencedor permanece na mesa"), sorteando entre os jogadores do evento, preferindo quem ainda não tem partida com o vencedor / está "na fila". | M          |
+| RF-11 | Calcular e exibir ranking **por evento**: melhor campanha → pior campanha, com jogadores sem partidas no final (0 jogos).                                                                                          | M          |
+| RF-12 | Exibir estatísticas por jogador **dentro do evento**: jogos, vitórias, derrotas, aproveitamento, sequência.                                                                                                        | M          |
+| RF-13 | Exibir detalhe do confronto direto entre dois jogadores de um evento (quem ganhou de quem).                                                                                                                        | S          |
+| RF-14 | Marcar/desmarcar jogador como "ativo/inativo" (para suspender sem excluir).                                                                                                                                        | C          |
+| RF-15 | Registrar sessão de mesa (fila de espera, quem entrou, quem ficou) — evolução, por evento.                                                                                                                         | C          |
+| RF-16 | Filtro do ranking por período (hoje, mês, total), dentro do evento.                                                                                                                                                | C          |
+| RF-17 | Cadastrar evento (nome **único**, `data_inicio`, `data_fim`, descrição opcional, status) — CRUD básico.                                                                                                            | M          |
+| RF-18 | Listar eventos e abrir o detalhe de cada um (dashboard do evento).                                                                                                                                                 | M          |
+| RF-19 | Adicionar/remover jogador de um evento: **adicionar enquanto em andamento**; **remover apenas sem partidas** no evento.                                                                                            | M          |
+| RF-20 | Listar jogadores de um evento (participantes).                                                                                                                                                                     | M          |
+| RF-21 | Impedir partida em evento com jogador que não pertence ao evento (validação).                                                                                                                                      | M          |
+| RF-22 | Impedir registro de partidas em evento **encerrado** (status bloqueia).                                                                                                                                            | M          |
+| RF-23 | Editar/excluir evento (exclusão **bloqueada** com partidas; status editável).                                                                                                                                      | S          |
+| RF-24 | (Futuro) Ranking entre eventos — evolução, dependerá do **casamento de jogadores por nome**.                                                                                                                       | C          |
 
 ---
 
 ## 4. Requisitos Não Funcionais (RNF)
 
-| ID | Requisito | Descrição |
-|----|-----------|-----------|
-| RNF-01 | Performance | Resposta de páginas em < 300 ms em ambiente local (aplicação leve). |
-| RNF-02 | Usabilidade | Interface simples, funcional em desktop e celular (Bootstrap responsivo). |
-| RNF-03 | Integridade | Banco SQLite com constraints (chaves estrangeiras, unicidade) e transações para registro de partida. |
-| RNF-04 | Manutenibilidade | Arquitetura em camadas (controller → service → repository); código em inglês, UI em português. |
-| RNF-05 | Testabilidade | Cobertura dos serviços de ranking, sorteio e registro de partidas com testes unitários. |
-| RNF-06 | Segurança | Validação de entrada no servidor (express-validator ou validação manual), prevenção de SQL injection (parâmetros preparados). |
-| RNF-07 | Portabilidade | Rodar em qualquer SO com Node.js; banco em arquivo único (sem instalação de SGBD). |
-| RNF-08 | Backup simples | Banco em arquivo `.db`, copiável para backup manual. |
-| RNF-09 | Versionamento | Git desde o início; commits pequenos e descritivos. |
+| ID     | Requisito        | Descrição                                                                                                                     |
+| ------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| RNF-01 | Performance      | Resposta de páginas em < 300 ms em ambiente local (aplicação leve).                                                           |
+| RNF-02 | Usabilidade      | Interface simples, funcional em desktop e celular (Bootstrap responsivo).                                                     |
+| RNF-03 | Integridade      | Banco SQLite com constraints (chaves estrangeiras, unicidade) e transações para registro de partida.                          |
+| RNF-04 | Manutenibilidade | Arquitetura em camadas (controller → service → repository); código em inglês, UI em português.                                |
+| RNF-05 | Testabilidade    | Cobertura dos serviços de ranking, sorteio e registro de partidas com testes unitários.                                       |
+| RNF-06 | Segurança        | Validação de entrada no servidor (express-validator ou validação manual), prevenção de SQL injection (parâmetros preparados). |
+| RNF-07 | Portabilidade    | Rodar em qualquer SO com Node.js; banco em arquivo único (sem instalação de SGBD).                                            |
+| RNF-08 | Backup simples   | Banco em arquivo `.db`, copiável para backup manual.                                                                          |
+| RNF-09 | Versionamento    | Git desde o início; commits pequenos e descritivos.                                                                           |
 
 ---
 
@@ -359,9 +359,9 @@ C:\repos\Sinuca\
 
 - **eventos** (1) ──< (N) **jogadores** (cada jogador pertence a um único evento)
 - **eventos** (1) ──< (N) **partidas** (toda partida pertence a um evento)
-- **jogadores** (1) ──< (N) **partidas** como *jogador_a*
-- **jogadores** (1) ──< (N) **partidas** como *jogador_b*
-- **jogadores** (1) ──< (N) **partidas** como *vencedor*
+- **jogadores** (1) ──< (N) **partidas** como _jogador_a_
+- **jogadores** (1) ──< (N) **partidas** como _jogador_b_
+- **jogadores** (1) ──< (N) **partidas** como _vencedor_
 
 > O vencedor é uma referência adicional ao jogador (FK), garantindo integridade.
 > A partida é a entidade de ligação entre dois jogadores **dentro de um evento**.
@@ -447,6 +447,7 @@ jogadores; a tabela `jogadores` tem FK `evento_id` e cada jogador pertence a um
 **único evento**. Não existe cadastro global nem tabela `evento_jogadores`.
 
 **Por quê (motivação do usuário):**
+
 1. **Simplicidade operacional**: quem organiza o bar/campeonato pensa em "jogadores
    daquele evento"; não há etapa de "associar jogador global a evento".
 2. **Isolamento por evento**: cada evento é autossuficiente — sua lista de jogadores,
@@ -455,6 +456,7 @@ jogadores; a tabela `jogadores` tem FK `evento_id` e cada jogador pertence a um
    (`evento_jogadores`), reduzindo o escopo da v1.
 
 **Caveat (registrado, decisão consciente do usuário):**
+
 - Um mesmo jogador que participa de eventos diferentes será **cadastrado em cada
   evento** (duplicidade de registro por nome).
 - O futuro **ranking entre eventos** será **menos confiável**: exigirá o **casamento
@@ -472,16 +474,16 @@ complexidade de associação que o usuário preferiu não ter na v1.
 
 ### 8.1 Stack recomendada (confirmada)
 
-| Camada | Tecnologia | Justificativa |
-|--------|-----------|---------------|
-| Runtime | **Node.js** (LTS) | Equipe familiarizada; ecossistema leve. |
-| Framework HTTP | **Express** | Padrão de mercado, middleware, roteamento simples. |
-| Banco de dados | **SQLite** (via **better-sqlite3**) | Arquivo único, sem instalação de SGBD; síncrono e rápido para baixo volume; suporte nativo a FKs e transações. |
-| View Engine | **EJS** | Simples, server-side, combina bem com Bootstrap. |
-| CSS/UI | **Bootstrap 5** (via CDN ou pacote local) | Responsivo sem esforço; componentes prontos (tabelas, forms, alerts). |
-| Validação | **express-validator** | Validação de entrada padronizada no servidor. |
-| Testes | **Vitest** (ou `node:test`) | Leve, rápido, integração simples; cobre serviços e rotas. |
-| Controle de versão | **Git + GitHub** | Histórico, colaboração e revisão. |
+| Camada             | Tecnologia                                | Justificativa                                                                                                  |
+| ------------------ | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Runtime            | **Node.js** (LTS)                         | Equipe familiarizada; ecossistema leve.                                                                        |
+| Framework HTTP     | **Express**                               | Padrão de mercado, middleware, roteamento simples.                                                             |
+| Banco de dados     | **SQLite** (via **better-sqlite3**)       | Arquivo único, sem instalação de SGBD; síncrono e rápido para baixo volume; suporte nativo a FKs e transações. |
+| View Engine        | **EJS**                                   | Simples, server-side, combina bem com Bootstrap.                                                               |
+| CSS/UI             | **Bootstrap 5** (via CDN ou pacote local) | Responsivo sem esforço; componentes prontos (tabelas, forms, alerts).                                          |
+| Validação          | **express-validator**                     | Validação de entrada padronizada no servidor.                                                                  |
+| Testes             | **Vitest** (ou `node:test`)               | Leve, rápido, integração simples; cobre serviços e rotas.                                                      |
+| Controle de versão | **Git + GitHub**                          | Histórico, colaboração e revisão.                                                                              |
 
 ### 8.2 Justificativa da stack
 
@@ -508,93 +510,93 @@ decisões confirmadas.
 
 ### Fase 0 — Setup e infraestrutura
 
-| # | Tarefa | Prioridade | Estimativa |
-|---|--------|-----------|-----------|
-| 0.1 | `npm init`, instalar dependências (express, better-sqlite3, ejs, express-validator, bootstrap, vitest, nodemon, dotenv). | A | 1 h |
-| 0.2 | Estrutura de pastas (src, controllers, services, repositories, views, test). | A | 0.5 h |
-| 0.3 | `app.js` (Express) + `server.js` + error handler + rotas base (health check). | A | 1 h |
-| 0.4 | Git init + .gitignore (node_modules, .env, db/*.db) + README básico. | A | 0.5 h |
-| 0.5 | Criação do banco + PRAGMA foreign_keys + schema inicial via script/migration (eventos, jogadores com FK `evento_id`, partidas). | A | 1 h |
+| #   | Tarefa                                                                                                                          | Prioridade | Estimativa |
+| --- | ------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| 0.1 | `npm init`, instalar dependências (express, better-sqlite3, ejs, express-validator, bootstrap, vitest, nodemon, dotenv).        | A          | 1 h        |
+| 0.2 | Estrutura de pastas (src, controllers, services, repositories, views, test).                                                    | A          | 0.5 h      |
+| 0.3 | `app.js` (Express) + `server.js` + error handler + rotas base (health check).                                                   | A          | 1 h        |
+| 0.4 | Git init + .gitignore (node_modules, .env, db/*.db) + README básico.                                                            | A          | 0.5 h      |
+| 0.5 | Criação do banco + PRAGMA foreign_keys + schema inicial via script/migration (eventos, jogadores com FK `evento_id`, partidas). | A          | 1 h        |
 
 ### Fase 1 — Eventos (CRUD + status)
 
-| # | Tarefa | Prioridade | Estimativa |
-|---|--------|-----------|-----------|
-| 1.1 | Repositório de eventos (listar, criar, buscar por id, atualizar, excluir). | A | 2 h |
-| 1.2 | Serviço de eventos (validações: nome obrigatório/único, `data_inicio`/`data_fim`, transições de status, exclusão bloqueada com partidas). | A | 2 h |
-| 1.3 | Controller + rotas de eventos (GET listar, GET detalhe, GET formulário, POST criar/editar/excluir). | A | 2 h |
-| 1.4 | Views: listagem de eventos + formulário (Bootstrap), mensagens de sucesso/erro. | A | 3 h |
-| 1.5 | View de detalhe do evento (dashboard: dados do evento, status, atalho para jogadores, partidas/sorteio e ranking). | A | 3 h |
-| 1.6 | Validação de entrada (express-validator) para evento e transições de status. | M | 1 h |
+| #   | Tarefa                                                                                                                                    | Prioridade | Estimativa |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| 1.1 | Repositório de eventos (listar, criar, buscar por id, atualizar, excluir).                                                                | A          | 2 h        |
+| 1.2 | Serviço de eventos (validações: nome obrigatório/único, `data_inicio`/`data_fim`, transições de status, exclusão bloqueada com partidas). | A          | 2 h        |
+| 1.3 | Controller + rotas de eventos (GET listar, GET detalhe, GET formulário, POST criar/editar/excluir).                                       | A          | 2 h        |
+| 1.4 | Views: listagem de eventos + formulário (Bootstrap), mensagens de sucesso/erro.                                                           | A          | 3 h        |
+| 1.5 | View de detalhe do evento (dashboard: dados do evento, status, atalho para jogadores, partidas/sorteio e ranking).                        | A          | 3 h        |
+| 1.6 | Validação de entrada (express-validator) para evento e transições de status.                                                              | M          | 1 h        |
 
 ### Fase 2 — Jogadores por evento
 
-| # | Tarefa | Prioridade | Estimativa |
-|---|--------|-----------|-----------|
-| 2.1 | Repositório de jogadores (listar por evento, criar, buscar por id, atualizar, excluir). | A | 2 h |
-| 2.2 | Serviço de jogadores (validações, regra de adição por status do evento, exclusão bloqueada com partidas). | A | 2 h |
-| 2.3 | Controller + rotas de jogadores do evento (GET listar, GET formulário, POST criar, POST editar, POST excluir). | A | 2 h |
-| 2.4 | Views: listagem + formulário de jogadores do evento (Bootstrap), mensagens de sucesso/erro. | A | 3 h |
-| 2.5 | Validação de entrada (express-validator) para jogador. | M | 1 h |
+| #   | Tarefa                                                                                                         | Prioridade | Estimativa |
+| --- | -------------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| 2.1 | Repositório de jogadores (listar por evento, criar, buscar por id, atualizar, excluir).                        | A          | 2 h        |
+| 2.2 | Serviço de jogadores (validações, regra de adição por status do evento, exclusão bloqueada com partidas).      | A          | 2 h        |
+| 2.3 | Controller + rotas de jogadores do evento (GET listar, GET formulário, POST criar, POST editar, POST excluir). | A          | 2 h        |
+| 2.4 | Views: listagem + formulário de jogadores do evento (Bootstrap), mensagens de sucesso/erro.                    | A          | 3 h        |
+| 2.5 | Validação de entrada (express-validator) para jogador.                                                         | M          | 1 h        |
 
 ### Fase 3 — Partidas (registro e histórico, por evento)
 
-| # | Tarefa | Prioridade | Estimativa |
-|---|--------|-----------|-----------|
-| 3.1 | Repositório de partidas (listar por evento com join jogadores, buscar, inserir, atualizar, excluir). | A | 2 h |
-| 3.2 | Serviço de partidas: validações (evento existe e não encerrado, jogadores existem, diferentes, do mesmo evento, vencedor ∈ {a, b}) + transação. | A | 4 h |
-| 3.3 | Controller + rotas de partidas (lista por evento, formulário, criar, editar, excluir). | A | 2 h |
-| 3.4 | Views: histórico de partidas do evento + formulário com selects de jogadores e vencedor. | A | 3 h |
-| 3.5 | Confronto direto entre dois jogadores (visão detalhe, dentro do evento). | M | 2 h |
+| #   | Tarefa                                                                                                                                          | Prioridade | Estimativa |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| 3.1 | Repositório de partidas (listar por evento com join jogadores, buscar, inserir, atualizar, excluir).                                            | A          | 2 h        |
+| 3.2 | Serviço de partidas: validações (evento existe e não encerrado, jogadores existem, diferentes, do mesmo evento, vencedor ∈ {a, b}) + transação. | A          | 4 h        |
+| 3.3 | Controller + rotas de partidas (lista por evento, formulário, criar, editar, excluir).                                                          | A          | 2 h        |
+| 3.4 | Views: histórico de partidas do evento + formulário com selects de jogadores e vencedor.                                                        | A          | 3 h        |
+| 3.5 | Confronto direto entre dois jogadores (visão detalhe, dentro do evento).                                                                        | M          | 2 h        |
 
 ### Fase 4 — Sorteio automático de confrontos ("vencedor permanece na mesa")
 
-| # | Tarefa | Prioridade | Estimativa |
-|---|--------|-----------|-----------|
-| 4.1 | `SorteioService`: candidatos = jogadores do evento; priorizar quem ainda não tem partida registrada com o vencedor; excluir o vencedor; escolher aleatoriamente entre elegíveis. | A | 4 h |
-| 4.2 | Regra de "fila": jogadores há mais tempo sem jogar têm prioridade; fallback quando todos já jogaram com o vencedor. | A | 2 h |
-| 4.3 | Integração com o fluxo de registro de partida: após informar o vencedor, exibir a sugestão de próximo adversário (aceitar ou escolher manualmente). | A | 3 h |
-| 4.4 | View/componente de sugestão de confronto (próxima partida) no dashboard do evento e no formulário de partidas. | A | 2 h |
-| 4.5 | Validação: o sorteio nunca sugere o próprio vencedor e respeita apenas os jogadores do evento. | M | 1 h |
+| #   | Tarefa                                                                                                                                                                           | Prioridade | Estimativa |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| 4.1 | `SorteioService`: candidatos = jogadores do evento; priorizar quem ainda não tem partida registrada com o vencedor; excluir o vencedor; escolher aleatoriamente entre elegíveis. | A          | 4 h        |
+| 4.2 | Regra de "fila": jogadores há mais tempo sem jogar têm prioridade; fallback quando todos já jogaram com o vencedor.                                                              | A          | 2 h        |
+| 4.3 | Integração com o fluxo de registro de partida: após informar o vencedor, exibir a sugestão de próximo adversário (aceitar ou escolher manualmente).                              | A          | 3 h        |
+| 4.4 | View/componente de sugestão de confronto (próxima partida) no dashboard do evento e no formulário de partidas.                                                                   | A          | 2 h        |
+| 4.5 | Validação: o sorteio nunca sugere o próprio vencedor e respeita apenas os jogadores do evento.                                                                                   | M          | 1 h        |
 
 ### Fase 5 — Ranking e estatísticas (por evento)
 
-| # | Tarefa | Prioridade | Estimativa |
-|---|--------|-----------|-----------|
-| 5.1 | `RankingService`: agregação por evento (filtro `evento_id`) de jogos/vitórias/derrotas, aproveitamento, confrontos; inclui todos os jogadores do evento (0 jogos). | A | 4 h |
-| 5.2 | Regra de ordenação e desempate (V → D → desempate final por ordem de cadastro/nome). | A | 2 h |
-| 5.3 | Controller + rota + view do ranking do evento (tabela com badges de posição e "sem jogos"). | A | 3 h |
-| 5.4 | Detalhe por jogador no evento (campanha completa: de quem ganhou / para quem perdeu). | M | 3 h |
+| #   | Tarefa                                                                                                                                                             | Prioridade | Estimativa |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ---------- |
+| 5.1 | `RankingService`: agregação por evento (filtro `evento_id`) de jogos/vitórias/derrotas, aproveitamento, confrontos; inclui todos os jogadores do evento (0 jogos). | A          | 4 h        |
+| 5.2 | Regra de ordenação e desempate (V → D → desempate final por ordem de cadastro/nome).                                                                               | A          | 2 h        |
+| 5.3 | Controller + rota + view do ranking do evento (tabela com badges de posição e "sem jogos").                                                                        | A          | 3 h        |
+| 5.4 | Detalhe por jogador no evento (campanha completa: de quem ganhou / para quem perdeu).                                                                              | M          | 3 h        |
 
 ### Fase 6 — Interface, UX e polimento
 
-| # | Tarefa | Prioridade | Estimativa |
-|---|--------|-----------|-----------|
-| 6.1 | Layout base (navbar, container responsivo, partials EJS). | M | 2 h |
-| 6.2 | Navegação entre telas (dashboard de eventos → evento → jogadores → partidas/sorteio → ranking). | M | 2 h |
-| 6.3 | Ajustes de usabilidade mobile (ordem dos campos, toques de tela). | B | 2 h |
-| 6.4 | Feedback ao usuário (toasts/alertas, confirmações de exclusão e edição de partidas). | M | 2 h |
+| #   | Tarefa                                                                                          | Prioridade | Estimativa |
+| --- | ----------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| 6.1 | Layout base (navbar, container responsivo, partials EJS).                                       | M          | 2 h        |
+| 6.2 | Navegação entre telas (dashboard de eventos → evento → jogadores → partidas/sorteio → ranking). | M          | 2 h        |
+| 6.3 | Ajustes de usabilidade mobile (ordem dos campos, toques de tela).                               | B          | 2 h        |
+| 6.4 | Feedback ao usuário (toasts/alertas, confirmações de exclusão e edição de partidas).            | M          | 2 h        |
 
 ### Fase 7 — Testes e validação
 
-| # | Tarefa | Prioridade | Estimativa |
-|---|--------|-----------|-----------|
-| 7.1 | Testes unitários do `RankingService` por evento (cenários: empate de vitórias, jogador sem jogos, desempate, isolamento entre eventos). | A | 4 h |
-| 7.2 | Testes unitários do `PartidaService` (validações incl. jogadores do mesmo evento, transação, bloqueio em evento encerrado). | A | 3 h |
-| 7.3 | Testes unitários do `SorteioService` (nunca sugere o vencedor, prioriza quem não jogou com o vencedor, randomização com seed, isolamento entre eventos). | A | 3 h |
-| 7.4 | Testes unitários do `EventoService`/jogadores (CRUD, unicidade de nome, transições de status, exclusão bloqueada com partidas). | A | 2 h |
-| 7.5 | Testes de integração das rotas (evento, jogador, partida e sorteio) com banco temporário. | M | 4 h |
-| 7.6 | Verificação manual (checklist) das regras de negócio em todas as telas. | A | 2 h |
+| #   | Tarefa                                                                                                                                                   | Prioridade | Estimativa |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| 7.1 | Testes unitários do `RankingService` por evento (cenários: empate de vitórias, jogador sem jogos, desempate, isolamento entre eventos).                  | A          | 4 h        |
+| 7.2 | Testes unitários do `PartidaService` (validações incl. jogadores do mesmo evento, transação, bloqueio em evento encerrado).                              | A          | 3 h        |
+| 7.3 | Testes unitários do `SorteioService` (nunca sugere o vencedor, prioriza quem não jogou com o vencedor, randomização com seed, isolamento entre eventos). | A          | 3 h        |
+| 7.4 | Testes unitários do `EventoService`/jogadores (CRUD, unicidade de nome, transições de status, exclusão bloqueada com partidas).                          | A          | 2 h        |
+| 7.5 | Testes de integração das rotas (evento, jogador, partida e sorteio) com banco temporário.                                                                | M          | 4 h        |
+| 7.6 | Verificação manual (checklist) das regras de negócio em todas as telas.                                                                                  | A          | 2 h        |
 
 ### Fase 8 — Evoluções (opcionais, após a v1)
 
-| # | Tarefa | Prioridade | Estimativa |
-|---|--------|-----------|-----------|
-| 8.1 | **Ranking entre eventos** (comparação/agregação de campanhas; exigirá casamento de jogadores por nome). | B | 8 h |
-| 8.2 | Múltiplas mesas (entidade mesas). | B | 5 h |
-| 8.3 | Controle de sessão de mesa (quem está na mesa, fila de espera). | B | 4 h |
-| 8.4 | Filtro de ranking por período (hoje, semana, mês, total). | B | 2 h |
-| 8.5 | Registro de placar/pontos por partida. | B | 2 h |
+| #   | Tarefa                                                                                                  | Prioridade | Estimativa |
+| --- | ------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| 8.1 | **Ranking entre eventos** (comparação/agregação de campanhas; exigirá casamento de jogadores por nome). | B          | 8 h        |
+| 8.2 | Múltiplas mesas (entidade mesas).                                                                       | B          | 5 h        |
+| 8.3 | Controle de sessão de mesa (quem está na mesa, fila de espera).                                         | B          | 4 h        |
+| 8.4 | Filtro de ranking por período (hoje, semana, mês, total).                                               | B          | 2 h        |
+| 8.5 | Registro de placar/pontos por partida.                                                                  | B          | 2 h        |
 
 ### 9.1 Ordem de execução e dependências
 
@@ -619,18 +621,18 @@ Fase 8 (paralela/opcional após Fase 7)
 
 ### 9.2 Estimativa total
 
-| Fase | Estimativa |
-|------|-----------|
-| F0 Setup | ~4 h |
-| F1 Eventos (CRUD + status) | ~13 h |
-| F2 Jogadores por evento | ~10 h |
-| F3 Partidas + histórico | ~13 h |
-| F4 Sorteio automático de confrontos | ~12 h |
-| F5 Ranking por evento | ~12 h |
-| F6 UX | ~8 h |
-| F7 Testes | ~18 h |
-| **Total (núcleo v1)** | **~90 h** |
-| F8 Evoluções (opcional) | ~21 h |
+| Fase                                | Estimativa |
+| ----------------------------------- | ---------- |
+| F0 Setup                            | ~4 h       |
+| F1 Eventos (CRUD + status)          | ~13 h      |
+| F2 Jogadores por evento             | ~10 h      |
+| F3 Partidas + histórico             | ~13 h      |
+| F4 Sorteio automático de confrontos | ~12 h      |
+| F5 Ranking por evento               | ~12 h      |
+| F6 UX                               | ~8 h       |
+| F7 Testes                           | ~18 h      |
+| **Total (núcleo v1)**               | **~90 h**  |
+| F8 Evoluções (opcional)             | ~21 h      |
 
 > Estimativa aproximada para 1 desenvolvedor. Com testes, revisão e ajustes,
 > planejar o núcleo em torno de 4 semanas (dedicação parcial).
@@ -687,26 +689,26 @@ Todas as questões em aberto foram **respondidas pelo usuário**. As respostas a
 são vinculantes e já estão refletidas nas seções 3 (RF), 5 (regras de negócio),
 7 (modelagem), 9 (fases) e 10 (testes).
 
-| # | Pergunta | Decisão confirmada |
-|---|----------|--------------------|
-| Q1 | Pode haver **empate** em uma partida? | **Sem empate** — toda partida tem apenas vencedor. |
-| Q2 | Qual o **critério de desempate** no ranking? | Apenas **Vitórias → Derrotas**. Não usar aproveitamento nem confronto direto. Desempate final restante: **ordem de cadastro** (ex.: nome/ordem de cadastro). |
-| Q3 | Jogadores **sem partidas** aparecem no ranking? | **Sim** — aparecem no final, com **0 jogos**. |
-| Q4 | O sistema deve **sortear** a ordem dos confrontos automaticamente? | **Sim** — sorteio automático de confrontos é funcionalidade **central da v1**: ao informar partida e vencedor, o sistema **sugere o próximo adversário** sorteado entre os demais jogadores do evento, preferencialmente os que estão "na fila" / sem partida pendente com o vencedor. |
-| Q5 | Permitir **editar/excluir** partidas já registradas? | **Sim, com confirmação**. |
-| Q6 | Ao **excluir jogador** com histórico, o que acontece com as partidas? | **Bloquear exclusão** de jogador com histórico. |
-| Q7 | O sistema controla **múltiplas mesas** simultâneas? | Não na v1 (uma única mesa); evolução futura. |
-| Q8 | Registrar **placar/pontos** por partida? | Não na v1 (apenas vencedor); evolução futura. |
-| Q9 | O ranking é **cumulativo** ou por período? | Cumulativo dentro do evento; filtro por período como evolução. |
-| Q10 | O sistema precisa de **autenticação** (login de administrador)? | Não na v1 (uso local/social). |
-| Q11 | Há limite de **número de jogadores** em uma sessão? | Sem limite na v1. |
-| Q12 | O "vencedor continua na mesa" deve ser **controlado pelo sistema**? | **Sim, com sorteio automático** do próximo adversário (ver Q4); o registro da sessão/fila em si (quem está sentado) fica como evolução. |
-| Q13 | Um **evento** representa o quê exatamente? | **Torneio com vários dias** — evento tem `data_inicio` e `data_fim`. |
-| Q14 | O evento deve ter **nome** e **data** obrigatórios? Nome único? | **Nome e data obrigatórios**; **nome único**. |
-| Q15 | Um evento tem **status** e isso bloqueia partidas? | **Sim** — status `planejado` / `em andamento` / `encerrado`, **bloqueando partidas** quando `encerrado`. |
-| Q16 | Pode-se **adicionar/remover jogador** de um evento já iniciado/encerrado? | **Adicionar enquanto em andamento**; **remover apenas sem partidas** no evento (bloquear remoção com histórico). |
-| Q17 | Ao **excluir evento** com partidas/participações, o que acontece? | **Bloquear exclusão** de evento com partidas. |
-| Q18 | Confirma-se o modelo de jogadores? | **Cadastro por evento** — cada evento tem sua própria lista de jogadores (tabela `jogadores` com FK `evento_id`). **Não** usar jogadores globais + `evento_jogadores`. |
+| #   | Pergunta                                                                  | Decisão confirmada                                                                                                                                                                                                                                                                     |
+| --- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Pode haver **empate** em uma partida?                                     | **Sem empate** — toda partida tem apenas vencedor.                                                                                                                                                                                                                                     |
+| Q2  | Qual o **critério de desempate** no ranking?                              | Apenas **Vitórias → Derrotas**. Não usar aproveitamento nem confronto direto. Desempate final restante: **ordem de cadastro** (ex.: nome/ordem de cadastro).                                                                                                                           |
+| Q3  | Jogadores **sem partidas** aparecem no ranking?                           | **Sim** — aparecem no final, com **0 jogos**.                                                                                                                                                                                                                                          |
+| Q4  | O sistema deve **sortear** a ordem dos confrontos automaticamente?        | **Sim** — sorteio automático de confrontos é funcionalidade **central da v1**: ao informar partida e vencedor, o sistema **sugere o próximo adversário** sorteado entre os demais jogadores do evento, preferencialmente os que estão "na fila" / sem partida pendente com o vencedor. |
+| Q5  | Permitir **editar/excluir** partidas já registradas?                      | **Sim, com confirmação**.                                                                                                                                                                                                                                                              |
+| Q6  | Ao **excluir jogador** com histórico, o que acontece com as partidas?     | **Bloquear exclusão** de jogador com histórico.                                                                                                                                                                                                                                        |
+| Q7  | O sistema controla **múltiplas mesas** simultâneas?                       | Não na v1 (uma única mesa); evolução futura.                                                                                                                                                                                                                                           |
+| Q8  | Registrar **placar/pontos** por partida?                                  | Não na v1 (apenas vencedor); evolução futura.                                                                                                                                                                                                                                          |
+| Q9  | O ranking é **cumulativo** ou por período?                                | Cumulativo dentro do evento; filtro por período como evolução.                                                                                                                                                                                                                         |
+| Q10 | O sistema precisa de **autenticação** (login de administrador)?           | Não na v1 (uso local/social).                                                                                                                                                                                                                                                          |
+| Q11 | Há limite de **número de jogadores** em uma sessão?                       | Sem limite na v1.                                                                                                                                                                                                                                                                      |
+| Q12 | O "vencedor continua na mesa" deve ser **controlado pelo sistema**?       | **Sim, com sorteio automático** do próximo adversário (ver Q4); o registro da sessão/fila em si (quem está sentado) fica como evolução.                                                                                                                                                |
+| Q13 | Um **evento** representa o quê exatamente?                                | **Torneio com vários dias** — evento tem `data_inicio` e `data_fim`.                                                                                                                                                                                                                   |
+| Q14 | O evento deve ter **nome** e **data** obrigatórios? Nome único?           | **Nome e data obrigatórios**; **nome único**.                                                                                                                                                                                                                                          |
+| Q15 | Um evento tem **status** e isso bloqueia partidas?                        | **Sim** — status `planejado` / `em andamento` / `encerrado`, **bloqueando partidas** quando `encerrado`.                                                                                                                                                                               |
+| Q16 | Pode-se **adicionar/remover jogador** de um evento já iniciado/encerrado? | **Adicionar enquanto em andamento**; **remover apenas sem partidas** no evento (bloquear remoção com histórico).                                                                                                                                                                       |
+| Q17 | Ao **excluir evento** com partidas/participações, o que acontece?         | **Bloquear exclusão** de evento com partidas.                                                                                                                                                                                                                                          |
+| Q18 | Confirma-se o modelo de jogadores?                                        | **Cadastro por evento** — cada evento tem sua própria lista de jogadores (tabela `jogadores` com FK `evento_id`). **Não** usar jogadores globais + `evento_jogadores`.                                                                                                                 |
 
 > **Caveat registrado (Q18):** o usuário reconfirmou o **cadastro por evento** mesmo
 > ciente de que o futuro ranking entre eventos será menos confiável (exigirá o
@@ -742,12 +744,12 @@ microinterações, **sem alterar nenhuma regra de negócio**.
 A camada de **apresentação** (EJS + CSS + JS de front) foi melhorada sem tocar
 em rotas, services, repositories, validators, schema SQL ou regras de negócio.
 
-| Camada | Alteração |
-|--------|-----------|
-| **CSS** | Novo `public/css/premium.css` (design system) carregado **após** `style.css`; o antigo permanece como base mobile-first. |
-| **JS** | Novo `public/js/app.js` (scroll-spy, FAB contextual, barras animadas, ripple, confirmação de exclusão). `theme.js` atualizado para padrão escuro no mobile. |
-| **Partials** | `header.ejs` (fonte Inter, CSS premium, toggle sempre visível), `footer.ejs` (sem nav fixa), novo `bottomnav.ejs` (bottom navigation). |
-| **Views** | `home`, `eventos/detalhe`, `eventos/form`, `jogadores/form`, `jogadores/campanha`, `partidas/form`, `404`, `500` redesenhadas mantendo **todos os `name`/`action`** dos formulários. |
+| Camada       | Alteração                                                                                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **CSS**      | Novo `public/css/premium.css` (design system) carregado **após** `style.css`; o antigo permanece como base mobile-first.                                                             |
+| **JS**       | Novo `public/js/app.js` (scroll-spy, FAB contextual, barras animadas, ripple, confirmação de exclusão). `theme.js` atualizado para padrão escuro no mobile.                          |
+| **Partials** | `header.ejs` (fonte Inter, CSS premium, toggle sempre visível), `footer.ejs` (sem nav fixa), novo `bottomnav.ejs` (bottom navigation).                                               |
+| **Views**    | `home`, `eventos/detalhe`, `eventos/form`, `jogadores/form`, `jogadores/campanha`, `partidas/form`, `404`, `500` redesenhadas mantendo **todos os `name`/`action`** dos formulários. |
 
 ### 13.3 Decisões de design
 
@@ -797,7 +799,7 @@ do teste (rejeição com 400) é mantida.
 ### 14.1 Contexto
 
 Fora do escopo original (eventos/partidas/ranking com "vencedor permanece na mesa"),
-o usuário solicitou um **módulo de torneios de sinuca** no estilo *mata-mata*, com
+o usuário solicitou um **módulo de torneios de sinuca** no estilo _mata-mata_, com
 chaveamento de **16 jogadores**, disputas em **melhor de 3** (eliminatórias) e
 **melhor de 5** (final), **avanço automático** de vencedores, **sorteio** da chave,
 **painel público para TV/telão** (com atualização automática) e **tela administrativa**
@@ -805,10 +807,10 @@ para registrar partidas. O detalhamento completo está em **`docs/TORNEIOS.md`**
 
 ### 14.2 Decisão principal: isolamento do módulo
 
-| Opção | Avaliação |
-|-------|-----------|
-| Reutilizar `eventos`/`jogadores`/`partidas` | **Descartada.** `partidas` exige `evento_id` do modelo de ranking; reaproveitá-las contaminaria o ranking (vitórias fora do evento) e exigiria alterar regras existentes (risco de quebrar o sistema). |
-| **Tabelas próprias** (`torneios`, `torneio_jogadores`, `torneio_confrontos`, `torneio_partidas`) | **Adotada.** Módulo 100% isolado; **nenhuma** regra/drota/tabela existente foi alterada. |
+| Opção                                                                                            | Avaliação                                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Reutilizar `eventos`/`jogadores`/`partidas`                                                      | **Descartada.** `partidas` exige `evento_id` do modelo de ranking; reaproveitá-las contaminaria o ranking (vitórias fora do evento) e exigiria alterar regras existentes (risco de quebrar o sistema). |
+| **Tabelas próprias** (`torneios`, `torneio_jogadores`, `torneio_confrontos`, `torneio_partidas`) | **Adotada.** Módulo 100% isolado; **nenhuma** regra/drota/tabela existente foi alterada.                                                                                                               |
 
 ### 14.3 O que foi implementado
 
@@ -849,4 +851,4 @@ Ver `docs/TORNEIOS.md` seção "Arquivos do módulo". Resumo de novas pastas:
 
 ---
 
-*Fim do documento.*
+_Fim do documento._

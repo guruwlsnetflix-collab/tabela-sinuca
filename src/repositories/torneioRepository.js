@@ -5,36 +5,42 @@ const TAMANHO_CHAVE = 16
 const TorneioRepository = {
   listar() {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT t.id, t.nome, t.local, t.data_inicio, t.previsao_termino,
                t.modalidade, t.numero_mesas, t.status, t.criado_em,
                tj.nome AS vencedor_nome
         FROM torneios t
         LEFT JOIN torneio_jogadores tj ON tj.id = t.vencedor_id
         ORDER BY t.id DESC
-      `)
+      `
+      )
       .all()
   },
 
   obterPorId(id) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT t.id, t.nome, t.local, t.data_inicio, t.previsao_termino,
                t.modalidade, t.numero_mesas, t.status, t.vencedor_id, t.criado_em,
                tj.nome AS vencedor_nome
         FROM torneios t
         LEFT JOIN torneio_jogadores tj ON tj.id = t.vencedor_id
         WHERE t.id = ?
-      `)
+      `
+      )
       .get(id)
   },
 
   criar({ nome, local, data_inicio, previsao_termino, modalidade, numero_mesas, senha_hash = null }) {
     const info = db
-      .prepare(`
+      .prepare(
+        `
         INSERT INTO torneios (nome, local, data_inicio, previsao_termino, modalidade, numero_mesas, senha_hash)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      `)
+      `
+      )
       .run(
         nome,
         local || null,
@@ -48,9 +54,7 @@ const TorneioRepository = {
   },
 
   listarComSenha() {
-    return db
-      .prepare('SELECT id, nome, senha_hash FROM torneios WHERE senha_hash IS NOT NULL')
-      .all()
+    return db.prepare('SELECT id, nome, senha_hash FROM torneios WHERE senha_hash IS NOT NULL').all()
   },
 
   atualizarSenha(id, senha_hash) {
@@ -59,11 +63,13 @@ const TorneioRepository = {
   },
 
   atualizar(id, { nome, local, data_inicio, previsao_termino, modalidade, numero_mesas }) {
-    db.prepare(`
+    db.prepare(
+      `
       UPDATE torneios
       SET nome = ?, local = ?, data_inicio = ?, previsao_termino = ?, modalidade = ?, numero_mesas = ?
       WHERE id = ?
-    `).run(
+    `
+    ).run(
       nome,
       local || null,
       data_inicio,
@@ -81,10 +87,7 @@ const TorneioRepository = {
   },
 
   limparVencedor(id) {
-    db.prepare('UPDATE torneios SET vencedor_id = NULL, status = ? WHERE id = ?').run(
-      'em_andamento',
-      id
-    )
+    db.prepare('UPDATE torneios SET vencedor_id = NULL, status = ? WHERE id = ?').run('em_andamento', id)
     return this.obterPorId(id)
   },
 
@@ -99,12 +102,14 @@ const TorneioRepository = {
 
   contarPartidasRealizadas(id) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT COUNT(*) AS total
         FROM torneio_partidas tp
         JOIN torneio_confrontos tc ON tc.id = tp.confronto_id
         WHERE tc.torneio_id = ?
-      `)
+      `
+      )
       .get(id).total
   },
 
@@ -116,47 +121,54 @@ const TorneioRepository = {
 
   listarJogadores(torneioId) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT id, torneio_id, posicao, nome, apelido, telefone, criado_em
         FROM torneio_jogadores
         WHERE torneio_id = ?
         ORDER BY posicao IS NULL, posicao, nome
-      `)
+      `
+      )
       .all(torneioId)
   },
 
   contarJogadores(torneioId) {
-    return db
-      .prepare('SELECT COUNT(*) AS total FROM torneio_jogadores WHERE torneio_id = ?')
-      .get(torneioId).total
+    return db.prepare('SELECT COUNT(*) AS total FROM torneio_jogadores WHERE torneio_id = ?').get(torneioId)
+      .total
   },
 
   obterJogador(id) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT id, torneio_id, posicao, nome, apelido, telefone, criado_em
         FROM torneio_jogadores
         WHERE id = ?
-      `)
+      `
+      )
       .get(id)
   },
 
   criarJogador({ torneio_id, nome, apelido, telefone }) {
     const info = db
-      .prepare(`
+      .prepare(
+        `
         INSERT INTO torneio_jogadores (torneio_id, nome, apelido, telefone)
         VALUES (?, ?, ?, ?)
-      `)
+      `
+      )
       .run(torneio_id, nome, apelido || null, telefone || null)
     return this.obterJogador(info.lastInsertRowid)
   },
 
   atualizarJogador(id, { nome, apelido, telefone }) {
-    db.prepare(`
+    db.prepare(
+      `
       UPDATE torneio_jogadores
       SET nome = ?, apelido = ?, telefone = ?
       WHERE id = ?
-    `).run(nome, apelido || null, telefone || null, id)
+    `
+    ).run(nome, apelido || null, telefone || null, id)
     return this.obterJogador(id)
   },
 

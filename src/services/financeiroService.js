@@ -100,12 +100,14 @@ const FinanceiroService = {
 
   _partidasDoEvento(eventoId) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT id, jogador_a_id, jogador_b_id, vencedor_id, valor_aposta, pago
         FROM partidas
         WHERE evento_id = ?
         ORDER BY data_partida ASC, id ASC
-      `)
+      `
+      )
       .all(eventoId)
   },
 
@@ -119,9 +121,7 @@ const FinanceiroService = {
     const idsAtivos = new Set(ativos.map((j) => j.id))
 
     // Bolo vivo: apenas partidas entre jogadores que continuam no evento.
-    const partidasVivas = todas.filter(
-      (p) => idsAtivos.has(p.jogador_a_id) && idsAtivos.has(p.jogador_b_id)
-    )
+    const partidasVivas = todas.filter((p) => idsAtivos.has(p.jogador_a_id) && idsAtivos.has(p.jogador_b_id))
 
     const { linhas } = this._agregarJogadores(ativos, partidasVivas)
 

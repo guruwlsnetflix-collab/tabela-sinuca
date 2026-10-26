@@ -4,7 +4,7 @@
    Camada de apresentação apenas. Não altera regras de negócio.
    ========================================================= */
 
-(() => {
+;(() => {
   'use strict'
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches

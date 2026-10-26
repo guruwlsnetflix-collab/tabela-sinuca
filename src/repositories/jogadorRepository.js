@@ -3,22 +3,26 @@ const db = require('../db')
 const JogadorRepository = {
   listarPorEvento(eventoId) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT id, evento_id, nome, apelido, telefone, ativo
         FROM jogadores
         WHERE evento_id = ?
         ORDER BY nome
-      `)
+      `
+      )
       .all(eventoId)
   },
 
   obterPorId(id) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT id, evento_id, nome, apelido, telefone, ativo, criado_em
         FROM jogadores
         WHERE id = ?
-      `)
+      `
+      )
       .get(id)
   },
 
@@ -47,17 +51,20 @@ const JogadorRepository = {
 
   contarPartidas(id) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT COUNT(*) AS total
         FROM partidas
         WHERE jogador_a_id = ? OR jogador_b_id = ?
-      `)
+      `
+      )
       .get(id, id).total
   },
 
   listarPartidas(id) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT p.id, p.jogador_a_id, p.jogador_b_id, p.vencedor_id, p.data_partida,
                pa.nome AS jogador_a, pb.nome AS jogador_b, pv.nome AS vencedor
         FROM partidas p
@@ -66,7 +73,8 @@ const JogadorRepository = {
         JOIN jogadores pv ON pv.id = p.vencedor_id
         WHERE p.jogador_a_id = ? OR p.jogador_b_id = ?
         ORDER BY p.data_partida DESC, p.id DESC
-      `)
+      `
+      )
       .all(id, id)
   },
 

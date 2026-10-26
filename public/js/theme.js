@@ -1,4 +1,4 @@
-(() => {
+;(() => {
   const STORAGE_KEY = 'sinuca-tema'
   const root = document.documentElement
 
@@ -26,9 +26,7 @@
     if (mobile) {
       return 'dark'
     }
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light'
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
   aplicarTema(temaInicial())

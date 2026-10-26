@@ -18,9 +18,7 @@ function dataInicioSugerida(evento) {
 
 function jogadoresParaForm(jogadores, partida) {
   const presentes = new Set(
-    partida
-      ? [partida.jogador_a_id, partida.jogador_b_id, partida.vencedor_id].map(Number)
-      : []
+    partida ? [partida.jogador_a_id, partida.jogador_b_id, partida.vencedor_id].map(Number) : []
   )
   return jogadores.filter((j) => j.ativo === 1 || presentes.has(j.id))
 }
@@ -130,10 +128,7 @@ router.post('/eventos/:eventoId/partidas/:id/pago', exigirEvento, (req, res) => 
   const eventoId = Number(req.params.eventoId)
   try {
     const partida = PartidaService.alternarPago(Number(req.params.id))
-    const msg =
-      partida.pago === 1
-        ? 'Partida marcada como paga.'
-        : 'Partida marcada como pendente.'
+    const msg = partida.pago === 1 ? 'Partida marcada como paga.' : 'Partida marcada como pendente.'
     res.redirect(`/eventos/${eventoId}?msg=${encodeURIComponent(msg)}`)
   } catch (err) {
     res.redirect(`/eventos/${eventoId}?erro=${encodeURIComponent(err.message)}`)

@@ -18,7 +18,7 @@ function alvoConfronto(torneioId, confrontoId) {
     if (lista[idx].status !== 'finalizado') return Number(confrontoId)
     const proximo = lista.find((c) => c.status !== 'finalizado')
     return proximo ? proximo.id : Number(confrontoId)
-  } catch (err) {
+  } catch (_err) {
     return Number(confrontoId)
   }
 }
@@ -27,7 +27,14 @@ function renderForm(res, { torneio, erros, modoEdicao }) {
   const status = erros ? 400 : 200
   res.status(status).render('pages/torneios/form', {
     title: modoEdicao ? 'Editar torneio' : 'Novo torneio',
-    torneio: torneio || { nome: '', local: '', data_inicio: '', previsao_termino: '', modalidade: 'par', numero_mesas: 1 },
+    torneio: torneio || {
+      nome: '',
+      local: '',
+      data_inicio: '',
+      previsao_termino: '',
+      modalidade: 'par',
+      numero_mesas: 1
+    },
     modalidadeLabel: TorneioService.MODALIDADE_LABEL,
     erros,
     modoEdicao
@@ -47,9 +54,11 @@ function renderJogadorForm(res, { torneio, jogador, erros }) {
 
 function mapaDeErros(req) {
   const mapa = {}
-  validationResult(req).array().forEach((e) => {
-    mapa[e.path] = e.msg
-  })
+  validationResult(req)
+    .array()
+    .forEach((e) => {
+      mapa[e.path] = e.msg
+    })
   return mapa
 }
 
@@ -89,8 +98,14 @@ router.post('/torneios', torneioValidators.criar, (req, res) => {
     return renderForm(res, { torneio: req.body, erros, modoEdicao: false })
   }
   try {
-    const torneio = TorneioService.criar({ ...req.body, modalidade: req.body.modalidade || 'par', numero_mesas: Number(req.body.numero_mesas) || 1 })
-    res.redirect(`/torneios/${torneio.id}?msg=${encodeURIComponent('Torneio criado. Informe a senha definida para editar os dados.')}`)
+    const torneio = TorneioService.criar({
+      ...req.body,
+      modalidade: req.body.modalidade || 'par',
+      numero_mesas: Number(req.body.numero_mesas) || 1
+    })
+    res.redirect(
+      `/torneios/${torneio.id}?msg=${encodeURIComponent('Torneio criado. Informe a senha definida para editar os dados.')}`
+    )
   } catch (err) {
     renderForm(res, {
       torneio: req.body,
@@ -135,7 +150,11 @@ router.post('/torneios/:id', exigirTorneio, torneioValidators.atualizar, (req, r
     return renderForm(res, { torneio: { ...req.body, id }, erros, modoEdicao: true })
   }
   try {
-    TorneioService.atualizar(id, { ...req.body, modalidade: req.body.modalidade || 'par', numero_mesas: Number(req.body.numero_mesas) || 1 })
+    TorneioService.atualizar(id, {
+      ...req.body,
+      modalidade: req.body.modalidade || 'par',
+      numero_mesas: Number(req.body.numero_mesas) || 1
+    })
     res.redirect(`/torneios/${id}?msg=Torneio atualizado com sucesso.`)
   } catch (err) {
     renderForm(res, { torneio: { ...req.body, id }, erros: { geral: err.message }, modoEdicao: true })
@@ -262,7 +281,9 @@ router.post('/torneios/:id/confrontos/:confrontoId/iniciar', exigirTorneio, (req
     TorneioService.iniciarConfronto(Number(req.params.id), Number(req.params.confrontoId))
     res.redirect(`/torneios/${req.params.id}?msg=Confronto em andamento.#confronto-${req.params.confrontoId}`)
   } catch (err) {
-    res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}#confronto-${req.params.confrontoId}`)
+    res.redirect(
+      `/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}#confronto-${req.params.confrontoId}`
+    )
   }
 })
 
@@ -274,30 +295,28 @@ router.post('/torneios/:id/confrontos/:confrontoId/partidas', exigirTorneio, (re
     )
   }
   try {
-    TorneioService.registrarPartida(
-      Number(req.params.id),
-      Number(req.params.confrontoId),
-      vencedorId
-    )
+    TorneioService.registrarPartida(Number(req.params.id), Number(req.params.confrontoId), vencedorId)
     const alvo = alvoConfronto(req.params.id, req.params.confrontoId)
     res.redirect(`/torneios/${req.params.id}?msg=Partida registrada.#confronto-${alvo}`)
   } catch (err) {
-    res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}#confronto-${req.params.confrontoId}`)
+    res.redirect(
+      `/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}#confronto-${req.params.confrontoId}`
+    )
   }
 })
 
-router.post(
-  '/torneios/:id/confrontos/:confrontoId/desfazer',
-  exigirTorneio,
-  (req, res) => {
-    try {
-      TorneioService.desfazerUltimaPartida(Number(req.params.id), Number(req.params.confrontoId))
-      res.redirect(`/torneios/${req.params.id}?msg=Última partida do confronto desfeita.#confronto-${req.params.confrontoId}`)
-    } catch (err) {
-      res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}#confronto-${req.params.confrontoId}`)
-    }
+router.post('/torneios/:id/confrontos/:confrontoId/desfazer', exigirTorneio, (req, res) => {
+  try {
+    TorneioService.desfazerUltimaPartida(Number(req.params.id), Number(req.params.confrontoId))
+    res.redirect(
+      `/torneios/${req.params.id}?msg=Última partida do confronto desfeita.#confronto-${req.params.confrontoId}`
+    )
+  } catch (err) {
+    res.redirect(
+      `/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}#confronto-${req.params.confrontoId}`
+    )
   }
-)
+})
 
 // ---------------- Painel público (TV) ----------------
 

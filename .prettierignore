@@ -1,0 +1,6 @@
+node_modules/
+coverage/
+data/
+.history/
+package-lock.json
+src/views/

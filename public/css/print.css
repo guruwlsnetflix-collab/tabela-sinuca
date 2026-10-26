@@ -37,7 +37,9 @@
   font-weight: 600;
   color: #fff;
   box-shadow: var(--p-shadow-soft);
-  transition: transform var(--p-transition), filter var(--p-transition);
+  transition:
+    transform var(--p-transition),
+    filter var(--p-transition);
   cursor: pointer;
 }
 
@@ -55,19 +57,19 @@
 }
 
 .report-toolbar__btn--share {
-  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
 .report-toolbar__btn--pdf {
-  background: linear-gradient(135deg, #EF4444, #DC2626);
+  background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
 .report-toolbar__btn--print {
-  background: linear-gradient(135deg, #22C55E, #16A34A);
+  background: linear-gradient(135deg, #22c55e, #16a34a);
 }
 
 .report-toolbar__btn--close {
-  background: linear-gradient(135deg, #6B7280, #4B5563);
+  background: linear-gradient(135deg, #6b7280, #4b5563);
 }
 
 .report-toolbar__icon {
@@ -359,7 +361,9 @@
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  transition: transform var(--p-transition), background-color var(--p-transition);
+  transition:
+    transform var(--p-transition),
+    background-color var(--p-transition);
 }
 
 .report-share-menu__btn:hover {

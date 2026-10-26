@@ -3,21 +3,25 @@ const db = require('../db')
 const EventoRepository = {
   listar() {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT id, nome, data_inicio, data_fim, status, valor_aposta_padrao
         FROM eventos
         ORDER BY data_inicio DESC, id DESC
-      `)
+      `
+      )
       .all()
   },
 
   obterPorId(id) {
     return db
-      .prepare(`
+      .prepare(
+        `
         SELECT id, nome, data_inicio, data_fim, status, valor_aposta_padrao, criado_em
         FROM eventos
         WHERE id = ?
-      `)
+      `
+      )
       .get(id)
   },
 
@@ -38,9 +42,7 @@ const EventoRepository = {
   },
 
   listarComSenha() {
-    return db
-      .prepare('SELECT id, nome, senha_hash FROM eventos WHERE senha_hash IS NOT NULL')
-      .all()
+    return db.prepare('SELECT id, nome, senha_hash FROM eventos WHERE senha_hash IS NOT NULL').all()
   },
 
   atualizarSenha(id, senha_hash) {

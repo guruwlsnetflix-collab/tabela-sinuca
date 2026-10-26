@@ -5,15 +5,16 @@ const EventoService = require('./eventoService')
 const RankingService = {
   gerar(eventoId) {
     const evento = EventoService.obter(eventoId)
-    const jogadores = JogadorRepository.listarPorEvento(evento.id)
-      .filter((j) => j.ativo === 1)
+    const jogadores = JogadorRepository.listarPorEvento(evento.id).filter((j) => j.ativo === 1)
 
     const partidas = db
-      .prepare(`
+      .prepare(
+        `
         SELECT jogador_a_id, jogador_b_id, vencedor_id
         FROM partidas
         WHERE evento_id = ?
-      `)
+      `
+      )
       .all(evento.id)
 
     const stats = new Map()

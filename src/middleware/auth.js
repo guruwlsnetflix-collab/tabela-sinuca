@@ -7,18 +7,18 @@ function carregarSessao(req, res, next) {
   res.locals.podeEditarEvento = (eventoId) =>
     Boolean(
       req.sessao &&
-        (req.sessao.nivel === 'mestre' ||
-          (req.sessao.nivel === 'evento' &&
-            Array.isArray(req.sessao.eventos) &&
-            req.sessao.eventos.includes(Number(eventoId))))
+      (req.sessao.nivel === 'mestre' ||
+        (req.sessao.nivel === 'evento' &&
+          Array.isArray(req.sessao.eventos) &&
+          req.sessao.eventos.includes(Number(eventoId))))
     )
   res.locals.podeEditarTorneio = (torneioId) =>
     Boolean(
       req.sessao &&
-        (req.sessao.nivel === 'mestre' ||
-          (req.sessao.nivel === 'torneio' &&
-            Array.isArray(req.sessao.torneios) &&
-            req.sessao.torneios.includes(Number(torneioId))))
+      (req.sessao.nivel === 'mestre' ||
+        (req.sessao.nivel === 'torneio' &&
+          Array.isArray(req.sessao.torneios) &&
+          req.sessao.torneios.includes(Number(torneioId))))
     )
   next()
 }

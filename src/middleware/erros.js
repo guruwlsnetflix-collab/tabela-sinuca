@@ -32,7 +32,6 @@ function naoEncontrado(req, res) {
   renderErro(res, { status: 404 })
 }
 
-// eslint-disable-next-line no-unused-vars
 function tratarErro(err, req, res, next) {
   renderErro(res, err)
 }

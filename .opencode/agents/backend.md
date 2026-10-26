@@ -184,9 +184,9 @@ Sempre padronizar.
 
 ```json
 {
-    "success": true,
-    "message": "",
-    "data": {}
+  "success": true,
+  "message": "",
+  "data": {}
 }
 ```
 

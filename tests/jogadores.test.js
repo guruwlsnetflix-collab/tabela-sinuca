@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import request from 'supertest'
 
 const app = require('../src/app')
 const db = require('../src/db')
@@ -36,9 +35,7 @@ describe('JogadorService', () => {
   it('bloqueia cadastro de jogador em evento encerrado', () => {
     const evento = criarEventoAtivo()
     EventoService.mudarStatus(evento.id, 'encerrado')
-    expect(() => JogadorService.criar({ evento_id: evento.id, nome: 'X' })).toThrow(
-      'evento encerrado'
-    )
+    expect(() => JogadorService.criar({ evento_id: evento.id, nome: 'X' })).toThrow('evento encerrado')
   })
 
   it('permite cadastrar jogador após o evento ter iniciado (em andamento)', () => {

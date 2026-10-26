@@ -74,7 +74,6 @@ Exemplos:
 - grandes refatorações;
 - padrões de desenvolvimento.
 
-
 ## Backend
 
 Para:
@@ -89,7 +88,6 @@ Utilize quando envolver:
 - repositories;
 - integrações;
 - regras de servidor.
-
 
 ## Banco de Dados
 
@@ -106,7 +104,6 @@ Utilize quando envolver:
 - otimização;
 - transações.
 
-
 ## Interface e Experiência do Usuário
 
 Para:
@@ -120,7 +117,6 @@ Utilize quando envolver:
 - organização visual;
 - usabilidade;
 - fluxo operacional.
-
 
 ## Frontend
 
@@ -136,7 +132,6 @@ Utilize quando envolver:
 - JavaScript do cliente;
 - componentes visuais.
 
-
 ## Regras de Negócio
 
 Para:
@@ -148,7 +143,6 @@ Utilize quando envolver:
 - alterações no processo operacional;
 - validações;
 - regras específicas do sistema.
-
 
 ## Segurança
 
@@ -164,7 +158,6 @@ Utilize quando envolver:
 - proteção de dados;
 - vulnerabilidades.
 
-
 ## Testes
 
 Para:
@@ -176,7 +169,6 @@ Utilize quando envolver:
 - novas funcionalidades;
 - correções importantes;
 - prevenção de regressões.
-
 
 ## Revisão
 

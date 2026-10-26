@@ -19,21 +19,24 @@ const SorteioService = {
       throw new Error('O jogador vencedor não pertence a este evento.')
     }
 
-    const jogadores = JogadorRepository.listarPorEvento(eventoId)
-      .filter((j) => j.ativo === 1 && j.id !== vencedorId)
+    const jogadores = JogadorRepository.listarPorEvento(eventoId).filter(
+      (j) => j.ativo === 1 && j.id !== vencedorId
+    )
 
     if (jogadores.length === 0) {
       return { adversarios: [], ultimoAdversario: null }
     }
 
     const ultimaPartida = db
-      .prepare(`
+      .prepare(
+        `
         SELECT p.jogador_a_id, p.jogador_b_id
         FROM partidas p
         WHERE p.evento_id = ? AND (p.jogador_a_id = ? OR p.jogador_b_id = ?)
         ORDER BY p.data_partida DESC, p.id DESC
         LIMIT 1
-      `)
+      `
+      )
       .get(eventoId, vencedorId, vencedorId)
 
     const ultimoAdversario = ultimaPartida

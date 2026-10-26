@@ -5,7 +5,14 @@ const app = require('../src/app')
 const db = require('../src/db')
 const EventoService = require('../src/services/eventoService')
 const TorneioService = require('../src/services/torneioService')
-const { SENHA_MESTRA, SENHA_EVENTO, SENHA_TORNEIO, agenteMestre, agenteEvento, agenteTorneio } = require('./authHelper')
+const {
+  SENHA_MESTRA,
+  SENHA_EVENTO,
+  SENHA_TORNEIO,
+  agenteMestre,
+  agenteEvento,
+  agenteTorneio
+} = require('./authHelper')
 
 function limparDb() {
   db.exec('DELETE FROM torneios; DELETE FROM partidas; DELETE FROM jogadores; DELETE FROM eventos;')
@@ -40,16 +47,15 @@ describe('Autenticação', () => {
     const res = await request(app).post('/login').type('form').send({ senha: SENHA_MESTRA })
     expect(res.status).toBe(302)
     expect(res.headers.location).toBe('/')
-    const cookie = res.headers['set-cookie'] ? res.headers['set-cookie'].find((c) => c.startsWith('sinuca_sessao=')) : null
+    const cookie = res.headers['set-cookie']
+      ? res.headers['set-cookie'].find((c) => c.startsWith('sinuca_sessao='))
+      : null
     expect(cookie).toBeTruthy()
     expect(cookie).toContain('HttpOnly')
   })
 
   it('POST /login?next=... redireciona para o destino após logar', async () => {
-    const res = await request(app)
-      .post('/login?next=/eventos/9')
-      .type('form')
-      .send({ senha: SENHA_MESTRA })
+    const res = await request(app).post('/login?next=/eventos/9').type('form').send({ senha: SENHA_MESTRA })
     expect(res.status).toBe(302)
     expect(res.headers.location).toBe('/eventos/9')
   })
@@ -184,10 +190,7 @@ describe('Autenticação', () => {
 
     criarEventoComSenha()
     const agente = await agenteEvento(app)
-    const comoEvento = await agente
-      .post(`/torneios/${id}/jogadores`)
-      .type('form')
-      .send({ nome: 'Jogador' })
+    const comoEvento = await agente.post(`/torneios/${id}/jogadores`).type('form').send({ nome: 'Jogador' })
     expect(comoEvento.status).toBe(302)
     expect(comoEvento.headers.location).toContain('/login')
 
@@ -195,10 +198,7 @@ describe('Autenticação', () => {
     expect(form.status).toBe(200)
 
     const mestre = await agenteMestre(app)
-    const ok = await mestre
-      .post(`/torneios/${id}/jogadores`)
-      .type('form')
-      .send({ nome: 'Jogador Mestre' })
+    const ok = await mestre.post(`/torneios/${id}/jogadores`).type('form').send({ nome: 'Jogador Mestre' })
     expect(ok.status).toBe(302)
     expect(ok.headers.location).toMatch(new RegExp(`/torneios/${id}`))
 

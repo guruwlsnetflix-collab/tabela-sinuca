@@ -44,14 +44,14 @@ deploy). Para não perder os dados do banco, criamos um **volume** persistente:
 1. No serviço, abra a aba **Variables**.
 2. Adicione as variáveis:
 
-   | Variável | Valor |
-   |----------|-------|
+   | Variável        | Valor             |
+   | --------------- | ----------------- |
    | `DATABASE_PATH` | `/data/sinuca.db` |
-   | `PORT` | `8080` |
+   | `PORT`          | `8080`            |
 
    `PORT=8080` é essencial: a Railway usa o valor da variável `PORT` para o
    **healthcheck** e para rotear o tráfego (default é `8080`). Sem ela, o app
-   pode subir em outra porta e o healthcheck falha com *service unavailable*.
+   pode subir em outra porta e o healthcheck falha com _service unavailable_.
 
    `DATABASE_PATH=/data/sinuca.db` garante que o arquivo SQLite seja gravado
    **dentro do volume** montado em `/data`.
@@ -83,7 +83,7 @@ para saber se a aplicação subiu corretamente:
 ## Auto-deploy
 
 A Railway faz deploy **automaticamente** a cada push no branch conectado.
-Para desativar: **Settings** → **Deployments** → desative *Auto Deploy*.
+Para desativar: **Settings** → **Deployments** → desative _Auto Deploy_.
 
 ## Troubleshooting
 
@@ -111,7 +111,7 @@ Confirme que:
 3. O arquivo `data/sinuca.db` **não** foi criado localmente e enviado para o
    repositório (o diretório `data/` está no `.gitignore`).
 
-### O deploy fica em *building* para sempre / healthcheck falha
+### O deploy fica em _building_ para sempre / healthcheck falha
 
 Confirme que a variável `PORT=8080` está definida (o healthcheck da Railway usa
 o valor dela). Veja os logs do serviço e teste a rota `/health` no domínio

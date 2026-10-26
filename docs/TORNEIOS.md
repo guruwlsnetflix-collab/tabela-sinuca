@@ -1,7 +1,7 @@
 # Módulo de Torneios
 
 O **tabela-sinuca** conta com um módulo de **torneios de sinuca** (eliminatórias
-no estilo *mata-mata*), isolado do sistema existente de eventos, jogadores e
+no estilo _mata-mata_), isolado do sistema existente de eventos, jogadores e
 partidas de ranking.
 
 - Chave fixa de **16 jogadores** (oitavas de final → quartas → semifinais → final).
@@ -17,13 +17,13 @@ partidas de ranking.
 
 ### Status do torneio
 
-| Status              | Descrição                                                     |
-|---------------------|---------------------------------------------------------------|
-| `cadastro_jogadores`| Estado inicial. Jogadores podem ser cadastrados/editados.     |
-| `sorteado`          | Sorteio realizado; a chave foi montada. Alterações bloqueadas.|
-| `em_andamento`      | Torneio iniciado; partidas podem ser registradas.             |
-| `finalizado`        | Última partida da final registrada; campeão definido.         |
-| `cancelado`         | Torneio cancelado (não pode cancelar o já finalizado).        |
+| Status               | Descrição                                                      |
+| -------------------- | -------------------------------------------------------------- |
+| `cadastro_jogadores` | Estado inicial. Jogadores podem ser cadastrados/editados.      |
+| `sorteado`           | Sorteio realizado; a chave foi montada. Alterações bloqueadas. |
+| `em_andamento`       | Torneio iniciado; partidas podem ser registradas.              |
+| `finalizado`         | Última partida da final registrada; campeão definido.          |
+| `cancelado`          | Torneio cancelado (não pode cancelar o já finalizado).         |
 
 ### Fluxo principal
 
@@ -33,14 +33,15 @@ partidas de ranking.
 3. **Sortear** (`POST /torneios/:id/sortear`) — embaralha os jogadores, atribui
    posições 1–16 e monta os 15 confrontos:
 
-   | Fase        | Confrontos | Partidas p/ avançar |
-   |-------------|------------|---------------------|
-   | Oitavas     | 1–8        | 2 (melhor de 3)     |
-   | Quartas     | 9–12       | 2 (melhor de 3)     |
-   | Semifinais  | 13–14      | 2 (melhor de 3)     |
-   | Final       | 15         | 3 (melhor de 5)     |
+   | Fase       | Confrontos | Partidas p/ avançar |
+   | ---------- | ---------- | ------------------- |
+   | Oitavas    | 1–8        | 2 (melhor de 3)     |
+   | Quartas    | 9–12       | 2 (melhor de 3)     |
+   | Semifinais | 13–14      | 2 (melhor de 3)     |
+   | Final      | 15         | 3 (melhor de 5)     |
 
    É possível **refazer o sorteio** enquanto nenhuma partida tiver sido registrada.
+
 4. **Iniciar** (`POST /torneios/:id/iniciar`) — só após o sorteio, com 16 jogadores.
 5. **Registrar partidas** (`POST /torneios/:id/confrontos/:confrontoId/partidas`).
    O confronto só aceita partidas quando possui os dois jogadores definidos e o
@@ -67,42 +68,42 @@ partidas de ranking.
 Banco SQLite (`src/db/schema.sql`). As tabelas de torneio são **independentes** das
 tabelas `eventos`/`jogadores`/`partidas` — não interferem no ranking.
 
-| Tabela                | Descrição                                            |
-|-----------------------|------------------------------------------------------|
-| `torneios`            | Dados do torneio + status + `vencedor_id` (ON DELETE SET NULL). |
-| `torneio_jogadores`   | Jogadores inscritos, com `posicao` (1–16 pós-sorteio). |
-| `torneio_confrontos`  | Confrontos 1–15 com fase, `vitorias_necessarias`, placares e status. |
-| `torneio_partidas`    | Partidas de cada confronto (número sequencial + vencedor). |
+| Tabela               | Descrição                                                            |
+| -------------------- | -------------------------------------------------------------------- |
+| `torneios`           | Dados do torneio + status + `vencedor_id` (ON DELETE SET NULL).      |
+| `torneio_jogadores`  | Jogadores inscritos, com `posicao` (1–16 pós-sorteio).               |
+| `torneio_confrontos` | Confrontos 1–15 com fase, `vitorias_necessarias`, placares e status. |
+| `torneio_partidas`   | Partidas de cada confronto (número sequencial + vencedor).           |
 
 ## Rotas
 
 ### Páginas
 
-| Método | Rota                                                   | Ação                          |
-|--------|--------------------------------------------------------|-------------------------------|
-| GET    | `/torneios`                                            | Listagem                      |
-| GET    | `/torneios/novo`                                       | Formulário de criação         |
-| POST   | `/torneios`                                            | Criar torneio                 |
-| GET    | `/torneios/:id`                                        | Detalhe / painel administrativo (chave completa) |
-| GET    | `/torneios/:id/editar` · POST `/torneios/:id`          | Editar torneio                |
-| POST   | `/torneios/:id/cancelar` · `/torneios/:id/excluir`     | Cancelar / excluir            |
-| GET    | `/torneios/:id/jogadores/novo` · POST `/torneios/:id/jogadores` | Cadastrar jogador   |
-| GET    | `/torneios/:id/jogadores/:jogadorId/editar` · POST `/...` | Editar jogador              |
-| POST   | `/torneios/:id/jogadores/:jogadorId/excluir`           | Remover jogador               |
-| POST   | `/torneios/:id/sortear` · `/torneios/:id/iniciar`      | Sortear / iniciar             |
-| POST   | `/torneios/:id/confrontos/:confrontoId/iniciar`        | Iniciar confronto             |
-| POST   | `/torneios/:id/confrontos/:confrontoId/partidas`       | Registrar partida             |
-| POST   | `/torneios/:id/confrontos/:confrontoId/desfazer`       | Desfazer última partida       |
-| GET    | `/torneios/:id/painel`                                 | Painel público (TV)           |
-| GET    | `/torneios/:id/painel-tv`                              | Painel TV forçado p/ Fire Stick / TVs |
+| Método | Rota                                                            | Ação                                             |
+| ------ | --------------------------------------------------------------- | ------------------------------------------------ |
+| GET    | `/torneios`                                                     | Listagem                                         |
+| GET    | `/torneios/novo`                                                | Formulário de criação                            |
+| POST   | `/torneios`                                                     | Criar torneio                                    |
+| GET    | `/torneios/:id`                                                 | Detalhe / painel administrativo (chave completa) |
+| GET    | `/torneios/:id/editar` · POST `/torneios/:id`                   | Editar torneio                                   |
+| POST   | `/torneios/:id/cancelar` · `/torneios/:id/excluir`              | Cancelar / excluir                               |
+| GET    | `/torneios/:id/jogadores/novo` · POST `/torneios/:id/jogadores` | Cadastrar jogador                                |
+| GET    | `/torneios/:id/jogadores/:jogadorId/editar` · POST `/...`       | Editar jogador                                   |
+| POST   | `/torneios/:id/jogadores/:jogadorId/excluir`                    | Remover jogador                                  |
+| POST   | `/torneios/:id/sortear` · `/torneios/:id/iniciar`               | Sortear / iniciar                                |
+| POST   | `/torneios/:id/confrontos/:confrontoId/iniciar`                 | Iniciar confronto                                |
+| POST   | `/torneios/:id/confrontos/:confrontoId/partidas`                | Registrar partida                                |
+| POST   | `/torneios/:id/confrontos/:confrontoId/desfazer`                | Desfazer última partida                          |
+| GET    | `/torneios/:id/painel`                                          | Painel público (TV)                              |
+| GET    | `/torneios/:id/painel-tv`                                       | Painel TV forçado p/ Fire Stick / TVs            |
 
 ### API JSON (somente leitura)
 
-| Método | Rota                     | Retorno                                   |
-|--------|--------------------------|-------------------------------------------|
-| GET    | `/api/torneios`          | Lista resumida de torneios                |
-| GET    | `/api/torneios/:id`      | Estado completo (torneio, fases, confrontos, próximos, fase atual) |
-| GET    | `/api/torneios/:id/painel` | Sinônimo de `/api/torneios/:id` (usá-lo em painéis externos) |
+| Método | Rota                       | Retorno                                                            |
+| ------ | -------------------------- | ------------------------------------------------------------------ |
+| GET    | `/api/torneios`            | Lista resumida de torneios                                         |
+| GET    | `/api/torneios/:id`        | Estado completo (torneio, fases, confrontos, próximos, fase atual) |
+| GET    | `/api/torneios/:id/painel` | Sinônimo de `/api/torneios/:id` (usá-lo em painéis externos)       |
 
 Formato dos confrontos na API:
 
@@ -148,6 +149,7 @@ aparelhos use:
 página do torneio).
 
 A variante:
+
 - Força o viewport para `width=1600` (o navegador escala para preencher a TV).
 - Aplica a classe `painel--telao`, **ignorando** os media queries de mobile
   (sempre 4 colunas em telas >900px, 1 coluna abaixo).
@@ -163,19 +165,19 @@ A variante:
 
 ## Arquivos do módulo
 
-| Arquivo                          | Responsabilidade                              |
-|----------------------------------|-----------------------------------------------|
-| `src/db/schema.sql`              | Tabelas `torneios`, `torneio_jogadores`, `torneio_confrontos`, `torneio_partidas`. |
-| `src/repositories/torneioRepository.js` | CRUD de torneios e jogadores.           |
-| `src/repositories/confrontoRepository.js` | CRUD de confrontos e partidas.      |
-| `src/services/torneioService.js` | Regras de negócio: sorteio, avanço, validações, estado das views e `TAMANHO_CHAVE=16`. |
-| `src/validators/torneioValidator.js` | Validações `express-validator`.        |
-| `src/routes/torneios.js`         | Rotas de página (CRUD + painel).             |
-| `src/routes/apiTorneios.js`      | Rotas API JSON de leitura.                   |
-| `src/views/pages/torneios/*.ejs` | Telas: listagem, formulários, detalhe e painel. |
-| `public/css/torneio.css`         | Estilo administrativo da chave.              |
-| `public/css/painel.css`          | Estilo do painel TV.                         |
-| `tests/torneio.test.js`          | Testes de serviço, rotas e API.              |
+| Arquivo                                   | Responsabilidade                                                                       |
+| ----------------------------------------- | -------------------------------------------------------------------------------------- |
+| `src/db/schema.sql`                       | Tabelas `torneios`, `torneio_jogadores`, `torneio_confrontos`, `torneio_partidas`.     |
+| `src/repositories/torneioRepository.js`   | CRUD de torneios e jogadores.                                                          |
+| `src/repositories/confrontoRepository.js` | CRUD de confrontos e partidas.                                                         |
+| `src/services/torneioService.js`          | Regras de negócio: sorteio, avanço, validações, estado das views e `TAMANHO_CHAVE=16`. |
+| `src/validators/torneioValidator.js`      | Validações `express-validator`.                                                        |
+| `src/routes/torneios.js`                  | Rotas de página (CRUD + painel).                                                       |
+| `src/routes/apiTorneios.js`               | Rotas API JSON de leitura.                                                             |
+| `src/views/pages/torneios/*.ejs`          | Telas: listagem, formulários, detalhe e painel.                                        |
+| `public/css/torneio.css`                  | Estilo administrativo da chave.                                                        |
+| `public/css/painel.css`                   | Estilo do painel TV.                                                                   |
+| `tests/torneio.test.js`                   | Testes de serviço, rotas e API.                                                        |
 
 ## Como testar
 

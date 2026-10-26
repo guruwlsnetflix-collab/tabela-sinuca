@@ -78,7 +78,9 @@
 
 .p-confronto--ao-vivo {
   border: 2px solid var(--p-danger);
-  box-shadow: 0 0 0 1px var(--p-danger), 0 8px 28px rgba(239, 68, 68, 0.22);
+  box-shadow:
+    0 0 0 1px var(--p-danger),
+    0 8px 28px rgba(239, 68, 68, 0.22);
 }
 
 .p-confronto__head {
@@ -120,12 +122,12 @@
 }
 
 .p-confronto__player--winner .p-confronto__name {
-  color: #FACC15;
+  color: #facc15;
   font-weight: 800;
 }
 
 .p-confronto__player--winner .p-confronto__score {
-  color: #FACC15;
+  color: #facc15;
 }
 
 .p-confronto__name {

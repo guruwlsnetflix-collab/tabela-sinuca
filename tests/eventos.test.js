@@ -91,41 +91,37 @@ describe('Rotas de eventos', () => {
   beforeEach(limparDb)
 
   it('POST /eventos cria um evento e redireciona (sem login)', async () => {
-    const res = await request(app)
-      .post('/eventos')
-      .type('form')
-      .send({ nome: 'Torneio de Domingo', data_inicio: '2026-08-09', data_fim: '2026-08-09', senha: SENHA_EVENTO })
+    const res = await request(app).post('/eventos').type('form').send({
+      nome: 'Torneio de Domingo',
+      data_inicio: '2026-08-09',
+      data_fim: '2026-08-09',
+      senha: SENHA_EVENTO
+    })
     expect(res.status).toBe(302)
     expect(res.headers.location).toMatch(/^\/eventos\/\d+/)
   })
 
   it('POST /eventos persiste o valor de aposta padrão', async () => {
-    const res = await request(app)
-      .post('/eventos')
-      .type('form')
-      .send({
-        nome: 'Com apostas',
-        data_inicio: '2026-08-09',
-        data_fim: '2026-08-10',
-        valor_aposta_padrao: '5.00',
-        senha: SENHA_EVENTO
-      })
+    const res = await request(app).post('/eventos').type('form').send({
+      nome: 'Com apostas',
+      data_inicio: '2026-08-09',
+      data_fim: '2026-08-10',
+      valor_aposta_padrao: '5.00',
+      senha: SENHA_EVENTO
+    })
     expect(res.status).toBe(302)
     const id = res.headers.location.match(/\/eventos\/(\d+)/)[1]
     expect(EventoService.obter(Number(id)).valor_aposta_padrao).toBe(5)
   })
 
   it('POST /eventos rejeita valor de aposta padrão negativo', async () => {
-    const res = await request(app)
-      .post('/eventos')
-      .type('form')
-      .send({
-        nome: 'Aposta negativa',
-        data_inicio: '2026-08-09',
-        data_fim: '2026-08-10',
-        valor_aposta_padrao: '-5',
-        senha: SENHA_EVENTO
-      })
+    const res = await request(app).post('/eventos').type('form').send({
+      nome: 'Aposta negativa',
+      data_inicio: '2026-08-09',
+      data_fim: '2026-08-10',
+      valor_aposta_padrao: '-5',
+      senha: SENHA_EVENTO
+    })
     expect(res.status).toBe(400)
     expect(res.text).toContain('valor da aposta padrão')
   })
@@ -175,12 +171,8 @@ describe('Rotas de eventos', () => {
       data_inicio: '2026-08-01',
       data_fim: '2026-08-02'
     })
-    const a = db
-      .prepare('INSERT INTO jogadores (evento_id, nome) VALUES (?, ?)')
-      .run(evento.id, 'João')
-    const b = db
-      .prepare('INSERT INTO jogadores (evento_id, nome) VALUES (?, ?)')
-      .run(evento.id, 'Maria')
+    const a = db.prepare('INSERT INTO jogadores (evento_id, nome) VALUES (?, ?)').run(evento.id, 'João')
+    const b = db.prepare('INSERT INTO jogadores (evento_id, nome) VALUES (?, ?)').run(evento.id, 'Maria')
     db.prepare(
       'INSERT INTO partidas (evento_id, jogador_a_id, jogador_b_id, vencedor_id) VALUES (?, ?, ?, ?)'
     ).run(evento.id, a.lastInsertRowid, b.lastInsertRowid, a.lastInsertRowid)

@@ -46,7 +46,9 @@ router.post('/eventos', eventoValidators.criar, (req, res) => {
 
   try {
     const evento = EventoService.criar(req.body)
-    res.redirect(`/eventos/${evento.id}?msg=${encodeURIComponent('Evento criado. Informe a senha definida para editar os dados.')}`)
+    res.redirect(
+      `/eventos/${evento.id}?msg=${encodeURIComponent('Evento criado. Informe a senha definida para editar os dados.')}`
+    )
   } catch (err) {
     res.status(400).render('pages/eventos/form', {
       title: 'Novo evento',
@@ -64,7 +66,8 @@ function carregarDadosEvento(eventoId) {
     .prepare('SELECT id, nome, apelido, ativo FROM jogadores WHERE evento_id = ? ORDER BY nome')
     .all(evento.id)
   const partidas = db
-    .prepare(`
+    .prepare(
+      `
       SELECT p.id, p.data_partida, p.valor_aposta, p.pago, pa.nome AS jogador_a, pb.nome AS jogador_b,
              pv.nome AS vencedor, p.jogador_a_id, p.jogador_b_id, p.vencedor_id
       FROM partidas p
@@ -73,7 +76,8 @@ function carregarDadosEvento(eventoId) {
       JOIN jogadores pv ON pv.id = p.vencedor_id
       WHERE p.evento_id = ?
       ORDER BY p.data_partida DESC, p.id DESC
-    `)
+    `
+    )
     .all(evento.id)
   const ranking = RankingService.gerar(evento.id)
   const financeiro = FinanceiroService.gerar(evento.id)
@@ -124,9 +128,7 @@ router.get('/eventos/:id/sorteio', (req, res) => {
   try {
     const vencedorId = Number(req.query.vencedor_id)
     const resultado = SorteioService.sugerirProximoAdversario(Number(req.params.id), vencedorId)
-    const vencedor = db
-      .prepare('SELECT id, nome, apelido FROM jogadores WHERE id = ?')
-      .get(vencedorId)
+    const vencedor = db.prepare('SELECT id, nome, apelido FROM jogadores WHERE id = ?').get(vencedorId)
     const ultimoAdversario = resultado.ultimoAdversario
       ? db.prepare('SELECT nome FROM jogadores WHERE id = ?').get(resultado.ultimoAdversario)
       : null

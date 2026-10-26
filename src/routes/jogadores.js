@@ -113,10 +113,7 @@ router.post('/eventos/:eventoId/jogadores/:id', exigirEvento, jogadorValidators.
 
 router.get('/eventos/:eventoId/jogadores/:id/campanha', (req, res) => {
   try {
-    const campanha = JogadorService.campanha(
-      Number(req.params.eventoId),
-      Number(req.params.id)
-    )
+    const campanha = JogadorService.campanha(Number(req.params.eventoId), Number(req.params.id))
     res.render('pages/jogadores/campanha', {
       title: `Campanha de ${campanha.jogador.nome}`,
       campanha

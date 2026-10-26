@@ -196,8 +196,20 @@ describe('FinanceiroService', () => {
     const b = JogadorService.criar({ evento_id: evento.id, nome: 'B' })
     const c = JogadorService.criar({ evento_id: evento.id, nome: 'C' })
 
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 10 })
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: c.id, vencedor_id: a.id, valor_aposta: 10 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10
+    })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: c.id,
+      vencedor_id: a.id,
+      valor_aposta: 10
+    })
 
     const fin = FinanceiroService.gerar(evento.id)
     const porNome = new Map(fin.jogadoresFinanceiros.map((l) => [l.jogador.nome, l]))
@@ -221,7 +233,13 @@ describe('FinanceiroService', () => {
     const a = JogadorService.criar({ evento_id: evento.id, nome: 'A' })
     const b = JogadorService.criar({ evento_id: evento.id, nome: 'B' })
 
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 0 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 0
+    })
 
     const fin = FinanceiroService.gerar(evento.id)
     expect(fin.totalMovimentado).toBe(0)
@@ -237,11 +255,29 @@ describe('FinanceiroService', () => {
     const d = JogadorService.criar({ evento_id: evento.id, nome: 'D' })
 
     // A vence B (10) — B deve 10 a A
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 10 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10
+    })
     // C vence D (6) — D deve 6 a C
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: c.id, jogador_b_id: d.id, vencedor_id: c.id, valor_aposta: 6 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: c.id,
+      jogador_b_id: d.id,
+      vencedor_id: c.id,
+      valor_aposta: 6
+    })
     // C vence B (4) — B deve 4 a C
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: b.id, jogador_b_id: c.id, vencedor_id: c.id, valor_aposta: 4 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: b.id,
+      jogador_b_id: c.id,
+      vencedor_id: c.id,
+      valor_aposta: 4
+    })
 
     const fin = FinanceiroService.gerar(evento.id)
     expect(fin.totalMovimentado).toBe(20)
@@ -257,9 +293,21 @@ describe('FinanceiroService', () => {
     const c = JogadorService.criar({ evento_id: evento.id, nome: 'C' })
 
     // A vence B (10) → B deve 10 a A
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 10 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10
+    })
     // C vence A (4) → A deve 4 a C
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: c.id, vencedor_id: c.id, valor_aposta: 4 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: c.id,
+      vencedor_id: c.id,
+      valor_aposta: 4
+    })
 
     const fin = FinanceiroService.gerar(evento.id)
     const porNome = new Map(fin.jogadoresFinanceiros.map((l) => [l.jogador.nome, l]))
@@ -287,8 +335,20 @@ describe('FinanceiroService', () => {
     const c = JogadorService.criar({ evento_id: evento.id, nome: 'C' })
 
     // A vence B (10) e depois C vence A (6)
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 10 })
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: c.id, vencedor_id: c.id, valor_aposta: 6 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10
+    })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: c.id,
+      vencedor_id: c.id,
+      valor_aposta: 6
+    })
     JogadorService.desistir(b.id)
 
     const fin = FinanceiroService.gerar(evento.id)
@@ -317,8 +377,20 @@ describe('FinanceiroService', () => {
     const c = JogadorService.criar({ evento_id: evento.id, nome: 'C' })
 
     // A vence B (10) → B deve 10 a A; B vence C (4) → C deve 4 a B
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 10 })
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: b.id, jogador_b_id: c.id, vencedor_id: b.id, valor_aposta: 4 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10
+    })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: b.id,
+      jogador_b_id: c.id,
+      vencedor_id: b.id,
+      valor_aposta: 4
+    })
 
     const proj = FinanceiroService.projetarDesistencia(evento.id, b.id)
     expect(proj.jogador.id).toBe(b.id)
@@ -337,9 +409,7 @@ describe('FinanceiroService', () => {
     const evento = criarEvento()
     const a = JogadorService.criar({ evento_id: evento.id, nome: 'A' })
     JogadorService.desistir(a.id)
-    expect(() => FinanceiroService.projetarDesistencia(evento.id, a.id)).toThrow(
-      'já está marcado'
-    )
+    expect(() => FinanceiroService.projetarDesistencia(evento.id, a.id)).toThrow('já está marcado')
   })
 
   it('ignora partidas pagas nos saldos e acertos (não pendentes)', () => {
@@ -349,9 +419,22 @@ describe('FinanceiroService', () => {
     const c = JogadorService.criar({ evento_id: evento.id, nome: 'C' })
 
     // A vence B (10) já quitada
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 10, pago: '1' })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10,
+      pago: '1'
+    })
     // C vence A (6) ainda pendente
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: c.id, vencedor_id: c.id, valor_aposta: 6 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: c.id,
+      vencedor_id: c.id,
+      valor_aposta: 6
+    })
 
     const fin = FinanceiroService.gerar(evento.id)
     const porNome = new Map(fin.jogadoresFinanceiros.map((l) => [l.jogador.nome, l]))
@@ -381,8 +464,22 @@ describe('FinanceiroService', () => {
     const a = JogadorService.criar({ evento_id: evento.id, nome: 'A' })
     const b = JogadorService.criar({ evento_id: evento.id, nome: 'B' })
 
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 10, pago: '1' })
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 4, pago: '1' })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10,
+      pago: '1'
+    })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 4,
+      pago: '1'
+    })
 
     const fin = FinanceiroService.gerar(evento.id)
     const porNome = new Map(fin.jogadoresFinanceiros.map((l) => [l.jogador.nome, l]))
@@ -401,9 +498,22 @@ describe('FinanceiroService', () => {
     const b = JogadorService.criar({ evento_id: evento.id, nome: 'B' })
 
     // A vence B (10) já paga — não deve obrigar B a pagar de novo
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 10, pago: '1' })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10,
+      pago: '1'
+    })
     // A vence B (6) pendente
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 6 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 6
+    })
 
     const proj = FinanceiroService.projetarDesistencia(evento.id, b.id)
     expect(proj.aPagar).toBe(6)
@@ -416,8 +526,21 @@ describe('FinanceiroService', () => {
     const b = JogadorService.criar({ evento_id: evento.id, nome: 'B' })
 
     // A vence B (10) já paga e depois A vence B (6) pendente
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 10, pago: '1' })
-    PartidaService.registrar({ evento_id: evento.id, jogador_a_id: a.id, jogador_b_id: b.id, vencedor_id: a.id, valor_aposta: 6 })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 10,
+      pago: '1'
+    })
+    PartidaService.registrar({
+      evento_id: evento.id,
+      jogador_a_id: a.id,
+      jogador_b_id: b.id,
+      vencedor_id: a.id,
+      valor_aposta: 6
+    })
     JogadorService.desistir(b.id)
 
     const fin = FinanceiroService.gerar(evento.id)

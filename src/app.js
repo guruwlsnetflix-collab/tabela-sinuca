@@ -32,9 +32,11 @@ Object.assign(app.locals, formatacao)
 app.use(cabecalhos)
 app.use(compression())
 if (config.env !== 'test') {
-  app.use(morgan(config.env === 'production' ? 'combined' : 'dev', {
-    skip: (req) => req.path === '/health'
-  }))
+  app.use(
+    morgan(config.env === 'production' ? 'combined' : 'dev', {
+      skip: (req) => req.path === '/health'
+    })
+  )
 }
 
 app.use(express.urlencoded({ extended: true, limit: '100kb' }))

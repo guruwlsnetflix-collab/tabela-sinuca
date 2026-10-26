@@ -74,7 +74,7 @@ describe('SorteioService', () => {
   })
 
   it('lança erro para vencedor de outro evento', () => {
-    const { evento, jogadores } = criarEventoComJogadores(['A', 'B'])
+    const { evento } = criarEventoComJogadores(['A', 'B'])
     const outro = EventoService.criar({
       nome: 'Outro',
       data_inicio: '2026-09-01',

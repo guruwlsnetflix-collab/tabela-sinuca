@@ -203,7 +203,9 @@ const TorneioService = {
 
     const jogadores = TorneioRepository.listarJogadores(torneio.id)
     if (jogadores.length !== TAMANHO_CHAVE) {
-      throw negar(`O sorteio só pode ser realizado com os ${TAMANHO_CHAVE} jogadores cadastrados (atualmente: ${jogadores.length}).`)
+      throw negar(
+        `O sorteio só pode ser realizado com os ${TAMANHO_CHAVE} jogadores cadastrados (atualmente: ${jogadores.length}).`
+      )
     }
 
     const jaSorteado = confrontosExistem(torneio.id)
@@ -329,8 +331,7 @@ const TorneioService = {
         vencedor_id: vencedorId
       })
 
-      const campoVencedor =
-        vencedorId === confronto.jogador_a_id ? 'placar_a' : 'placar_b'
+      const campoVencedor = vencedorId === confronto.jogador_a_id ? 'placar_a' : 'placar_b'
       ConfrontoRepository.somarPlacar(confronto.id, campoVencedor)
 
       const atualizado = ConfrontoRepository.obterPorId(confronto.id)
@@ -338,12 +339,7 @@ const TorneioService = {
         vencedorId === atualizado.jogador_a_id ? atualizado.placar_a : atualizado.placar_b
 
       if (placarVencedor >= atualizado.vitorias_necessarias) {
-        ConfrontoRepository.finalizar(
-          atualizado.id,
-          vencedorId,
-          atualizado.placar_a,
-          atualizado.placar_b
-        )
+        ConfrontoRepository.finalizar(atualizado.id, vencedorId, atualizado.placar_a, atualizado.placar_b)
         this._avancarVencedor(torneio.id, atualizado, vencedorId)
         return ConfrontoRepository.obterPorId(atualizado.id)
       }
@@ -388,17 +384,14 @@ const TorneioService = {
 
     if (confronto.numero < 15) {
       const destino = AVANCO_CHAVE[confronto.numero]
-      const proximo = destino
-        ? ConfrontoRepository.obterPorNumero(torneio.id, destino.proximo)
-        : null
+      const proximo = destino ? ConfrontoRepository.obterPorNumero(torneio.id, destino.proximo) : null
       if (proximo && ConfrontoRepository.contarPartidas(proximo.id) > 0) {
         throw negar('Desfaça antes os resultados do confronto seguinte.')
       }
     }
 
     const executar = db.transaction(() => {
-      const campoVencedor =
-        ultima.vencedor_id === confronto.jogador_a_id ? 'placar_a' : 'placar_b'
+      const campoVencedor = ultima.vencedor_id === confronto.jogador_a_id ? 'placar_a' : 'placar_b'
       ConfrontoRepository.subtrairPlacar(confronto.id, campoVencedor)
       ConfrontoRepository.excluirPartida(ultima.id)
 
@@ -411,9 +404,7 @@ const TorneioService = {
         } else {
           TorneioRepository.atualizarStatus(torneio.id, 'em_andamento')
           const destino = AVANCO_CHAVE[confronto.numero]
-          const proximo = destino
-            ? ConfrontoRepository.obterPorNumero(torneio.id, destino.proximo)
-            : null
+          const proximo = destino ? ConfrontoRepository.obterPorNumero(torneio.id, destino.proximo) : null
           if (proximo) {
             const campo = destino && destino.lado === 'a' ? 'jogador_a_id' : 'jogador_b_id'
             if (campo === 'jogador_a_id') {
@@ -423,11 +414,7 @@ const TorneioService = {
             }
           }
         }
-        ConfrontoRepository.reabrir(
-          atualizado.id,
-          atualizado.placar_a,
-          atualizado.placar_b
-        )
+        ConfrontoRepository.reabrir(atualizado.id, atualizado.placar_a, atualizado.placar_b)
         if (totalPartidas === 0) {
           ConfrontoRepository.setStatus(atualizado.id, 'aguardando')
         }
@@ -445,9 +432,7 @@ const TorneioService = {
   // ---------------- Estado para views ----------------
 
   _mesasOcupadas(torneioId) {
-    return ConfrontoRepository.listarPorTorneio(torneioId).filter(
-      (c) => c.status === 'em_andamento'
-    ).length
+    return ConfrontoRepository.listarPorTorneio(torneioId).filter((c) => c.status === 'em_andamento').length
   },
 
   obterEstado(torneioId) {
@@ -488,9 +473,7 @@ const TorneioService = {
       classificados: confCompletos
         .filter((c) => c.status === 'finalizado' && c.vencedor_id)
         .map((c) => ({ numero: c.numero, vencedor: c.vencedor_nome })),
-      proximosConfrontos: confCompletos.filter(
-        (c) => c.status === 'aguardando' && c.preparado
-      )
+      proximosConfrontos: confCompletos.filter((c) => c.status === 'aguardando' && c.preparado)
     }
   },
   faseLabel
@@ -509,7 +492,12 @@ function calcularFaseAtual(torneio, confrontos) {
   }
   const emAndamento = confrontos.find((c) => c.status === 'em_andamento')
   if (emAndamento) {
-    return { key: emAndamento.fase, label: emAndamento.faseLabel, fase: emAndamento.fase, confronto: emAndamento }
+    return {
+      key: emAndamento.fase,
+      label: emAndamento.faseLabel,
+      fase: emAndamento.fase,
+      confronto: emAndamento
+    }
   }
   const proximo = confrontos.find((c) => c.status === 'aguardando' && c.preparado)
   if (proximo) {

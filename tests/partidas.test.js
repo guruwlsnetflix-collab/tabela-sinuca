@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import request from 'supertest'
 
 const app = require('../src/app')
 const db = require('../src/db')
@@ -184,7 +183,12 @@ describe('Rotas de partidas', () => {
     const res = await agente
       .post(`/eventos/${evento.id}/partidas`)
       .type('form')
-      .send({ jogador_a_id: String(a.id), jogador_b_id: String(b.id), vencedor_id: String(a.id), valor_aposta: '' })
+      .send({
+        jogador_a_id: String(a.id),
+        jogador_b_id: String(b.id),
+        vencedor_id: String(a.id),
+        valor_aposta: ''
+      })
     expect(res.status).toBe(302)
     expect(res.headers.location).toBe(`/eventos/${evento.id}?msg=Partida%20registrada%20com%20sucesso.`)
     expect(PartidaService.listarPorEvento(evento.id)[0].valor_aposta).toBe(7)

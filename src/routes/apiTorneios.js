@@ -46,9 +46,7 @@ function serializarEstado(estado) {
       ? {
           key: estado.faseAtual.key,
           label: estado.faseAtual.label,
-          confronto: estado.faseAtual.confronto
-            ? serializarConfronto(estado.faseAtual.confronto)
-            : null
+          confronto: estado.faseAtual.confronto ? serializarConfronto(estado.faseAtual.confronto) : null
         }
       : null
   }

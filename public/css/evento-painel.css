@@ -15,16 +15,23 @@
   --ep-ok: #2fd16f;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
 }
 
 body.epainel {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   background: var(--ep-bg);
   color: var(--ep-texto);
   display: flex;
@@ -149,7 +156,9 @@ body.epainel {
   border-radius: 999px;
   padding: 10px 22px;
   cursor: pointer;
-  transition: background var(--p-transition, 0.2s), border-color var(--p-transition, 0.2s);
+  transition:
+    background var(--p-transition, 0.2s),
+    border-color var(--p-transition, 0.2s);
 }
 
 .ep-voltar:hover,
@@ -228,8 +237,12 @@ body.epainel {
   box-shadow: 0 0 26px rgba(255, 215, 94, 0.2);
 }
 
-.ep-rank--top2 { border-color: rgba(203, 213, 225, 0.35); }
-.ep-rank--top3 { border-color: rgba(180, 140, 90, 0.35); }
+.ep-rank--top2 {
+  border-color: rgba(203, 213, 225, 0.35);
+}
+.ep-rank--top3 {
+  border-color: rgba(180, 140, 90, 0.35);
+}
 
 .ep-rank__pos {
   flex: 0 0 auto;
@@ -274,8 +287,12 @@ body.epainel {
 }
 
 /* ---------- Cores utilitárias ---------- */
-.ep-ok { color: var(--ep-ok); }
-.ep-no { color: var(--ep-vivo); }
+.ep-ok {
+  color: var(--ep-ok);
+}
+.ep-no {
+  color: var(--ep-vivo);
+}
 
 /* ---------- Financeiro: saldos ---------- */
 .ep-saldos {
