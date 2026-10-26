@@ -1561,3 +1561,187 @@ html {
 @media (min-width: 576px) and (max-width: 767.98px) {
   .p-financeiro__jogadores { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ---------- Marca ---------- */
+.p-brand__logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  box-shadow: var(--p-glow-green);
+  flex-shrink: 0;
+}
+
+.p-topbar .nav-link.active {
+  color: var(--p-text);
+  background: var(--p-card-2);
+}
+
+/* ---------- Rodapé ---------- */
+.p-footer__brand {
+  font-weight: 700;
+  color: var(--p-text);
+}
+
+.p-footer__version {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--p-border);
+}
+
+.p-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 18px;
+}
+
+.p-footer__links a {
+  color: var(--p-muted);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.p-footer__links a:hover {
+  color: var(--p-primary);
+}
+
+/* ---------- Login ---------- */
+.p-login {
+  max-width: 420px;
+  margin: clamp(8px, 4vh, 48px) auto 0;
+}
+
+.p-login__head {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.p-login__logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  box-shadow: var(--p-glow-green);
+  margin-bottom: 16px;
+}
+
+.p-login__help {
+  list-style: none;
+  padding: 0;
+  margin: 20px 4px 0;
+  display: grid;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--p-muted);
+}
+
+.p-login__help li {
+  padding-left: 18px;
+  position: relative;
+}
+
+.p-login__help li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--p-primary);
+}
+
+.p-login__help a {
+  color: var(--p-primary);
+  font-weight: 600;
+}
+
+.p-password {
+  position: relative;
+}
+
+.p-password .form-control {
+  padding-right: 52px;
+}
+
+.p-password__toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--p-radius-xs);
+  background: transparent;
+  color: var(--p-muted);
+}
+
+.p-password__toggle:hover,
+.p-password__toggle[aria-pressed="true"] {
+  color: var(--p-text);
+  background: var(--p-card-2);
+}
+
+/* ---------- Páginas de erro ---------- */
+.p-error {
+  max-width: 520px;
+  margin: clamp(16px, 8vh, 80px) auto;
+  text-align: center;
+}
+
+.p-error__ball {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #4b5563, #111827 55%, #030712);
+  box-shadow: var(--p-shadow);
+}
+
+.p-error__ball span {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  color: #111827;
+  font-weight: 800;
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-error__code {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--p-primary);
+  margin-bottom: 6px;
+}
+
+.p-error__detail {
+  margin: 16px auto 0;
+  padding: 12px 14px;
+  text-align: left;
+  white-space: pre-wrap;
+  font-size: 0.8rem;
+  color: var(--p-danger);
+  background: var(--p-card);
+  border: 1px solid var(--p-border);
+  border-radius: var(--p-radius-xs);
+}
+
+@media print {
+  .p-footer {
+    display: none !important;
+  }
+}

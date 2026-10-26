@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="<%= telaFirestick ? 'width=1600' : 'width=device-width, initial-scale=1.0' %>">
   <meta name="theme-color" content="#0B1020">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
   <title><%= evento.nome %> — Painel | Tabela de Sinuca</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +30,7 @@
       <h1 class="ep-title"><%= evento.nome %></h1>
       <div class="ep-sub">
         <span class="ep-chip <%= statusClasse %>"><%= statusLabel[evento.status] %></span>
-        <span class="ep-chip"><%= evento.data_inicio %> → <%= evento.data_fim %></span>
+        <span class="ep-chip"><%= formatarPeriodo(evento.data_inicio, evento.data_fim) %></span>
         <span class="ep-chip">Aposta padrão: <%= fmtMoeda(evento.valor_aposta_padrao) %></span>
       </div>
     </div>

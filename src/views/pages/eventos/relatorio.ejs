@@ -34,8 +34,8 @@
     <h1 class="report__title">🏆 <%= evento.nome %></h1>
     <div class="report__meta">
       <span>Status: <strong><%= statusLabel[evento.status] %></strong></span>
-      <span>Início: <strong><%= evento.data_inicio %></strong></span>
-      <span>Fim: <strong><%= evento.data_fim %></strong></span>
+      <span>Início: <strong><%= formatarData(evento.data_inicio) %></strong></span>
+      <span>Fim: <strong><%= formatarData(evento.data_fim) %></strong></span>
       <span>Aposta padrão: <strong><%= fmtMoeda(evento.valor_aposta_padrao) %></strong></span>
       <span>Gerado em: <strong><%= new Date().toLocaleString('pt-BR') %></strong></span>
     </div>

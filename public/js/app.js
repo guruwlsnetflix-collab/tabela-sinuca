@@ -123,11 +123,38 @@
     })
   }
 
+  /* ---------- Mostrar/ocultar senha ---------- */
+  function initToggleSenha() {
+    document.querySelectorAll('[data-toggle-senha]').forEach((botao) => {
+      const campo = document.getElementById(botao.dataset.toggleSenha)
+      if (!campo) return
+      botao.addEventListener('click', () => {
+        const visivel = campo.type === 'password'
+        campo.type = visivel ? 'text' : 'password'
+        botao.setAttribute('aria-pressed', String(visivel))
+        botao.setAttribute('aria-label', visivel ? 'Ocultar senha' : 'Mostrar senha')
+        campo.focus()
+      })
+    })
+  }
+
+  /* ---------- Botão "Voltar" ---------- */
+  function initVoltar() {
+    document.querySelectorAll('[data-voltar]').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        if (window.history.length > 1) window.history.back()
+        else window.location.href = '/'
+      })
+    })
+  }
+
   /* ---------- Inicialização ---------- */
   document.addEventListener('DOMContentLoaded', () => {
     initScrollSpy()
     initBars()
     initRipple()
     initConfirmForms()
+    initToggleSenha()
+    initVoltar()
   })
 })()

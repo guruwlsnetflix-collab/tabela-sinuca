@@ -1,21 +1,22 @@
 <%- include('../../partials/header', { title }) %>
 
-<div class="row justify-content-center">
-  <div class="col-12 col-md-6 col-lg-5">
-    <div class="mb-4">
-      <h1 class="p-page__title h2 mb-1">Entrar</h1>
-      <p class="p-page__subtitle mb-0">Acesso para edição dos dados</p>
-    </div>
+<div class="p-login">
+  <div class="p-login__head">
+    <img class="p-login__logo" src="/img/logo.svg" alt="" width="64" height="64">
+    <h1 class="p-page__title h2 mb-1">Área do organizador</h1>
+    <p class="p-page__subtitle mb-0">Entre para cadastrar e editar eventos e torneios</p>
+  </div>
 
-    <% if (erro) { %>
-      <div class="p-alert p-alert--danger mb-4" role="alert"><%= erro %></div>
-    <% } %>
+  <% if (erro) { %>
+    <div class="p-alert p-alert--danger mb-3" role="alert"><%= erro %></div>
+  <% } %>
 
-    <form method="POST" action="/login" class="p-card">
-      <div class="p-card__body">
-        <input type="hidden" name="next" value="<%= next %>">
-        <div class="p-field">
-          <label for="senha" class="form-label">Senha</label>
+  <form method="POST" action="/login" class="p-card">
+    <div class="p-card__body">
+      <input type="hidden" name="next" value="<%= next %>">
+      <div class="p-field">
+        <label for="senha" class="form-label">Senha</label>
+        <div class="p-password">
           <input
             type="password"
             class="form-control"
@@ -27,22 +28,22 @@
             maxlength="60"
             placeholder="Digite a senha"
           >
-          <div class="form-text mt-2">
-            Informe a senha do evento ou do torneio para poder editar os dados dele.
-            A senha mestra dá acesso a todos os eventos e torneios.
-            Sem senha você acompanha tudo como visitante (somente leitura).
-          </div>
-        </div>
-
-        <div class="d-grid gap-2 d-md-flex mt-4">
-          <button type="submit" class="btn p-btn p-btn--primary flex-shrink-0">
-            Entrar
+          <button type="button" class="p-password__toggle" data-toggle-senha="senha"
+                  aria-label="Mostrar senha" aria-pressed="false">
+            <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
-          <a href="/" class="btn p-btn p-btn--outline">Voltar</a>
         </div>
       </div>
-    </form>
-  </div>
+
+      <button type="submit" class="btn p-btn p-btn--primary w-100 mt-4">Entrar</button>
+    </div>
+  </form>
+
+  <ul class="p-login__help">
+    <li>A <strong>senha do evento ou do torneio</strong> libera a edição apenas dele.</li>
+    <li>A <strong>senha mestra</strong> dá acesso a todos os eventos e torneios.</li>
+    <li>Sem senha você acompanha tudo como visitante (somente leitura). <a href="/">Ver eventos</a></li>
+  </ul>
 </div>
 
 <%- include('../../partials/footer') %>
