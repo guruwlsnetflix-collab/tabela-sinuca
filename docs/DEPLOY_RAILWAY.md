@@ -44,14 +44,21 @@ deploy). Para não perder os dados do banco, criamos um **volume** persistente:
 1. No serviço, abra a aba **Variables**.
 2. Adicione as variáveis:
 
-   | Variável        | Valor             |
-   | --------------- | ----------------- |
-   | `DATABASE_PATH` | `/data/sinuca.db` |
-   | `PORT`          | `8080`            |
+   | Variável         | Valor             |
+   | ---------------- | ----------------- |
+   | `DATABASE_PATH`  | `/data/sinuca.db` |
+   | `PORT`           | `8080`            |
+   | `SENHA_MAESTRA`  | _senha forte_     |
+   | `SESSION_SECRET` | _texto aleatório_ |
 
    `PORT=8080` é essencial: a Railway usa o valor da variável `PORT` para o
    **healthcheck** e para rotear o tráfego (default é `8080`). Sem ela, o app
    pode subir em outra porta e o healthcheck falha com _service unavailable_.
+
+   `SENHA_MAESTRA` é a senha de administrador (acesso a todos os eventos e
+   torneios). **Sem ela, uma senha aleatória é gerada a cada reinício** e só
+   aparece nos logs. `SESSION_SECRET` assina o cookie de login; gere um valor
+   com `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
 
    `DATABASE_PATH=/data/sinuca.db` garante que o arquivo SQLite seja gravado
    **dentro do volume** montado em `/data`.
