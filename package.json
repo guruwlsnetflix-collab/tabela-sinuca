@@ -1,6 +1,6 @@
 {
   "name": "tabela-sinuca",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Gestão de eventos e torneios de sinuca: jogadores, partidas, chaveamento mata-mata, ranking, financeiro e painel ao vivo para TV.",
   "type": "commonjs",
   "main": "src/server.js",
