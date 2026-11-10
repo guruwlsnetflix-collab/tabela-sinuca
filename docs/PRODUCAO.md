@@ -90,6 +90,20 @@ npm run db:init   # aplica alterações de esquema, mantendo os dados
 pm2 restart sinuca   # ou pare e rode npm start de novo
 ```
 
+### Publicar em um servidor remoto (VM)
+
+Com acesso SSH ao servidor, rode a partir do seu computador:
+
+```bash
+npm run publicar            # publica a branch main do GitHub
+npm run publicar -- status  # mostra versão, processo e saúde do app
+```
+
+O script faz backup do banco, atualiza o código, reinstala as dependências,
+reinicia o processo do pm2 e confere `/health`. Se o app não responder,
+volta sozinho para a versão anterior. Servidor, chave SSH e pastas são
+configurados por variáveis `SINUCA_*` (veja o topo de `scripts/publicar.sh`).
+
 ## Acesso pela internet (opcional)
 
 Para acompanhar de fora da rede local, coloque o app atrás de um proxy com
