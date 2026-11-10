@@ -77,11 +77,9 @@
       </div>
 
       <div class="p-field mt-3">
-        <label for="modalidade" class="form-label">Modalidade *</label>
-        <select id="modalidade" name="modalidade" class="form-select">
-          <option value="par" <%= (torneio.modalidade || 'par') === 'par' ? 'selected' : '' %>>Par</option>
-          <option value="impar" <%= torneio.modalidade === 'impar' ? 'selected' : '' %>>Ímpar</option>
-        </select>
+        <label for="modalidade" class="form-label">Modalidade</label>
+        <input type="text" id="modalidade" class="form-control" value="Par ou Ímpar" readonly>
+        <input type="hidden" name="modalidade" value="<%= torneio.modalidade || 'par' %>">
         <% if (erros && erros.modalidade) { %>
           <div class="invalid-feedback d-block"><%= erros.modalidade %></div>
         <% } %>

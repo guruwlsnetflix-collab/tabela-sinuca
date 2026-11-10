@@ -14,9 +14,10 @@ const STATUS_LABEL = {
   cancelado: 'Cancelado'
 }
 
+// Modalidade única exibida: valores antigos ('par'/'impar') continuam válidos no banco
 const MODALIDADE_LABEL = {
-  par: 'Par',
-  impar: 'Ímpar'
+  par: 'Par ou Ímpar',
+  impar: 'Par ou Ímpar'
 }
 
 const CONFRONTO_STATUS_LABEL = {
