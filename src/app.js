@@ -48,9 +48,11 @@ app.use((req, res, next) => {
   // Destaca o item do menu correspondente à página atual
   res.locals.secaoAtual = req.path.startsWith('/torneios')
     ? 'torneios'
-    : req.path === '/' || req.path.startsWith('/eventos')
+    : req.path.startsWith('/eventos')
       ? 'eventos'
-      : null
+      : req.path === '/'
+        ? 'inicio'
+        : null
   next()
 })
 app.use(verificarOrigem)

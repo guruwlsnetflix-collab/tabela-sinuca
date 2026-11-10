@@ -1,0 +1,17 @@
+<%
+  // Busca + filtro por situação (aplicados no navegador por public/js/app.js).
+  // Espera: alvo (id da lista), placeholder
+%>
+<div class="p-toolbar" data-filtro="<%= alvo %>">
+  <div class="p-search">
+    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="search" class="form-control" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>" data-filtro-busca>
+  </div>
+  <div class="p-chips" role="group" aria-label="Filtrar por situação">
+    <button type="button" class="p-chip is-active" data-filtro-status="">Todos</button>
+    <button type="button" class="p-chip" data-filtro-status="em_andamento">Em andamento</button>
+    <button type="button" class="p-chip" data-filtro-status="planejado">Planejados</button>
+    <button type="button" class="p-chip" data-filtro-status="encerrado">Encerrados</button>
+  </div>
+</div>
+<p class="p-empty-filtro d-none" data-filtro-vazio="<%= alvo %>">Nenhum resultado para esse filtro.</p>

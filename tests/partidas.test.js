@@ -349,12 +349,12 @@ describe('Rotas de partidas', () => {
     expect(PartidaService.obter(partida.id).pago).toBe(0)
   })
 
-  it('POST /partidas/:id/pago redireciona com erro para partida inexistente', async () => {
+  it('POST /partidas/:id/pago responde 404 para partida inexistente', async () => {
     const { evento } = criarCenario()
     const agente = await agenteMestre(app)
     const res = await agente.post(`/eventos/${evento.id}/partidas/99999/pago`)
-    expect(res.status).toBe(302)
-    expect(res.headers.location).toContain(encodeURIComponent('Partida não encontrada.'))
+    expect(res.status).toBe(404)
+    expect(res.text).toContain('Partida não encontrada.')
   })
 
   it('GET form de edição exibe checkbox marcado quando a partida está paga', async () => {

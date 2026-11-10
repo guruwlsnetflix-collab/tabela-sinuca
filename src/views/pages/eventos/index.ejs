@@ -1,0 +1,38 @@
+<%- include('../../partials/header', { title }) %>
+
+<% if (msg) { %>
+  <div class="p-alert p-alert--success mb-4" role="status"><%= msg %></div>
+<% } %>
+<% if (erro) { %>
+  <div class="p-alert p-alert--danger mb-4" role="alert"><%= erro %></div>
+<% } %>
+
+<div class="d-flex align-items-center justify-content-between mb-4 gap-3">
+  <div class="min-w-0">
+    <h1 class="p-page__title h2 mb-0">Eventos</h1>
+    <p class="p-page__subtitle mb-0">Rodadas livres com ranking, apostas e acerto de contas</p>
+  </div>
+  <a href="/eventos/novo" class="btn btn-primary p-btn p-btn--primary flex-shrink-0">
+    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+    Novo evento
+  </a>
+</div>
+
+<% if (eventos.length === 0) { %>
+  <div class="p-empty">
+    <div class="p-empty__icon" aria-hidden="true">🎱</div>
+    <div>
+      <p class="fw-semibold mb-1">Nenhum evento cadastrado ainda</p>
+      <p class="mb-0">Crie o primeiro evento para começar.</p>
+    </div>
+  </div>
+<% } else { %>
+  <%- include('../../partials/filtroLista', { alvo: 'lista-eventos', placeholder: 'Buscar evento pelo nome' }) %>
+  <div class="p-event-list p-stagger" id="lista-eventos">
+    <% eventos.forEach((e) => { %>
+      <%- include('../../partials/cardEvento', { e }) %>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../../partials/footer') %>

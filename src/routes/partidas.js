@@ -23,6 +23,16 @@ function jogadoresParaForm(jogadores, partida) {
   return jogadores.filter((j) => j.ativo === 1 || presentes.has(j.id))
 }
 
+// A partida da URL precisa pertencer ao evento da URL (ver routes/jogadores.js)
+router.param('id', (req, res, next, id) => {
+  try {
+    PartidaService.obterDoEvento(Number(req.params.eventoId), Number(id))
+    next()
+  } catch (err) {
+    renderErro(res, err)
+  }
+})
+
 function renderForm(res, { evento, jogadores, partida, erros }) {
   const editando = Boolean(partida && partida.id)
   const status = erros ? 400 : 200

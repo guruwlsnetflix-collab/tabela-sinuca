@@ -58,19 +58,24 @@
       </div>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item d-none d-md-block">
-            <a class="nav-link <%= secaoAtual === 'eventos' ? 'active' : '' %>" href="/"<%- secaoAtual === 'eventos' ? ' aria-current="page"' : '' %>>Eventos</a>
+          <li class="nav-item">
+            <a class="nav-link <%= secaoAtual === 'inicio' ? 'active' : '' %>" href="/"<%- secaoAtual === 'inicio' ? ' aria-current="page"' : '' %>>Início</a>
           </li>
-          <li class="nav-item d-none d-md-block">
+          <li class="nav-item">
+            <a class="nav-link <%= secaoAtual === 'eventos' ? 'active' : '' %>" href="/eventos"<%- secaoAtual === 'eventos' ? ' aria-current="page"' : '' %>>Eventos</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link <%= secaoAtual === 'torneios' ? 'active' : '' %>" href="/torneios"<%- secaoAtual === 'torneios' ? ' aria-current="page"' : '' %>>Torneios</a>
           </li>
           <li class="nav-item ms-md-2 mt-2 mt-md-0">
             <% if (typeof sessao !== 'undefined' && sessao) { %>
+              <% var qtdAcessos = sessao.eventos.length + sessao.torneios.length %>
               <form method="POST" action="/logout" class="d-flex align-items-center gap-2">
-                <span class="badge <%= sessao.nivel === 'mestre' ? 'text-bg-warning' : 'text-bg-secondary' %> px-2 py-1">
-                  <%= sessao.nivel === 'mestre' ? 'Mestre' : (sessao.nivel === 'evento' ? 'Evento' : 'Torneio') %>
+                <span class="p-session-pill <%= sessao.mestre ? 'p-session-pill--mestre' : '' %>"
+                      title="<%= sessao.mestre ? 'Acesso a todos os eventos e torneios' : 'Você administra ' + qtdAcessos + ' evento(s)/torneio(s) neste aparelho' %>">
+                  <%= sessao.mestre ? 'Administrador geral' : 'Organizador · ' + qtdAcessos %>
                 </span>
-                <button type="submit" class="btn btn-sm p-btn p-btn--outline">Sair</button>
+                <button type="submit" class="btn btn-sm p-btn p-btn--outline p-btn--sm">Sair</button>
               </form>
             <% } else { %>
               <a class="nav-link p-auth-link" href="/login">Entrar</a>

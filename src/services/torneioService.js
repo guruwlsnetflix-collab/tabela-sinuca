@@ -158,6 +158,15 @@ const TorneioService = {
     return TorneioRepository.listarJogadores(torneioId)
   },
 
+  // Garante que o jogador pertence ao torneio da URL
+  obterJogador(torneioId, jogadorId) {
+    const jogador = TorneioRepository.obterJogador(jogadorId)
+    if (!jogador || jogador.torneio_id !== Number(torneioId)) {
+      throw negar('Jogador não encontrado.', 404)
+    }
+    return jogador
+  },
+
   _bloquearAlteracaoDeJogador(torneio) {
     if (!['planejado', 'cadastro_jogadores'].includes(torneio.status)) {
       throw negar('Não é possível alterar jogadores após o sorteio do torneio.')

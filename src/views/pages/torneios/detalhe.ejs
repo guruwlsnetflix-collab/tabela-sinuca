@@ -19,7 +19,17 @@
   <div class="p-alert p-alert--danger mb-4" role="alert"><%= erro %></div>
 <% } %>
 
-<%= t.status === 'finalizado' && t.vencedor_nome ? '<div class="p-alert p-alert--success mb-4 fs-5 fw-semibold" role="status">🏆 CAMPEÃO DO TORNEIO: ' + t.vencedor_nome + '</div>' : '' %>
+<%- include('../../partials/modoAcesso', { tipo: 'torneios', item: t, podeAdministrar: podeEditar }) %>
+
+<% if (t.status === 'finalizado' && t.vencedor_nome) { %>
+  <div class="p-campeao mb-4" role="status">
+    <div class="p-campeao__trofeu" aria-hidden="true">🏆</div>
+    <div>
+      <p class="p-campeao__rotulo mb-0">Campeão do torneio</p>
+      <p class="p-campeao__nome mb-0"><%= t.vencedor_nome %></p>
+    </div>
+  </div>
+<% } %>
 
 <!-- ============ CABEÇALHO ============ -->
 <section class="p-section" style="margin-top:0">

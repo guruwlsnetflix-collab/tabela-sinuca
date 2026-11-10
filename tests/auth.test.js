@@ -71,14 +71,14 @@ describe('Autenticação', () => {
     expect(res.headers.location).toMatch(/^\/eventos\/\d+/)
   })
 
-  it('visita sem login não consegue editar dados do evento (redireciona para /login)', async () => {
+  it('visita sem login não consegue editar dados do evento (redireciona para a tela de acesso)', async () => {
     const evento = criarEventoComSenha()
     const res = await request(app)
       .post(`/eventos/${evento.id}/status`)
       .type('form')
       .send({ status: 'em_andamento' })
     expect(res.status).toBe(302)
-    expect(res.headers.location).toContain('/login')
+    expect(res.headers.location).toContain('/acesso')
     expect(EventoService.obter(evento.id).status).toBe('planejado')
   })
 
@@ -114,7 +114,7 @@ describe('Autenticação', () => {
       .type('form')
       .send({ status: 'em_andamento' })
     expect(alheio.status).toBe(302)
-    expect(alheio.headers.location).toContain('/login')
+    expect(alheio.headers.location).toContain('/acesso')
     expect(EventoService.obter(outro.id).status).toBe('planejado')
   })
 
@@ -186,13 +186,13 @@ describe('Autenticação', () => {
       .type('form')
       .send({ nome: 'Jogador' })
     expect(visitante.status).toBe(302)
-    expect(visitante.headers.location).toContain('/login')
+    expect(visitante.headers.location).toContain('/acesso')
 
     criarEventoComSenha()
     const agente = await agenteEvento(app)
     const comoEvento = await agente.post(`/torneios/${id}/jogadores`).type('form').send({ nome: 'Jogador' })
     expect(comoEvento.status).toBe(302)
-    expect(comoEvento.headers.location).toContain('/login')
+    expect(comoEvento.headers.location).toContain('/acesso')
 
     const form = await request(app).get('/torneios/novo')
     expect(form.status).toBe(200)
@@ -232,7 +232,7 @@ describe('Autenticação', () => {
       .type('form')
       .send({ nome: 'Jogador' })
     expect(alheioRes.status).toBe(302)
-    expect(alheioRes.headers.location).toContain('/login')
+    expect(alheioRes.headers.location).toContain('/acesso')
     expect(TorneioService.listarJogadores(alheio.id)).toHaveLength(0)
   })
 
@@ -246,6 +246,6 @@ describe('Autenticação', () => {
       .type('form')
       .send({ status: 'em_andamento' })
     expect(res.status).toBe(302)
-    expect(res.headers.location).toContain('/login')
+    expect(res.headers.location).toContain('/acesso')
   })
 })

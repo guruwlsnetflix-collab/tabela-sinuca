@@ -57,6 +57,10 @@ const TorneioRepository = {
     return db.prepare('SELECT id, nome, senha_hash FROM torneios WHERE senha_hash IS NOT NULL').all()
   },
 
+  obterSenha(id) {
+    return db.prepare('SELECT id, senha_hash FROM torneios WHERE id = ? AND senha_hash IS NOT NULL').get(id)
+  },
+
   atualizarSenha(id, senha_hash) {
     db.prepare('UPDATE torneios SET senha_hash = ? WHERE id = ?').run(senha_hash, id)
     return this.obterPorId(id)

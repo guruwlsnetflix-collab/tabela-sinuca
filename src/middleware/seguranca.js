@@ -28,10 +28,23 @@ const cabecalhos = helmet({
 
 function hostDaUrl(valor) {
   try {
-    return new URL(valor).host
+    const url = new URL(valor)
+    return { host: url.host, hostname: url.hostname }
   } catch (_err) {
     return null
   }
+}
+
+function hostDaReq(req) {
+  let hostHeader = req.get('host') || ''
+  // Quando atrás de proxy reverso confiável, prioriza o host encaminhado
+  if (config.trustProxy) {
+    hostHeader = req.get('x-forwarded-host') || hostHeader
+  }
+  if (!hostHeader) return { host: '', hostname: '' }
+  // Remove porta se presente (exceto colchetes IPv6)
+  const hostSemPorta = hostHeader.replace(/:\d+$/, '')
+  return { host: hostHeader, hostname: hostSemPorta }
 }
 
 // Proteção contra CSRF: requisições que alteram dados precisam vir do próprio
@@ -42,11 +55,37 @@ function verificarOrigem(req, res, next) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next()
   const origem = req.get('origin') || req.get('referer')
   if (!origem) return next()
-  if (hostDaUrl(origem) === req.get('host')) return next()
+
+  const origemInfo = hostDaUrl(origem)
+  const reqInfo = hostDaReq(req)
+
+  if (!origemInfo) return next()
+
+  // Comparação exata por host (com porta)
+  if (origemInfo.host === reqInfo.host) return next()
+
+  // Comparação por hostname (ignora porta)
+  if (origemInfo.hostname && reqInfo.hostname && origemInfo.hostname === reqInfo.hostname) {
+    return next()
+  }
+
+  // Aceita equivalentes localhost
+  const locais = ['localhost', '127.0.0.1', '::1']
+  if (
+    origemInfo.hostname &&
+    reqInfo.hostname &&
+    locais.includes(origemInfo.hostname) &&
+    locais.includes(reqInfo.hostname)
+  ) {
+    return next()
+  }
+
   renderErro(res, { status: 403, message: 'Requisição bloqueada: origem não autorizada.' })
 }
 
-// Limita tentativas de senha erradas por IP para impedir força bruta.
+// Limita tentativas de senha erradas por IP para impedir força bruta. O mesmo
+// contador vale para o login geral e para o acesso a cada evento/torneio.
+// Rotas com tela própria definem req.renderLimite para exibir o aviso nela.
 const limiteLogin = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: config.loginMaxTentativas,
@@ -54,9 +93,11 @@ const limiteLogin = rateLimit({
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   handler: (req, res) => {
+    const mensagem = 'Muitas tentativas de senha. Aguarde 15 minutos e tente novamente.'
+    if (typeof req.renderLimite === 'function') return req.renderLimite(mensagem)
     res.status(429).render('pages/auth/login', {
       title: 'Entrar',
-      erro: 'Muitas tentativas de login. Aguarde 15 minutos e tente novamente.',
+      erro: mensagem,
       next: '/'
     })
   }

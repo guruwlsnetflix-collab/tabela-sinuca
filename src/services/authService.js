@@ -5,6 +5,7 @@ const EventoRepository = require('../repositories/eventoRepository')
 const TorneioRepository = require('../repositories/torneioRepository')
 
 const NOME_COOKIE = 'sinuca_sessao'
+const MAX_ACESSOS = 40
 
 function hashSenha(senha) {
   const salt = crypto.randomBytes(16).toString('hex')
@@ -55,12 +56,58 @@ function buscarTorneioPorSenha(senha) {
 }
 
 function autenticar(senha) {
-  if (ehSenhaMaestra(senha)) return { nivel: 'mestre' }
+  if (ehSenhaMaestra(senha)) return { mestre: true }
   const evento = buscarEventoPorSenha(senha)
-  if (evento) return { nivel: 'evento', eventos: [evento.id] }
+  if (evento) return { eventos: [evento.id] }
   const torneio = buscarTorneioPorSenha(senha)
-  if (torneio) return { nivel: 'torneio', torneios: [torneio.id] }
+  if (torneio) return { torneios: [torneio.id] }
   return null
+}
+
+// Valida a senha de um evento específico (ou a senha mestra). Diferente de
+// autenticar(), funciona mesmo que dois eventos usem a mesma senha.
+function autenticarEvento(eventoId, senha) {
+  if (ehSenhaMaestra(senha)) return { mestre: true }
+  const evento = EventoRepository.obterSenha(Number(eventoId))
+  if (evento && verificarSenha(senha, evento.senha_hash)) return { eventos: [evento.id] }
+  return null
+}
+
+function autenticarTorneio(torneioId, senha) {
+  if (ehSenhaMaestra(senha)) return { mestre: true }
+  const torneio = TorneioRepository.obterSenha(Number(torneioId))
+  if (torneio && verificarSenha(senha, torneio.senha_hash)) return { torneios: [torneio.id] }
+  return null
+}
+
+// Sessão normalizada: { mestre, eventos: [ids], torneios: [ids] }. Um mesmo
+// aparelho pode administrar vários eventos e torneios ao mesmo tempo.
+// Aceita também o formato antigo ({ nivel, eventos | torneios }).
+function normalizarSessao(payload) {
+  if (!payload || typeof payload !== 'object') return null
+  const ids = (lista) =>
+    Array.isArray(lista) ? [...new Set(lista.map(Number).filter((n) => Number.isInteger(n) && n > 0))] : []
+  const sessao = {
+    mestre: payload.mestre === true || payload.nivel === 'mestre',
+    eventos: ids(payload.eventos),
+    torneios: ids(payload.torneios)
+  }
+  if (!sessao.mestre && sessao.eventos.length === 0 && sessao.torneios.length === 0) return null
+  return sessao
+}
+
+// Soma o novo acesso ao que a sessão já tinha. Acima do limite, os acessos
+// mais antigos são descartados para o cookie não crescer indefinidamente.
+function mesclarSessao(atual, novo) {
+  const vazia = { mestre: false, eventos: [], torneios: [] }
+  const a = normalizarSessao(atual) || vazia
+  const n = normalizarSessao(novo) || vazia
+  const juntar = (x, y) => [...new Set([...x, ...y])].slice(-MAX_ACESSOS)
+  return {
+    mestre: a.mestre || n.mestre,
+    eventos: juntar(a.eventos, n.eventos),
+    torneios: juntar(a.torneios, n.torneios)
+  }
 }
 
 function assinar(corpo) {
@@ -93,7 +140,8 @@ function lerToken(token) {
 }
 
 function definirSessao(req, res, payload) {
-  const token = criarToken({ ...payload, exp: Date.now() + config.duracaoSessaoMs })
+  const sessao = mesclarSessao(req.sessao, payload)
+  const token = criarToken({ ...sessao, exp: Date.now() + config.duracaoSessaoMs })
   res.cookie(NOME_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',
@@ -101,6 +149,8 @@ function definirSessao(req, res, payload) {
     secure: req.secure,
     maxAge: config.duracaoSessaoMs
   })
+  req.sessao = sessao
+  return sessao
 }
 
 function limparSessao(req, res) {
@@ -118,7 +168,7 @@ function lerSessao(req) {
       token = decodeURIComponent(parte.slice(i + 1).trim())
     }
   })
-  return lerToken(token)
+  return normalizarSessao(lerToken(token))
 }
 
 const AuthService = {
@@ -127,6 +177,10 @@ const AuthService = {
   verificarSenha,
   ehSenhaMaestra,
   autenticar,
+  autenticarEvento,
+  autenticarTorneio,
+  normalizarSessao,
+  mesclarSessao,
   definirSessao,
   limparSessao,
   lerSessao

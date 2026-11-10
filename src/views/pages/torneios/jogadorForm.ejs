@@ -1,10 +1,20 @@
 <%- include('../../partials/header', { title }) %>
 
+<% var editandoJogador = Boolean(jogador && jogador.id) %>
 <div class="mb-4">
+  <a href="/torneios/<%= torneio.id %>" class="p-link-back">← <%= torneio.nome %></a>
   <h1 class="p-page__title h2 mb-1"><%= title %></h1>
-  <p class="p-page__subtitle mb-0"><%= torneio.nome %></p>
+  <% if (!editandoJogador) { %>
+    <p class="p-page__subtitle mb-2"><%= totalJogadores %>/<%= tamanhoChave %> jogadores inscritos</p>
+    <div class="p-progress" role="progressbar" aria-valuemin="0" aria-valuemax="<%= tamanhoChave %>" aria-valuenow="<%= totalJogadores %>">
+      <div class="p-progress__fill" style="width: <%= Math.round((totalJogadores / tamanhoChave) * 100) %>%"></div>
+    </div>
+  <% } %>
 </div>
 
+<% if (msg) { %>
+  <div class="p-alert p-alert--success mb-4" role="status"><%= msg %></div>
+<% } %>
 <% if (erros && erros.geral) { %>
   <div class="p-alert p-alert--danger mb-4" role="alert"><%= erros.geral %></div>
 <% } %>
@@ -22,6 +32,7 @@
           name="nome"
           value="<%= jogador.nome %>"
           required
+          autofocus
           maxlength="120"
           placeholder="Nome do jogador"
         >
@@ -56,8 +67,8 @@
       </div>
 
       <div class="d-grid gap-2 d-md-flex mt-4">
-        <button type="submit" class="btn p-btn p-btn--primary">Salvar</button>
-        <a href="/torneios/<%= torneio.id %>" class="btn p-btn p-btn--outline">Cancelar</a>
+        <button type="submit" class="btn p-btn p-btn--primary"><%= editandoJogador ? 'Salvar' : 'Cadastrar e continuar' %></button>
+        <a href="/torneios/<%= torneio.id %>" class="btn p-btn p-btn--outline"><%= editandoJogador ? 'Cancelar' : 'Concluir' %></a>
       </div>
     </div>
   </div>

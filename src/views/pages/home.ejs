@@ -1,52 +1,157 @@
-<%- include('../partials/header', { title: 'Tabela de Sinuca' }) %>
+<%- include('../partials/header', { title }) %>
 
-<% if (typeof msg !== 'undefined' && msg) { %>
+<% if (msg) { %>
   <div class="p-alert p-alert--success mb-4" role="status"><%= msg %></div>
 <% } %>
-<% if (typeof erro !== 'undefined' && erro) { %>
+<% if (erro) { %>
   <div class="p-alert p-alert--danger mb-4" role="alert"><%= erro %></div>
 <% } %>
 
-<div class="d-flex align-items-center justify-content-between mb-4 gap-3">
-  <div class="min-w-0">
-    <h1 class="p-page__title h2 mb-0">Eventos</h1>
-    <p class="p-page__subtitle mb-0">Campeonatos e rodadas da sua galera</p>
-  </div>
-  <a href="/eventos/novo" class="btn btn-primary p-btn p-btn--primary flex-shrink-0">
-      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-      Novo evento
-    </a>
-</div>
-
-<% if (eventos.length === 0) { %>
-  <div class="p-empty">
-    <div class="p-empty__icon">
-      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-    </div>
-    <div>
-      <p class="fw-semibold mb-1">Nenhum evento cadastrado ainda</p>
-      <p class="mb-0">Crie o primeiro evento para começar.</p>
-    </div>
-  </div>
-<% } else { %>
-  <div class="p-event-list p-stagger">
-    <% eventos.forEach((e) => { %>
-      <a href="/eventos/<%= e.id %>" class="p-event-card">
-        <div class="p-event-card__icon" aria-hidden="true">🎱</div>
-        <div class="p-event-card__main">
-          <div class="p-event-card__name"><%= e.nome %></div>
-          <div class="p-event-card__dates">
-            <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-            <%= formatarPeriodo(e.data_inicio, e.data_fim) %>
-          </div>
-          <span class="badge text-bg-secondary mt-2">
-            <%= e.status === 'em_andamento' ? 'Em andamento' : (e.status === 'planejado' ? 'Planejado' : 'Encerrado') %>
-          </span>
-        </div>
-        <svg class="p-icon p-event-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+<!-- ============ APRESENTAÇÃO ============ -->
+<section class="p-landing">
+  <div class="p-landing__felt" aria-hidden="true"></div>
+  <div class="p-landing__content">
+    <p class="p-landing__kicker">Sinuca organizada, do primeiro taco ao campeão</p>
+    <h1 class="p-landing__title">Monte seu evento ou torneio em minutos</h1>
+    <p class="p-landing__lead">
+      Cadastre jogadores, registre partidas, acompanhe ranking, chaveamento e acertos financeiros —
+      e deixe todo mundo seguir o placar ao vivo pelo celular ou pela TV.
+    </p>
+    <div class="p-landing__ctas">
+      <a href="/eventos/novo" class="btn p-btn p-btn--primary">
+        <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        Criar evento
       </a>
-    <% }) %>
+      <a href="/torneios/novo" class="btn p-btn p-btn--gold">
+        <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        Criar torneio
+      </a>
+    </div>
+    <dl class="p-landing__stats">
+      <div><dt>Eventos</dt><dd><%= totais.eventos %></dd></div>
+      <div><dt>Torneios</dt><dd><%= totais.torneios %></dd></div>
+      <div><dt>Partidas jogadas</dt><dd><%= totais.partidas %></dd></div>
+    </dl>
   </div>
+</section>
+
+<!-- ============ COMO FUNCIONA ============ -->
+<section class="p-section">
+  <div class="p-features">
+    <div class="p-feature">
+      <div class="p-feature__icon p-stat__icon--green" aria-hidden="true">🎱</div>
+      <div>
+        <h2 class="p-feature__title">Evento</h2>
+        <p class="p-feature__text">Rodadas livres com ranking, sorteio de adversário, apostas e acerto de contas entre os jogadores.</p>
+      </div>
+    </div>
+    <div class="p-feature">
+      <div class="p-feature__icon p-stat__icon--gold" aria-hidden="true">🏆</div>
+      <div>
+        <h2 class="p-feature__title">Torneio</h2>
+        <p class="p-feature__text">Mata-mata com 16 jogadores: sorteio da chave, controle de mesas e placar de cada confronto.</p>
+      </div>
+    </div>
+    <div class="p-feature">
+      <div class="p-feature__icon p-stat__icon--blue" aria-hidden="true">🔒</div>
+      <div>
+        <h2 class="p-feature__title">Você no controle</h2>
+        <p class="p-feature__text">Cada evento e torneio tem a própria senha. Sem ela, qualquer pessoa acompanha, mas não altera nada.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ADMINISTRADOS POR MIM ============ -->
+<% if (administrados.eventos.length || administrados.torneios.length) { %>
+  <section class="p-section">
+    <h2 class="p-section__title">
+      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+      Você administra
+    </h2>
+    <div class="p-event-list p-stagger">
+      <% administrados.eventos.forEach((e) => { %>
+        <%- include('../partials/cardEvento', { e }) %>
+      <% }) %>
+      <% administrados.torneios.forEach((t) => { %>
+        <%- include('../partials/cardTorneio', { t, torneioStatusLabel }) %>
+      <% }) %>
+    </div>
+  </section>
 <% } %>
+
+<!-- ============ AO VIVO ============ -->
+<% if (aoVivo.eventos.length || aoVivo.torneios.length) { %>
+  <section class="p-section">
+    <h2 class="p-section__title">
+      <span class="p-live-dot" aria-hidden="true"></span>
+      Acontecendo agora
+    </h2>
+    <div class="p-event-list p-stagger">
+      <% aoVivo.torneios.forEach((t) => { %>
+        <%- include('../partials/cardTorneio', { t, torneioStatusLabel }) %>
+      <% }) %>
+      <% aoVivo.eventos.forEach((e) => { %>
+        <%- include('../partials/cardEvento', { e }) %>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+
+<!-- ============ VISTOS RECENTEMENTE (preenchido no navegador) ============ -->
+<section class="p-section d-none" id="recentes" aria-labelledby="recentes-titulo">
+  <h2 class="p-section__title" id="recentes-titulo">
+    <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    Vistos recentemente
+  </h2>
+  <div class="p-chips" id="recentes-lista"></div>
+</section>
+
+<!-- ============ ÚLTIMOS ============ -->
+<div class="row g-4 mt-1">
+  <section class="col-lg-6">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h2 class="p-section__title mb-0">Eventos recentes</h2>
+      <a href="/eventos" class="p-link-more">Ver todos →</a>
+    </div>
+    <% if (eventos.length === 0) { %>
+      <div class="p-empty">
+        <div class="p-empty__icon" aria-hidden="true">🎱</div>
+        <div>
+          <p class="fw-semibold mb-1">Nenhum evento ainda</p>
+          <p class="mb-0"><a href="/eventos/novo">Crie o primeiro</a> e chame a galera.</p>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="p-event-list">
+        <% eventos.slice(0, 5).forEach((e) => { %>
+          <%- include('../partials/cardEvento', { e }) %>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+
+  <section class="col-lg-6">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h2 class="p-section__title mb-0">Torneios recentes</h2>
+      <a href="/torneios" class="p-link-more">Ver todos →</a>
+    </div>
+    <% if (torneios.length === 0) { %>
+      <div class="p-empty">
+        <div class="p-empty__icon" aria-hidden="true">🏆</div>
+        <div>
+          <p class="fw-semibold mb-1">Nenhum torneio ainda</p>
+          <p class="mb-0"><a href="/torneios/novo">Crie o primeiro</a> e monte a chave.</p>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="p-event-list">
+        <% torneios.slice(0, 5).forEach((t) => { %>
+          <%- include('../partials/cardTorneio', { t, torneioStatusLabel }) %>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+</div>
 
 <%- include('../partials/footer') %>

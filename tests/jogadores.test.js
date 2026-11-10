@@ -133,7 +133,9 @@ describe('Rotas de jogadores', () => {
       .type('form')
       .send({ nome: 'Maria', apelido: 'Mari', telefone: '11999999999' })
     expect(res.status).toBe(302)
-    expect(res.headers.location).toBe(`/eventos/${evento.id}?msg=Jogador%20cadastrado%20com%20sucesso.`)
+    expect(res.headers.location).toBe(
+      `/eventos/${evento.id}/jogadores/novo?msg=Jogador%20cadastrado%20com%20sucesso.`
+    )
   })
 
   it('POST /eventos/:id/jogadores rejeita nome vazio', async () => {
@@ -156,7 +158,9 @@ describe('Rotas de jogadores', () => {
       .type('form')
       .send({ nome: 'Mariano', apelido: '', telefone: '' })
     expect(res.status).toBe(302)
-    expect(res.headers.location).toBe(`/eventos/${evento.id}?msg=Jogador%20cadastrado%20com%20sucesso.`)
+    expect(res.headers.location).toBe(
+      `/eventos/${evento.id}/jogadores/novo?msg=Jogador%20cadastrado%20com%20sucesso.`
+    )
   })
 
   it('POST /eventos/:id/jogadores/:id/desistir marca e informa o acerto de saída', async () => {

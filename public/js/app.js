@@ -148,6 +148,124 @@
     })
   }
 
+  /* ---------- Aviso flutuante ---------- */
+  function mostrarAviso(texto) {
+    let aviso = document.querySelector('.p-toast')
+    if (!aviso) {
+      aviso = document.createElement('div')
+      aviso.className = 'p-toast'
+      aviso.setAttribute('role', 'status')
+      document.body.appendChild(aviso)
+    }
+    aviso.textContent = texto
+    aviso.classList.add('is-visible')
+    clearTimeout(mostrarAviso.timer)
+    mostrarAviso.timer = setTimeout(() => aviso.classList.remove('is-visible'), 2400)
+  }
+
+  /* ---------- Busca e filtro por situação nas listagens ---------- */
+  function initFiltros() {
+    document.querySelectorAll('[data-filtro]').forEach((barra) => {
+      const lista = document.getElementById(barra.dataset.filtro)
+      if (!lista) return
+      const busca = barra.querySelector('[data-filtro-busca]')
+      const chips = barra.querySelectorAll('[data-filtro-status]')
+      const vazio = document.querySelector(`[data-filtro-vazio="${barra.dataset.filtro}"]`)
+      let status = ''
+
+      const normalizar = (s) =>
+        String(s || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[̀-ͯ]/g, '')
+
+      const aplicar = () => {
+        const termo = normalizar(busca ? busca.value.trim() : '')
+        let visiveis = 0
+        lista.querySelectorAll('[data-busca]').forEach((item) => {
+          const ok =
+            (!termo || normalizar(item.dataset.busca).includes(termo)) &&
+            (!status || item.dataset.status === status)
+          item.hidden = !ok
+          if (ok) visiveis += 1
+        })
+        if (vazio) vazio.classList.toggle('d-none', visiveis > 0)
+      }
+
+      if (busca) busca.addEventListener('input', aplicar)
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          status = chip.dataset.filtroStatus
+          chips.forEach((c) => c.classList.toggle('is-active', c === chip))
+          aplicar()
+        })
+      })
+    })
+  }
+
+  /* ---------- Compartilhar link (WhatsApp, etc.) ---------- */
+  function initCompartilhar() {
+    document.querySelectorAll('[data-compartilhar]').forEach((botao) => {
+      botao.addEventListener('click', async () => {
+        const url = window.location.origin + window.location.pathname
+        const titulo = botao.dataset.titulo || document.title
+        try {
+          if (navigator.share) {
+            await navigator.share({ title: titulo, text: `Acompanhe ${titulo} ao vivo`, url })
+            return
+          }
+          await navigator.clipboard.writeText(url)
+          mostrarAviso('Link copiado! Cole no WhatsApp para a galera acompanhar.')
+        } catch (err) {
+          if (err && err.name === 'AbortError') return
+          window.prompt('Copie o link:', url)
+        }
+      })
+    })
+  }
+
+  /* ---------- Vistos recentemente (guardado só neste navegador) ---------- */
+  const CHAVE_RECENTES = 'sinuca-recentes'
+
+  function lerRecentes() {
+    try {
+      const lista = JSON.parse(localStorage.getItem(CHAVE_RECENTES) || '[]')
+      return Array.isArray(lista) ? lista : []
+    } catch (_err) {
+      return []
+    }
+  }
+
+  function initRecentes() {
+    const atual = document.querySelector('[data-recente]')
+    if (atual) {
+      try {
+        const item = JSON.parse(atual.dataset.recente)
+        const lista = lerRecentes().filter((r) => !(r.tipo === item.tipo && r.id === item.id))
+        lista.unshift(item)
+        localStorage.setItem(CHAVE_RECENTES, JSON.stringify(lista.slice(0, 8)))
+      } catch (_err) {
+        // Armazenamento indisponível (aba anônima, etc.): apenas não registra
+      }
+    }
+
+    const secao = document.getElementById('recentes')
+    const alvo = document.getElementById('recentes-lista')
+    if (!secao || !alvo) return
+    const recentes = lerRecentes().filter(
+      (r) => r && ['eventos', 'torneios'].includes(r.tipo) && Number.isInteger(r.id)
+    )
+    if (!recentes.length) return
+    recentes.forEach((r) => {
+      const link = document.createElement('a')
+      link.className = 'p-chip'
+      link.href = `/${r.tipo}/${r.id}`
+      link.textContent = `${r.tipo === 'eventos' ? '🎱' : '🏆'} ${r.nome}`
+      alvo.appendChild(link)
+    })
+    secao.classList.remove('d-none')
+  }
+
   /* ---------- Inicialização ---------- */
   document.addEventListener('DOMContentLoaded', () => {
     initScrollSpy()
@@ -156,5 +274,8 @@
     initConfirmForms()
     initToggleSenha()
     initVoltar()
+    initFiltros()
+    initCompartilhar()
+    initRecentes()
   })
 })()

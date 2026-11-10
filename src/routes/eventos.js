@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator')
 
 const router = express.Router()
 
+const AuthService = require('../services/authService')
 const EventoService = require('../services/eventoService')
 const SorteioService = require('../services/sorteioService')
 const RankingService = require('../services/rankingService')
@@ -46,8 +47,10 @@ router.post('/eventos', eventoValidators.criar, (req, res) => {
 
   try {
     const evento = EventoService.criar(req.body)
+    // Quem cria já sai administrando; a senha serve para outros aparelhos
+    AuthService.definirSessao(req, res, { eventos: [evento.id] })
     res.redirect(
-      `/eventos/${evento.id}?msg=${encodeURIComponent('Evento criado. Informe a senha definida para editar os dados.')}`
+      `/eventos/${evento.id}?msg=${encodeURIComponent('Evento criado! Você já está administrando. Guarde a senha para acessar de outros aparelhos.')}`
     )
   } catch (err) {
     res.status(400).render('pages/eventos/form', {
@@ -220,7 +223,7 @@ router.post('/eventos/:id/status', exigirEvento, eventoValidators.status, (req, 
 router.post('/eventos/:id/excluir', exigirEvento, (req, res) => {
   try {
     EventoService.excluir(Number(req.params.id))
-    res.redirect('/?msg=Evento excluído.')
+    res.redirect('/eventos?msg=' + encodeURIComponent('Evento excluído.'))
   } catch (err) {
     res.redirect(`/eventos/${req.params.id}?erro=${encodeURIComponent(err.message)}`)
   }

@@ -1,25 +1,19 @@
 const AuthService = require('../services/authService')
 
+function podeEditarEvento(sessao, eventoId) {
+  return Boolean(sessao && (sessao.mestre || sessao.eventos.includes(Number(eventoId))))
+}
+
+function podeEditarTorneio(sessao, torneioId) {
+  return Boolean(sessao && (sessao.mestre || sessao.torneios.includes(Number(torneioId))))
+}
+
 function carregarSessao(req, res, next) {
   req.sessao = AuthService.lerSessao(req)
   res.locals.sessao = req.sessao
-  res.locals.ehMestre = Boolean(req.sessao && req.sessao.nivel === 'mestre')
-  res.locals.podeEditarEvento = (eventoId) =>
-    Boolean(
-      req.sessao &&
-      (req.sessao.nivel === 'mestre' ||
-        (req.sessao.nivel === 'evento' &&
-          Array.isArray(req.sessao.eventos) &&
-          req.sessao.eventos.includes(Number(eventoId))))
-    )
-  res.locals.podeEditarTorneio = (torneioId) =>
-    Boolean(
-      req.sessao &&
-      (req.sessao.nivel === 'mestre' ||
-        (req.sessao.nivel === 'torneio' &&
-          Array.isArray(req.sessao.torneios) &&
-          req.sessao.torneios.includes(Number(torneioId))))
-    )
+  res.locals.ehMestre = Boolean(req.sessao && req.sessao.mestre)
+  res.locals.podeEditarEvento = (eventoId) => podeEditarEvento(req.sessao, eventoId)
+  res.locals.podeEditarTorneio = (torneioId) => podeEditarTorneio(req.sessao, torneioId)
   next()
 }
 
@@ -28,29 +22,37 @@ function redirecionarParaLogin(req, res) {
   res.redirect(`/login?next=${encodeURIComponent(destino)}`)
 }
 
+// Sem permissão, leva à tela de acesso do próprio evento/torneio, onde basta
+// informar a senha dele (ou a mestra). Depois volta para onde o usuário estava.
+// Em POSTs, volta para a página de detalhe, pois o formulário não é repetível.
+function redirecionarParaAcesso(req, res, tipo, id) {
+  const destino = req.method === 'GET' ? req.originalUrl : `/${tipo}/${id}`
+  res.redirect(`/${tipo}/${id}/acesso?next=${encodeURIComponent(destino)}`)
+}
+
 function exigirMestre(req, res, next) {
-  if (req.sessao && req.sessao.nivel === 'mestre') return next()
+  if (req.sessao && req.sessao.mestre) return next()
   return redirecionarParaLogin(req, res)
 }
 
 function exigirEvento(req, res, next) {
-  if (!req.sessao) return redirecionarParaLogin(req, res)
-  if (req.sessao.nivel === 'mestre') return next()
-  if (req.sessao.nivel === 'evento') {
-    const eventoId = Number(req.params.eventoId || req.params.id)
-    if (Array.isArray(req.sessao.eventos) && req.sessao.eventos.includes(eventoId)) return next()
-  }
-  return redirecionarParaLogin(req, res)
+  const eventoId = Number(req.params.eventoId || req.params.id)
+  if (podeEditarEvento(req.sessao, eventoId)) return next()
+  return redirecionarParaAcesso(req, res, 'eventos', eventoId)
 }
 
 function exigirTorneio(req, res, next) {
-  if (!req.sessao) return redirecionarParaLogin(req, res)
-  if (req.sessao.nivel === 'mestre') return next()
-  if (req.sessao.nivel === 'torneio') {
-    const torneioId = Number(req.params.eventoId || req.params.id)
-    if (Array.isArray(req.sessao.torneios) && req.sessao.torneios.includes(torneioId)) return next()
-  }
-  return redirecionarParaLogin(req, res)
+  const torneioId = Number(req.params.id)
+  if (podeEditarTorneio(req.sessao, torneioId)) return next()
+  return redirecionarParaAcesso(req, res, 'torneios', torneioId)
 }
 
-module.exports = { carregarSessao, exigirMestre, exigirTorneio, exigirEvento, redirecionarParaLogin }
+module.exports = {
+  carregarSessao,
+  exigirMestre,
+  exigirTorneio,
+  exigirEvento,
+  redirecionarParaLogin,
+  podeEditarEvento,
+  podeEditarTorneio
+}
