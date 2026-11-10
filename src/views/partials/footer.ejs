@@ -7,10 +7,10 @@
         <span class="p-footer__version">v<%= appVersao %></span>
       </div>
       <nav class="p-footer__links" aria-label="Links do rodapé">
-        <a href="/">Eventos</a>
+        <a href="/eventos">Eventos</a>
         <a href="/torneios">Torneios</a>
         <% if (typeof sessao !== 'undefined' && sessao) { %>
-          <span>Conectado como <%= sessao.nivel === 'mestre' ? 'mestre' : (sessao.nivel === 'evento' ? 'organizador do evento' : 'organizador do torneio') %></span>
+          <span>Conectado como <%= sessao.mestre ? 'administrador geral' : 'organizador' %></span>
         <% } else { %>
           <a href="/login">Área do organizador</a>
         <% } %>

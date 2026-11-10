@@ -106,22 +106,35 @@
 
       <div class="p-field mt-3">
         <label for="senha" class="form-label"><%= modoEdicao ? 'Senha do torneio' : 'Senha do torneio *' %></label>
-        <input
-          type="password"
-          class="form-control <%= erros && erros.senha ? 'is-invalid' : '' %>"
-          id="senha"
-          name="senha"
-          autocomplete="new-password"
-          maxlength="60"
-          placeholder="<%= modoEdicao ? 'Deixe em branco para manter a atual' : 'Senha para liberar a edição deste torneio' %>"
-        >
+        <div class="p-password">
+          <input
+            type="password"
+            class="form-control <%= erros && erros.senha ? 'is-invalid' : '' %>"
+            id="senha"
+            name="senha"
+            autocomplete="new-password"
+            maxlength="60"
+            minlength="6"
+            placeholder="<%= modoEdicao ? 'Deixe em branco para manter a atual' : 'Senha para liberar a edição deste torneio' %>"
+          >
+          <button type="button" class="p-password__toggle" data-toggle-senha="senha"
+                  aria-label="Mostrar senha" aria-pressed="false">
+            <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <% if (!modoEdicao) { %>
+          <div class="p-alert p-alert--warning mt-2 mb-0 py-2 small">
+            <strong>Anote esta senha.</strong> Neste aparelho você já entra administrando, mas ela será
+            pedida para editar o torneio em outro celular ou computador.
+          </div>
+        <% } %>
         <div class="form-text mt-1">
           Esta senha vale somente para este torneio.
           Quem informar poderá editar jogadores, partidas e resultados.
           Os visitantes sem senha acompanham apenas como leitura.
         </div>
         <% if (erros && erros.senha) { %>
-          <div class="invalid-feedback"><%= erros.senha %></div>
+          <div class="invalid-feedback d-block"><%= erros.senha %></div>
         <% } %>
       </div>
 

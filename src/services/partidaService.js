@@ -51,6 +51,15 @@ const PartidaService = {
     return partida
   },
 
+  // Garante que a partida pertence ao evento da URL (ver JogadorService.obterDoEvento)
+  obterDoEvento(eventoId, id) {
+    const partida = PartidaRepository.obterPorId(id)
+    if (!partida || partida.evento_id !== Number(eventoId)) {
+      throw new PartidaNaoEncontradaError()
+    }
+    return partida
+  },
+
   registrar({ evento_id, jogador_a_id, jogador_b_id, vencedor_id, data_partida, valor_aposta, pago }) {
     const evento = EventoService.obter(evento_id)
     if (evento.status === 'encerrado') {

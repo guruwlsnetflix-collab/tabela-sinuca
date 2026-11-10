@@ -30,21 +30,33 @@ function textoAcerto(projecao) {
   return linhas.join('; ')
 }
 
-function renderForm(res, { evento, jogador, erros }) {
+// O jogador da URL precisa pertencer ao evento da URL: impede que quem
+// administra um evento altere dados de outro trocando o id no endereço
+router.param('id', (req, res, next, id) => {
+  try {
+    JogadorService.obterDoEvento(Number(req.params.eventoId), Number(id))
+    next()
+  } catch (err) {
+    renderErro(res, err)
+  }
+})
+
+function renderForm(res, { evento, jogador, erros, msg }) {
   const editando = Boolean(jogador && jogador.id)
   const status = erros ? 400 : 200
   res.status(status).render('pages/jogadores/form', {
     title: editando ? 'Editar jogador' : 'Novo jogador',
     evento,
     jogador: jogador || { nome: '', apelido: '', telefone: '' },
-    erros
+    erros,
+    msg: msg || null
   })
 }
 
 router.get('/eventos/:eventoId/jogadores/novo', exigirEvento, (req, res) => {
   try {
     const evento = EventoService.obter(Number(req.params.eventoId))
-    renderForm(res, { evento, jogador: null, erros: null })
+    renderForm(res, { evento, jogador: null, erros: null, msg: req.query.msg || null })
   } catch (err) {
     renderErro(res, err)
   }
@@ -65,7 +77,9 @@ router.post('/eventos/:eventoId/jogadores', exigirEvento, jogadorValidators.cria
 
   try {
     JogadorService.criar({ ...req.body, evento_id: eventoId })
-    res.redirect(`/eventos/${eventoId}?msg=Jogador cadastrado com sucesso.`)
+    res.redirect(
+      `/eventos/${eventoId}/jogadores/novo?msg=${encodeURIComponent('Jogador cadastrado com sucesso.')}`
+    )
   } catch (err) {
     renderForm(res, {
       evento,

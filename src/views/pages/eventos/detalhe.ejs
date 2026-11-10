@@ -39,6 +39,8 @@
   <div class="p-alert p-alert--danger mb-4" role="alert"><%= erro %></div>
 <% } %>
 
+<%- include('../../partials/modoAcesso', { tipo: 'eventos', item: evento, podeAdministrar: podeEditarEvento(evento.id) }) %>
+
 <!-- ============ DASHBOARD ============ -->
 <section id="dashboard" data-nav-target="dashboard" class="p-section" style="margin-top:0">
   <div class="p-hero">

@@ -63,19 +63,56 @@
       </div>
 
       <div class="row g-3 mt-0">
-        <div class="col-md-6 p-field">
-          <label for="vencedor_id" class="form-label">Vencedor *</label>
-          <select class="form-select <%= erros && erros.vencedor_id ? 'is-invalid' : '' %>"
-                  id="vencedor_id" name="vencedor_id" required>
-            <option value="">Selecione...</option>
-            <% jogadores.forEach((j) => { %>
-              <option value="<%= j.id %>" <%= String(partida.vencedor_id) === String(j.id) ? 'selected' : '' %>>
-                <%= j.nome %><%= j.apelido ? ' (' + j.apelido + ')' : '' %>
-              </option>
-            <% }) %>
-          </select>
+        <div class="col-12 p-field">
+          <label class="form-label">Vencedor *</label>
+          <div class="p-vencedor-grid">
+            <input
+              class="d-none"
+              type="radio"
+              name="vencedor_id"
+              id="vencedor_a"
+              value="<%= partida.jogador_a_id || '' %>"
+              <%= String(partida.vencedor_id) && String(partida.vencedor_id) === String(partida.jogador_a_id) ? 'checked' : '' %>
+            >
+            <label class="p-vencedor-card <%= !(partida.jogador_a_id) ? 'p-vencedor-card--disabled' : '' %>" for="vencedor_a" id="card-vencedor-a">
+              <div class="p-vencedor-card__inner">
+                <div class="p-vencedor-card__avatar">A</div>
+                <div class="p-vencedor-card__info">
+                  <div class="p-vencedor-card__nome" id="nome-vencedor-a">Selecione o Jogador A</div>
+                  <div class="p-vencedor-card__hint">Toque para marcar como vencedor</div>
+                </div>
+                <div class="p-vencedor-card__check" aria-hidden="true">
+                  <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+              </div>
+            </label>
+
+            <div class="p-vencedor-vs">VS</div>
+
+            <input
+              class="d-none"
+              type="radio"
+              name="vencedor_id"
+              id="vencedor_b"
+              value="<%= partida.jogador_b_id || '' %>"
+              <%= String(partida.vencedor_id) && String(partida.vencedor_id) === String(partida.jogador_b_id) ? 'checked' : '' %>
+            >
+            <label class="p-vencedor-card <%= !(partida.jogador_b_id) ? 'p-vencedor-card--disabled' : '' %>" for="vencedor_b" id="card-vencedor-b">
+              <div class="p-vencedor-card__inner">
+                <div class="p-vencedor-card__avatar">B</div>
+                <div class="p-vencedor-card__info">
+                  <div class="p-vencedor-card__nome" id="nome-vencedor-b">Selecione o Jogador B</div>
+                  <div class="p-vencedor-card__hint">Toque para marcar como vencedor</div>
+                </div>
+                <div class="p-vencedor-card__check" aria-hidden="true">
+                  <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+              </div>
+            </label>
+          </div>
+          <div class="form-text mt-2" id="aviso-vencedor">Selecione os dois jogadores para definir o vencedor.</div>
           <% if (erros && erros.vencedor_id) { %>
-            <div class="invalid-feedback"><%= erros.vencedor_id %></div>
+            <div class="text-danger small mt-1"><%= erros.vencedor_id %></div>
           <% } %>
         </div>
 
@@ -146,43 +183,89 @@
 (function () {
   const a = document.getElementById('jogador_a_id')
   const b = document.getElementById('jogador_b_id')
-  const v = document.getElementById('vencedor_id')
-  if (!a || !b || !v) return
+  const radioA = document.getElementById('vencedor_a')
+  const radioB = document.getElementById('vencedor_b')
+  const cardA = document.getElementById('card-vencedor-a')
+  const cardB = document.getElementById('card-vencedor-b')
+  const nomeA = document.getElementById('nome-vencedor-a')
+  const nomeB = document.getElementById('nome-vencedor-b')
+  const aviso = document.getElementById('aviso-vencedor')
 
-  function opcoes(select) {
-    return Array.from(select.options).filter((o) => o.value !== '')
+  if (!a || !b) return
+
+  function nomeDoSelect(select) {
+    const opt = select.options[select.selectedIndex]
+    if (!opt || !opt.value) return ''
+    return opt.textContent.trim()
   }
 
-  function idsPermitidos() {
-    return [a.value, b.value].filter(Boolean)
-  }
+  function atualizar() {
+    const na = nomeDoSelect(a)
+    const nb = nomeDoSelect(b)
+    const va = a.value
+    const vb = b.value
 
-  function ajustarVencedor() {
-    const ids = idsPermitidos()
-    opcoes(v).forEach((o) => {
-      o.disabled = !ids.includes(o.value)
+    if (nomeA) nomeA.textContent = na || 'Selecione o Jogador A'
+    if (nomeB) nomeB.textContent = nb || 'Selecione o Jogador B'
+
+    if (radioA) {
+      radioA.value = va || ''
+      if (va) {
+        radioA.disabled = false
+      } else {
+        radioA.disabled = true
+        if (radioA.checked) radioA.checked = false
+      }
+    }
+    if (radioB) {
+      radioB.value = vb || ''
+      if (vb) {
+        radioB.disabled = false
+      } else {
+        radioB.disabled = true
+        if (radioB.checked) radioB.checked = false
+      }
+    }
+
+    if (cardA) {
+      if (va) cardA.classList.remove('p-vencedor-card--disabled')
+      else cardA.classList.add('p-vencedor-card--disabled')
+    }
+    if (cardB) {
+      if (vb) cardB.classList.remove('p-vencedor-card--disabled')
+      else cardB.classList.add('p-vencedor-card--disabled')
+    }
+
+    // Evita mesmo jogador
+    const optsA = Array.from(a.options)
+    const optsB = Array.from(b.options)
+    optsB.forEach((o) => {
+      if (!o.value) return
+      o.disabled = o.value === va
     })
-    if (v.value && !ids.includes(v.value)) {
-      v.value = ''
-    }
-    if (ids.length === 2 && v.value === '') {
-      v.value = ids[0]
-    }
-  }
-
-  function ajustarOutro(mudou, outro) {
-    opcoes(outro).forEach((o) => {
-      o.disabled = o.value === mudou.value
+    optsA.forEach((o) => {
+      if (!o.value) return
+      o.disabled = o.value === vb
     })
-    if (outro.value && outro.value === mudou.value) {
-      outro.value = ''
+    if (b.value && b.value === va) b.value = ''
+    if (a.value && a.value === vb) a.value = ''
+
+    if (aviso) {
+      if (va && vb) {
+        aviso.textContent = 'Toque no nome do vencedor para selecioná-lo.'
+      } else {
+        aviso.textContent = 'Selecione os dois jogadores para definir o vencedor.'
+      }
     }
-    ajustarVencedor()
+
+    // Se vencedor já marcado não pertence aos selecionados, limpa
+    if (radioA && radioA.checked && va && radioA.value !== va) radioA.checked = false
+    if (radioB && radioB.checked && vb && radioB.value !== vb) radioB.checked = false
   }
 
-  a.addEventListener('change', () => ajustarOutro(a, b))
-  b.addEventListener('change', () => ajustarOutro(b, a))
-  ajustarVencedor()
+  a.addEventListener('change', atualizar)
+  b.addEventListener('change', atualizar)
+  atualizar()
 })()
 </script>
 

@@ -43,6 +43,16 @@ const JogadorService = {
     return jogador
   },
 
+  // Garante que o jogador pertence ao evento da URL: quem administra um evento
+  // não pode alterar jogadores de outro trocando o id no endereço.
+  obterDoEvento(eventoId, id) {
+    const jogador = JogadorRepository.obterPorId(id)
+    if (!jogador || jogador.evento_id !== Number(eventoId)) {
+      throw new JogadorNaoEncontradoError()
+    }
+    return jogador
+  },
+
   criar({ evento_id, nome, apelido, telefone }) {
     const evento = EventoService.obter(evento_id)
     if (evento.status === 'encerrado') {

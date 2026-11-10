@@ -1,0 +1,28 @@
+<%
+  // Card de evento usado na página inicial e na listagem de eventos.
+  // Espera: e (evento com total_jogadores/total_partidas)
+  var badgeEvento = e.status === 'em_andamento' ? 'p-badge--andamento' : (e.status === 'planejado' ? 'p-badge--planejado' : 'p-badge--encerrado')
+  var rotuloEvento = e.status === 'em_andamento' ? 'Em andamento' : (e.status === 'planejado' ? 'Planejado' : 'Encerrado')
+%>
+<a href="/eventos/<%= e.id %>" class="p-event-card"
+   data-busca="<%= String(e.nome).toLowerCase() %>" data-status="<%= e.status %>">
+  <div class="p-event-card__icon" aria-hidden="true">🎱</div>
+  <div class="p-event-card__main">
+    <div class="p-event-card__name"><%= e.nome %></div>
+    <div class="p-event-card__dates">
+      <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+      <%= formatarPeriodo(e.data_inicio, e.data_fim) %>
+    </div>
+    <div class="p-event-card__meta">
+      <span class="p-badge <%= badgeEvento %>"><%= rotuloEvento %></span>
+      <% if (typeof e.total_jogadores !== 'undefined') { %>
+        <span class="p-meta"><%= e.total_jogadores %> jogador<%= e.total_jogadores === 1 ? '' : 'es' %></span>
+        <span class="p-meta"><%= e.total_partidas %> partida<%= e.total_partidas === 1 ? '' : 's' %></span>
+      <% } %>
+      <% if (podeEditarEvento(e.id)) { %>
+        <span class="p-tag-admin" title="Você pode administrar este evento">Admin</span>
+      <% } %>
+    </div>
+  </div>
+  <svg class="p-icon p-event-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+</a>

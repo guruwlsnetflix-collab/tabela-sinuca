@@ -54,6 +54,11 @@ Detalhes das regras em [docs/TORNEIOS.md](docs/TORNEIOS.md).
 | Organizador do torneio | Senha definida no torneio   | Editar aquele torneio              |
 | Administrador          | `SENHA_MAESTRA` do servidor | Editar todos os eventos e torneios |
 
+- Qualquer pessoa pode criar um evento ou torneio; quem cria já sai administrando naquele aparelho.
+- Em outro aparelho, o botão **Administrar** da página do evento/torneio pede a senha dele (ou a mestra).
+- Um mesmo aparelho pode administrar vários eventos e torneios ao mesmo tempo; **Sair** encerra todos.
+- Cada alteração confere se o jogador/partida pertence ao evento ou torneio da URL.
+
 <p align="center">
   <img src="docs/img/evento.png" alt="Página de um evento com resumo, ranking e financeiro" width="49%">
   <img src="docs/img/login.png" alt="Tela de login da área do organizador" width="49%">

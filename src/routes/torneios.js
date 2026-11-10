@@ -3,10 +3,22 @@ const { validationResult } = require('express-validator')
 
 const router = express.Router()
 
+const AuthService = require('../services/authService')
 const TorneioService = require('../services/torneioService')
 const torneioValidators = require('../validators/torneioValidator')
 const { exigirTorneio } = require('../middleware/auth')
 const { renderErro } = require('../middleware/erros')
+
+// O jogador da URL precisa pertencer ao torneio da URL: impede que quem
+// administra um torneio altere jogadores de outro trocando o id no endereço
+router.param('jogadorId', (req, res, next, jogadorId) => {
+  try {
+    TorneioService.obterJogador(Number(req.params.id), Number(jogadorId))
+    next()
+  } catch (err) {
+    renderErro(res, err)
+  }
+})
 
 function alvoConfronto(torneioId, confrontoId) {
   try {
@@ -41,14 +53,17 @@ function renderForm(res, { torneio, erros, modoEdicao }) {
   })
 }
 
-function renderJogadorForm(res, { torneio, jogador, erros }) {
+function renderJogadorForm(res, { torneio, jogador, erros, msg }) {
   const editando = Boolean(jogador && jogador.id)
   const status = erros ? 400 : 200
   res.status(status).render('pages/torneios/jogadorForm', {
     title: editando ? 'Editar jogador' : 'Novo jogador',
     torneio,
     jogador: jogador || { nome: '', apelido: '', telefone: '' },
-    erros
+    totalJogadores: TorneioService.contarJogadores(torneio.id),
+    tamanhoChave: TorneioService.TAMANHO_CHAVE,
+    erros,
+    msg: msg || null
   })
 }
 
@@ -78,7 +93,10 @@ function renderDetalhe(res, torneioId, extra) {
 // ---------------- Listagem e formulários do torneio ----------------
 
 router.get('/torneios', (req, res) => {
-  const torneios = TorneioService.listar()
+  const torneios = TorneioService.listar().map((t) => ({
+    ...t,
+    total_jogadores: TorneioService.contarJogadores(t.id)
+  }))
   res.render('pages/torneios/index', {
     title: 'Torneios',
     torneios,
@@ -103,8 +121,10 @@ router.post('/torneios', torneioValidators.criar, (req, res) => {
       modalidade: req.body.modalidade || 'par',
       numero_mesas: Number(req.body.numero_mesas) || 1
     })
+    // Quem cria já sai administrando; a senha serve para outros aparelhos
+    AuthService.definirSessao(req, res, { torneios: [torneio.id] })
     res.redirect(
-      `/torneios/${torneio.id}?msg=${encodeURIComponent('Torneio criado. Informe a senha definida para editar os dados.')}`
+      `/torneios/${torneio.id}?msg=${encodeURIComponent('Torneio criado! Você já está administrando. Guarde a senha para acessar de outros aparelhos.')}`
     )
   } catch (err) {
     renderForm(res, {
@@ -173,7 +193,7 @@ router.post('/torneios/:id/cancelar', exigirTorneio, (req, res) => {
 router.post('/torneios/:id/excluir', exigirTorneio, (req, res) => {
   try {
     TorneioService.excluir(Number(req.params.id))
-    res.redirect('/torneios?msg=Torneio excluído.')
+    res.redirect('/torneios?msg=' + encodeURIComponent('Torneio excluído.'))
   } catch (err) {
     res.redirect(`/torneios/${req.params.id}?erro=${encodeURIComponent(err.message)}`)
   }
@@ -204,7 +224,7 @@ router.post('/torneios/:id/iniciar', exigirTorneio, (req, res) => {
 router.get('/torneios/:id/jogadores/novo', exigirTorneio, (req, res) => {
   try {
     const torneio = TorneioService.obter(Number(req.params.id))
-    renderJogadorForm(res, { torneio, jogador: null, erros: null })
+    renderJogadorForm(res, { torneio, jogador: null, erros: null, msg: req.query.msg })
   } catch (err) {
     renderErro(res, err)
   }
@@ -218,8 +238,16 @@ router.post('/torneios/:id/jogadores', exigirTorneio, torneioValidators.jogador,
     return renderJogadorForm(res, { torneio, jogador: req.body, erros })
   }
   try {
-    TorneioService.cadastrarJogador({ ...req.body, torneio_id: torneioId })
-    res.redirect(`/torneios/${torneioId}?msg=Jogador cadastrado com sucesso.`)
+    const jogador = TorneioService.cadastrarJogador({ ...req.body, torneio_id: torneioId })
+    const total = TorneioService.contarJogadores(torneioId)
+    const faltam = TorneioService.TAMANHO_CHAVE - total
+    if (faltam > 0) {
+      // Cadastro em sequência: volta ao formulário vazio para o próximo jogador
+      const msg = `${jogador.nome} cadastrado (${total}/${TorneioService.TAMANHO_CHAVE}). Faltam ${faltam}.`
+      return res.redirect(`/torneios/${torneioId}/jogadores/novo?msg=${encodeURIComponent(msg)}`)
+    }
+    const msg = 'Todos os jogadores cadastrados. Pronto para o sorteio!'
+    res.redirect(`/torneios/${torneioId}?msg=${encodeURIComponent(msg)}`)
   } catch (err) {
     renderJogadorForm(res, { torneio, jogador: req.body, erros: { geral: err.message } })
   }
@@ -228,12 +256,7 @@ router.post('/torneios/:id/jogadores', exigirTorneio, torneioValidators.jogador,
 router.get('/torneios/:id/jogadores/:jogadorId/editar', exigirTorneio, (req, res) => {
   try {
     const torneio = TorneioService.obter(Number(req.params.id))
-    const jogador = TorneioService.listarJogadores(torneio.id).find(
-      (j) => j.id === Number(req.params.jogadorId)
-    )
-    if (!jogador) {
-      throw Object.assign(new Error('Jogador não encontrado.'), { status: 404 })
-    }
+    const jogador = TorneioService.obterJogador(torneio.id, Number(req.params.jogadorId))
     renderJogadorForm(res, { torneio, jogador, erros: null })
   } catch (err) {
     renderErro(res, err)
