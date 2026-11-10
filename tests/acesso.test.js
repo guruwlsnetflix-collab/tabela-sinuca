@@ -239,4 +239,18 @@ describe('Páginas públicas', () => {
     expect(res.text).toContain('class="p-campeao')
     expect(res.text).not.toContain('&lt;div')
   })
+
+  it('painel da TV escapa o nome do campeão (sem injeção de HTML)', async () => {
+    const torneio = TorneioService.criar({ nome: 'TV', data_inicio: '2026-09-01', senha: 'senha-tv-1' })
+    const jogador = TorneioService.cadastrarJogador({
+      torneio_id: torneio.id,
+      nome: '<img src=x onerror=alert(1)>'
+    })
+    TorneioRepository.definirVencedor(torneio.id, jogador.id)
+    const res = await request(app).get(`/torneios/${torneio.id}/painel`)
+    expect(res.status).toBe(200)
+    expect(res.text).not.toContain('<img src=x')
+    expect(res.text).toContain('&lt;img src=x')
+    expect(res.text).toContain('TORNEIO ENCERRADO')
+  })
 })

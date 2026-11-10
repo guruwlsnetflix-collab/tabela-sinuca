@@ -189,6 +189,9 @@ body.painel {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  /* Acima do SVG das linhas da chave: conectores nunca passam sobre o texto */
+  position: relative;
+  z-index: 2;
 }
 
 .painel-coluna__titulo {
@@ -340,6 +343,8 @@ body.painel {
 }
 
 .painel-nome {
+  flex: 1;
+  min-width: 0;
   font-size: clamp(13px, 2.2vh, 26px);
   font-weight: 700;
   white-space: nowrap;
@@ -375,35 +380,26 @@ body.painel {
   color: var(--painel-texto-fraco);
 }
 
-.painel-classificado {
-  position: absolute;
-  top: 8px;
-  z-index: 2;
-  font-size: clamp(9px, 1.5vh, 15px);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--painel-ok);
-  background: rgba(47, 209, 111, 0.12);
-  border: 1px solid rgba(47, 209, 111, 0.5);
-  padding: 2px 10px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  white-space: nowrap;
+/* Marca do vencedor (✓ classificado / 🏆 campeão), na linha do nome */
+.painel-marca {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+  font-size: clamp(10px, 1.6vh, 18px);
+  font-weight: 900;
+  line-height: 1;
+  color: #04170c;
+  background: var(--painel-ok);
+  box-shadow: 0 0 12px rgba(47, 209, 111, 0.45);
 }
 
-.painel-classificado--dir {
-  right: 10px;
-}
-
-.painel-classificado--esq {
-  left: 10px;
-  right: auto;
-}
-
-.painel-classificado--campeao {
-  color: var(--painel-ouro);
-  border-color: rgba(255, 215, 94, 0.55);
-  background: rgba(255, 215, 94, 0.14);
+.painel-marca--campeao {
+  background: rgba(255, 215, 94, 0.18);
+  box-shadow: 0 0 14px rgba(255, 215, 94, 0.5);
 }
 
 .painel-conf-num {
@@ -438,13 +434,75 @@ body.painel {
   font-weight: 600;
 }
 
-/* Telas menores (não-TV): permitir rolagem discreta */
-@media (max-width: 1500px) and (min-width: 1101px) {
-  .painel-chave {
-    grid-template-columns: repeat(2, 1fr);
+/* Chave em 4 colunas (telas largas e modo telão): jogadores empilhados no
+   card, como em chaveamento tradicional, para os nomes usarem a largura toda */
+@media (min-width: 1101px) {
+  .painel-jogo,
+  .painel-definir {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .painel-anda {
+    display: none;
+  }
+  /* Faixas AO VIVO/PRÓXIMO dentro do card, sem cobrir os nomes */
+  .painel-confronto {
+    gap: 3px;
+    padding: 6px 12px;
+  }
+  .painel-vivo,
+  .painel-proximo {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    padding: 2px 10px;
+    font-size: clamp(9px, 1.3vh, 15px);
+  }
+  .painel-vivo {
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .painel-vivo__conf {
+    display: none;
+  }
+  .painel-vivo__partida {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* O card ao vivo cresce o necessário (faixa + 2 jogadores), centrado na vaga */
+  .painel-coluna__jogos .painel-confronto--vivo {
+    transform: none;
+    align-self: center;
+    height: auto;
+    min-height: 100%;
+  }
+  .painel-jogo .painel-jogador + .painel-anda + .painel-jogador,
+  .painel-definir .painel-jogador + .painel-anda + .painel-jogador {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 2px;
   }
 }
 
+@media (min-width: 901px) {
+  body.painel--telao .painel-jogo,
+  body.painel--telao .painel-definir {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  body.painel--telao .painel-anda {
+    display: none;
+  }
+  body.painel--telao .painel-jogo .painel-jogador + .painel-anda + .painel-jogador,
+  body.painel--telao .painel-definir .painel-jogador + .painel-anda + .painel-jogador {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 2px;
+  }
+}
+
+/* Telas menores (não-TV): permitir rolagem discreta */
 @media (max-width: 1100px) {
   body.painel {
     overflow: auto;
@@ -534,20 +592,6 @@ body.painel--telao .painel-vivo__partida {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-body.painel--telao .painel-classificado {
-  position: relative;
-  top: auto;
-  right: auto;
-  left: auto;
-  align-self: flex-end;
-  padding: 2px 8px;
-  font-size: clamp(9px, 1.3vh, 14px);
-}
-
-body.painel--telao .painel-classificado--esq {
-  align-self: flex-start;
 }
 
 body.painel--telao .painel-placar {

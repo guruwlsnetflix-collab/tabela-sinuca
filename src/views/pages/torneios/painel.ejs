@@ -42,9 +42,9 @@
       </div>
     </div>
     <div class="painel-fase">
-      <span class="painel-fase__label">FASE ATUAL</span>
+      <span class="painel-fase__label"><%= fin ? 'TORNEIO ENCERRADO' : 'FASE ATUAL' %></span>
       <span class="painel-fase__value">
-        <%- fin ? '🏆 ' + t.vencedor_nome : (faseAtual ? faseAtual.label : 'Aguardando início') %>
+        <%= fin ? '🏆 ' + t.vencedor_nome : (faseAtual ? faseAtual.label : 'Aguardando início') %>
       </span>
     </div>
   </header>
@@ -98,13 +98,14 @@
                   </div>
                 </div>
               <% } else { %>
-                <% if (c.status === 'finalizado') { %>
-                  <span class="painel-classificado <%= c.numero === 15 ? 'painel-classificado--campeao' : '' %> <%= vencedorA ? 'painel-classificado--esq' : 'painel-classificado--dir' %>">
-                    <%= c.numero === 15 ? '🏆 CAMPEÃO' : 'CLASSIFICADO' %>
-                  </span>
-                <% } %>
+                <%
+                  // Marca do vencedor fica na mesma linha do nome (não sobrepõe o texto)
+                  var marca = c.numero === 15 ? '🏆' : '✓'
+                  var tituloMarca = c.numero === 15 ? 'Campeão' : 'Classificado'
+                %>
                 <div class="painel-jogo">
                   <div class="painel-jogador <%= vencedorA ? 'painel-jogador--vencedor' : '' %>">
+                    <% if (vencedorA) { %><span class="painel-marca <%= c.numero === 15 ? 'painel-marca--campeao' : '' %>" title="<%= tituloMarca %>"><%= marca %></span><% } %>
                     <span class="painel-nome"><%= c.jogador_a_nome || '—' %></span>
                     <span class="painel-placar"><%= c.placar_a %></span>
                   </div>
@@ -113,6 +114,7 @@
                     <span class="painel-conf-num">C<%= c.numero %></span>
                   </div>
                   <div class="painel-jogador <%= vencedorB ? 'painel-jogador--vencedor' : '' %>">
+                    <% if (vencedorB) { %><span class="painel-marca <%= c.numero === 15 ? 'painel-marca--campeao' : '' %>" title="<%= tituloMarca %>"><%= marca %></span><% } %>
                     <span class="painel-nome"><%= c.jogador_b_nome || '—' %></span>
                     <span class="painel-placar"><%= c.placar_b %></span>
                   </div>
@@ -199,6 +201,11 @@
           var A = ponto(p.a, 'd')
           var B = ponto(p.b, 'd')
           var C = ponto(p.c, 'e')
+          // Em telas médias a chave quebra em 2 linhas de 2 colunas: só liga
+          // fases que ficaram lado a lado (destino à direita e entre as origens)
+          var alto = Math.min(A.y, B.y)
+          var baixo = Math.max(A.y, B.y)
+          if (C.x <= Math.max(A.x, B.x) || C.y < alto || C.y > baixo) continue
           var ex = (A.x + C.x) / 2
           d.push('M ' + A.x + ' ' + A.y + ' H ' + ex + ' V ' + B.y + ' H ' + B.x)
           d.push('M ' + ex + ' ' + C.y + ' H ' + C.x)
