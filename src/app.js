@@ -28,6 +28,8 @@ if (config.trustProxy) app.set('trust proxy', 1)
 
 app.locals.appNome = config.appNome
 app.locals.appVersao = config.appVersao
+// Muda a cada reinício (publicação): força o navegador/TV a baixar CSS/JS novos apesar do cache de 7 dias
+app.locals.versaoAssets = Date.now().toString(36)
 Object.assign(app.locals, formatacao)
 
 app.use(cabecalhos)

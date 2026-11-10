@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/painel.css">
+  <link rel="stylesheet" href="/css/painel.css?v=<%= versaoAssets %>">
 </head>
-<body class="painel <%= telaFirestick ? 'painel--telao' : '' %>">
+<body data-versao="<%= versaoAssets %>" class="painel <%= telaFirestick ? 'painel--telao' : '' %>">
   <div id="painel-alvo">
   <%
     var t = estado.torneio
@@ -244,6 +244,11 @@
       xhr.onload = function () {
         if (xhr.status !== 200) return
         var doc = new DOMParser().parseFromString(xhr.responseText, 'text/html')
+        // Nova versão publicada: recarrega a página inteira para pegar o CSS/JS novos
+        if (doc.body && doc.body.getAttribute('data-versao') !== document.body.getAttribute('data-versao')) {
+          window.location.reload()
+          return
+        }
         var alvo = document.getElementById('painel-alvo')
         var novo = doc.getElementById('painel-alvo')
         if (alvo && novo) {
